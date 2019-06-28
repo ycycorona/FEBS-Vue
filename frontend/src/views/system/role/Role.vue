@@ -43,14 +43,16 @@
         </a-dropdown>
       </div>
       <!-- 表格区域 -->
-      <a-table ref="TableInfo"
-               :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-               :scroll="{ x: 900 }"
-               @change="handleTableChange">
+      <a-table
+        ref="TableInfo"
+        :rowKey="record => record.roleId"
+        :columns="columns"
+        :dataSource="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :scroll="{ x: 900 }"
+        @change="handleTableChange">
         <template slot="remark" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
