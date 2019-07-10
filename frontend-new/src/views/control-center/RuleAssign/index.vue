@@ -13,7 +13,7 @@ export default {
   props: {
 
   },
-  components: { Sub },
+  components: {Sub},
   render (h) {
     return h('Sub', {
       scopedSlots: {

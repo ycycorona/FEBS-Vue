@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 import {message, Modal, notification} from 'ant-design-vue'
 import moment from 'moment'
 import store from '../store'
@@ -7,7 +8,7 @@ moment.locale('zh-cn')
 
 // 统一配置
 let FEBS_REQUEST = axios.create({
-  baseURL: 'http://127.0.0.1:9527/',
+  baseURL: '/',
   responseType: 'json',
   validateStatus (status) {
     // 200 外的状态码都认定为失败
@@ -81,74 +82,34 @@ const request = {
   post (url, params) {
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
-        let result = ''
-        Object.keys(params).forEach((key) => {
-          if (!Object.is(params[key], undefined) && !Object.is(params[key], null)) {
-            result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
-          }
-        })
-        return result
+        return qs.stringify(params)
       }],
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     })
   },
-  put (url, params) {
+  put (url, params = {}) {
     return FEBS_REQUEST.put(url, params, {
       transformRequest: [(params) => {
-        let result = ''
-        Object.keys(params).forEach((key) => {
-          if (!Object.is(params[key], undefined) && !Object.is(params[key], null)) {
-            result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
-          }
-        })
-        return result
+        return qs.stringify(params)
       }],
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     })
   },
-  get (url, params) {
-    let _params
-    if (Object.is(params, undefined)) {
-      _params = ''
-    } else {
-      _params = '?'
-      for (let key in params) {
-        if (params.hasOwnProperty(key) && params[key] !== null) {
-          _params += `${key}=${params[key]}&`
-        }
-      }
-    }
-    return FEBS_REQUEST.get(`${url}${_params}`)
+  get (url, params = {}) {
+    return FEBS_REQUEST.get(url, {params})
   },
-  delete (url, params) {
-    let _params
-    if (Object.is(params, undefined)) {
-      _params = ''
-    } else {
-      _params = '?'
-      for (let key in params) {
-        if (params.hasOwnProperty(key) && params[key] !== null) {
-          _params += `${key}=${params[key]}&`
-        }
-      }
-    }
-    return FEBS_REQUEST.delete(`${url}${_params}`)
+  delete (url, params = {}) {
+    return FEBS_REQUEST.delete(url, {params})
   },
   export (url, params = {}) {
     message.loading('导出数据中')
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
-        let result = ''
-        Object.keys(params).forEach((key) => {
-          if (!Object.is(params[key], undefined) && !Object.is(params[key], null)) {
-            result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
-          }
-        })
-        return result
+        return qs.stringify(params)
       }],
       responseType: 'blob'
     }).then((r) => {
@@ -176,13 +137,7 @@ const request = {
     message.loading('文件传输中')
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
-        let result = ''
-        Object.keys(params).forEach((key) => {
-          if (!Object.is(params[key], undefined) && !Object.is(params[key], null)) {
-            result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
-          }
-        })
-        return result
+        return qs.stringify(params)
       }],
       responseType: 'blob'
     }).then((r) => {

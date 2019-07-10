@@ -7,6 +7,9 @@ import request from 'utils/request'
 import db from 'utils/localstorage'
 import VueApexCharts from 'vue-apexcharts'
 
+// mock
+import './mock'
+
 import 'ant-design-vue/dist/antd.css'
 
 import 'utils/install'

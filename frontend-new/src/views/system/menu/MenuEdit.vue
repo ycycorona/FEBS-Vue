@@ -90,8 +90,8 @@
 <script>
 import Icons from './Icons'
 const formItemLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 18 }
+  labelCol: {span: 3},
+  wrapperCol: {span: 18}
 }
 export default {
   name: 'MenuEdit',

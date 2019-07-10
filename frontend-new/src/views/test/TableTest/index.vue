@@ -1,0 +1,120 @@
+<template>
+  <!-- :title="() => 'testTableTitle'" -->
+  <a-table
+    class="test-table"
+    :columns="columns"
+    :rowSelection="rowSelection"
+
+    :bordered="true"
+    :rowKey="record => record.login.uuid"
+    :dataSource="data"
+    :pagination="pagination"
+    :loading="loading"
+    @change="handleTableChange">
+    <template slot="name" slot-scope="text">
+      {{text.first}} {{text.last}}
+    </template>
+    <template slot="gender" slot-scope="gender">
+      {{gender}}
+    </template>
+    <template slot="action" slot-scope="record">
+      {{record.login.uuid}}
+    </template>
+  </a-table>
+</template>
+
+<script>
+const columns = [{
+  title: 'Name',
+  dataIndex: 'name',
+  sorter: true,
+  width: '20%',
+  scopedSlots: {customRender: 'name'}
+}, {
+  title: 'Gender',
+  dataIndex: 'gender',
+  scopedSlots: {customRender: 'gender'},
+  // filters: [
+  //   {text: 'Male', value: 'male'},
+  //   {text: 'Female', value: 'female'}
+  // ],
+  width: '20%'
+}, {
+  title: 'Email',
+  dataIndex: 'email'
+}, {
+  title: '操作',
+  // key: 'action',
+  scopedSlots: {customRender: 'action'}
+}]
+
+export default {
+  name: 'TableTest',
+  props: {},
+  components: {},
+  created () {
+    this.fetch()
+  },
+  data () {
+    const selectedRowKeys = []
+    return {
+      rowSelection: {
+        onChange (selectedRowKeys, selectedRows) {
+          console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+          this.selectedRowKeys = selectedRowKeys
+        },
+        onSelect: (record, selected, selectedRows) => {
+          console.log(record, selected, selectedRows)
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+          console.log(selected, selectedRows, changeRows)
+        },
+        selectedRowKeys: selectedRowKeys
+      },
+      selectedRowKeys: selectedRowKeys,
+      columns,
+      data: [],
+      pagination: {},
+      loading: false
+    }
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    handleTableChange (pagination, filters, sorter) {
+      const pager = {...this.pagination}
+      pager.current = pagination.current
+      this.pagination = pager
+      this.fetch({
+        results: pagination.pageSize,
+        page: pagination.current,
+        sortField: sorter.field,
+        sortOrder: sorter.order,
+        ...filters
+      })
+    },
+    fetch (params = {}) {
+      console.log('params:', params)
+      this.loading = true
+      this.$get('https://randomuser.me/api', {
+        results: 10,
+        ...params
+      }).then(({data}) => {
+        const pagination = {...this.pagination}
+        // Read total count from server
+        // pagination.total = data.totalCount;
+        pagination.total = 200
+        this.loading = false
+        this.data = data.results
+        this.pagination = pagination
+      })
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.test-table {
+  width: 100%
+}
+</style>

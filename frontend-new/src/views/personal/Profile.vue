@@ -37,13 +37,13 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 import UpdateAvatar from './UpdateAvatar'
 import UpdateProfile from './UpdateProfile'
 
 export default {
   name: 'Profile',
-  components: { UpdateAvatar, UpdateProfile },
+  components: {UpdateAvatar, UpdateProfile},
   data () {
     return {
       updateAvatarModelVisible: false,

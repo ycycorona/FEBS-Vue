@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 
 export default {
   name: 'Online',
@@ -69,7 +69,7 @@ export default {
       return [{
         title: '用户名',
         dataIndex: 'username',
-        scopedSlots: { customRender: 'username' }
+        scopedSlots: {customRender: 'username'}
       }, {
         title: '登录时间',
         dataIndex: 'loginTime'
@@ -82,7 +82,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: { customRender: 'operation' },
+        scopedSlots: {customRender: 'operation'},
         fixed: 'right',
         width: 120
       }]

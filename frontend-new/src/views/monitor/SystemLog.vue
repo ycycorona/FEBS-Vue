@@ -94,7 +94,7 @@ import RangeDate from '@/components/datetime/RangeDate'
 
 export default {
   name: 'SystemLog',
-  components: { RangeDate },
+  components: {RangeDate},
   data () {
     return {
       advanced: false,
@@ -116,7 +116,7 @@ export default {
   },
   computed: {
     columns () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       sortedInfo = sortedInfo || {}
       return [{
         title: '操作人',
@@ -143,11 +143,11 @@ export default {
       }, {
         title: '执行方法',
         dataIndex: 'method',
-        scopedSlots: { customRender: 'method' }
+        scopedSlots: {customRender: 'method'}
       }, {
         title: '方法参数',
         dataIndex: 'params',
-        scopedSlots: { customRender: 'params' },
+        scopedSlots: {customRender: 'params'},
         width: 100
       }, {
         title: 'IP地址',
@@ -211,7 +211,7 @@ export default {
       })
     },
     exprotExccel () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -225,7 +225,7 @@ export default {
       })
     },
     search () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -285,7 +285,7 @@ export default {
         ...params
       }).then((r) => {
         let data = r.data
-        const pagination = { ...this.pagination }
+        const pagination = {...this.pagination}
         pagination.total = data.total
         this.loading = false
         this.dataSource = data.rows

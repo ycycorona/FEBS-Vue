@@ -79,7 +79,7 @@ import DeptEdit from './DeptEdit'
 
 export default {
   name: 'Dept',
-  components: { DeptAdd, DeptEdit, RangeDate },
+  components: {DeptAdd, DeptEdit, RangeDate},
   data () {
     return {
       advanced: false,
@@ -99,7 +99,7 @@ export default {
   },
   computed: {
     columns () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       sortedInfo = sortedInfo || {}
       return [{
         title: '名称',
@@ -120,7 +120,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: { customRender: 'operation' },
+        scopedSlots: {customRender: 'operation'},
         fixed: 'right',
         width: 120
       }]
@@ -185,7 +185,7 @@ export default {
       })
     },
     exportExcel () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -199,7 +199,7 @@ export default {
       })
     },
     search () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {

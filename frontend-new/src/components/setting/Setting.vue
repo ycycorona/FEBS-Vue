@@ -47,8 +47,8 @@ import SettingItem from './SettingItem'
 import StyleItem from './StyleItem'
 import ColorCheckbox from '../checkbox/ColorCheckbox'
 import ImgCheckbox from '../checkbox/ImgCheckbox'
-import { updateTheme } from 'utils/color'
-import { mapState, mapMutations } from 'vuex'
+import {updateTheme} from 'utils/color'
+import {mapState, mapMutations} from 'vuex'
 
 const ColorCheckboxGroup = ColorCheckbox.Group
 const ImgCheckboxGroup = ImgCheckbox.Group
@@ -84,7 +84,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations({ setSettingBar: 'setting/setSettingBar' }),
+    ...mapMutations({setSettingBar: 'setting/setSettingBar'}),
     onColorChange (values, colors) {
       if (colors.length > 0) {
         updateTheme(colors)

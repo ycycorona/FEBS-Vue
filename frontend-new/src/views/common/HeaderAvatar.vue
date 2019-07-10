@@ -37,12 +37,12 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 import UpdatePassword from '../personal/UpdatePassword'
 
 export default {
   name: 'HeaderAvatar',
-  components: { UpdatePassword },
+  components: {UpdatePassword},
   data () {
     return {
       updatePasswordModelVisible: false
@@ -87,7 +87,7 @@ export default {
         this.$message.error('退出系统失败')
       })
     },
-    ...mapMutations({ setSettingBar: 'setting/setSettingBar' })
+    ...mapMutations({setSettingBar: 'setting/setSettingBar'})
   }
 }
 </script>

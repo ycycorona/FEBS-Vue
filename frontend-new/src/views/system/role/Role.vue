@@ -99,7 +99,7 @@ import RoleEdit from './RoleEdit'
 
 export default {
   name: 'Role',
-  components: { RangeDate, RoleInfo, RoleAdd, RoleEdit },
+  components: {RangeDate, RoleInfo, RoleAdd, RoleEdit},
   data () {
     return {
       advanced: false,
@@ -134,7 +134,7 @@ export default {
   },
   computed: {
     columns () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       sortedInfo = sortedInfo || {}
       return [{
         title: '角色',
@@ -142,7 +142,7 @@ export default {
       }, {
         title: '描述',
         dataIndex: 'remark',
-        scopedSlots: { customRender: 'remark' },
+        scopedSlots: {customRender: 'remark'},
         width: 350
       }, {
         title: '创建时间',
@@ -157,7 +157,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: { customRender: 'operation' }
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -232,7 +232,7 @@ export default {
       })
     },
     exprotExccel () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -246,7 +246,7 @@ export default {
       })
     },
     search () {
-      let { sortedInfo } = this
+      let {sortedInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -303,7 +303,7 @@ export default {
         ...params
       }).then((r) => {
         let data = r.data
-        const pagination = { ...this.pagination }
+        const pagination = {...this.pagination}
         pagination.total = data.total
         this.dataSource = data.rows
         this.pagination = pagination

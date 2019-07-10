@@ -105,7 +105,7 @@ import ButtonEdit from './ButtonEdit'
 
 export default {
   name: 'Menu',
-  components: { ButtonAdd, ButtonEdit, RangeDate, MenuAdd, MenuEdit },
+  components: {ButtonAdd, ButtonEdit, RangeDate, MenuAdd, MenuEdit},
   data () {
     return {
       advanced: false,
@@ -128,7 +128,7 @@ export default {
   },
   computed: {
     columns () {
-      let { filteredInfo } = this
+      let {filteredInfo} = this
       filteredInfo = filteredInfo || {}
       return [{
         title: '名称',
@@ -138,7 +138,7 @@ export default {
       }, {
         title: '图标',
         dataIndex: 'icon',
-        scopedSlots: { customRender: 'icon' }
+        scopedSlots: {customRender: 'icon'}
       }, {
         title: '类型',
         dataIndex: 'type',
@@ -153,8 +153,8 @@ export default {
           }
         },
         filters: [
-          { text: '按钮', value: '1' },
-          { text: '菜单', value: '0' }
+          {text: '按钮', value: '1'},
+          {text: '菜单', value: '0'}
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.type || null,
@@ -181,7 +181,7 @@ export default {
         title: '操作',
         dataIndex: 'operation',
         width: 120,
-        scopedSlots: { customRender: 'operation' },
+        scopedSlots: {customRender: 'operation'},
         fixed: 'right'
       }]
     }
@@ -269,14 +269,14 @@ export default {
       })
     },
     exprotExccel () {
-      let { filteredInfo } = this
+      let {filteredInfo} = this
       this.$export('menu/excel', {
         ...this.queryParams,
         ...filteredInfo
       })
     },
     search () {
-      let { filteredInfo } = this
+      let {filteredInfo} = this
       this.fetch({
         ...this.queryParams,
         ...filteredInfo

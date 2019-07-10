@@ -56,8 +56,8 @@
 </template>
 <script>
 const formItemLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 18 }
+  labelCol: {span: 3},
+  wrapperCol: {span: 18}
 }
 export default {
   name: 'ButtonEdit',

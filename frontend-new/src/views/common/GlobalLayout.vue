@@ -25,8 +25,8 @@ import GlobalFooter from './GlobalFooter'
 import Drawer from '~/tool/Drawer'
 import SiderMenu from '~/menu/SiderMenu'
 import Setting from '~/setting/Setting'
-import { mapState, mapMutations } from 'vuex'
-import { triggerWindowResizeEvent } from 'utils/common'
+import {mapState, mapMutations} from 'vuex'
+import {triggerWindowResizeEvent} from 'utils/common'
 
 const minHeight = window.innerHeight - 64 - 24 - 66
 

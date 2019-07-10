@@ -68,8 +68,8 @@
 import {mapState, mapMutations} from 'vuex'
 
 const formItemLayout = {
-  labelCol: { span: 3 },
-  wrapperCol: { span: 18 }
+  labelCol: {span: 3},
+  wrapperCol: {span: 18}
 }
 export default {
   props: {

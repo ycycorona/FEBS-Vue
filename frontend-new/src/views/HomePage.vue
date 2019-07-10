@@ -126,13 +126,13 @@
 </template>
 <script>
 import HeadInfo from '@/views/common/HeadInfo'
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'HomePage',
-  components: { HeadInfo },
+  components: {HeadInfo},
   data () {
     return {
       series: [],

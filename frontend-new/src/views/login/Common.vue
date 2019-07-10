@@ -21,7 +21,7 @@ import Regist from './Regist'
 
 export default {
   name: 'Common',
-  components: { GlobalFooter, Login, Regist },
+  components: {GlobalFooter, Login, Regist},
   data () {
     return {
       componentName: 'Login'

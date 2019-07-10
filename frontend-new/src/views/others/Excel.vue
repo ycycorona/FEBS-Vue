@@ -50,7 +50,7 @@
 import ImportResult from './ImportResult'
 
 export default {
-  components: { ImportResult },
+  components: {ImportResult},
   data () {
     return {
       fileList: [],
@@ -117,7 +117,7 @@ export default {
       return false
     },
     handleUpload () {
-      const { fileList } = this
+      const {fileList} = this
       const formData = new FormData()
       formData.append('file', fileList[0])
       this.uploading = true
@@ -157,7 +157,7 @@ export default {
         ...params
       }).then((r) => {
         let data = r.data
-        const pagination = { ...this.pagination }
+        const pagination = {...this.pagination}
         pagination.total = data.total
         this.loading = false
         this.dataSource = data.rows

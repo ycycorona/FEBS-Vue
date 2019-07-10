@@ -67,10 +67,10 @@ export default {
           }
         },
         filters: [
-          { text: 'GET', value: 'GET' },
-          { text: 'POST', value: 'POST' },
-          { text: 'PUT', value: 'PUT' },
-          { text: 'DELETE', value: 'DELETE' }
+          {text: 'GET', value: 'GET'},
+          {text: 'POST', value: 'POST'},
+          {text: 'PUT', value: 'PUT'},
+          {text: 'DELETE', value: 'DELETE'}
         ],
         filterMultiple: true,
         onFilter: (value, record) => record.request.method.includes(value)

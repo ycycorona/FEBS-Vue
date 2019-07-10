@@ -17,11 +17,11 @@
 
 <script>
 import IMenu from './menu'
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 
 export default {
   name: 'SiderMenu',
-  components: { IMenu },
+  components: {IMenu},
   props: {
     collapsible: {
       type: Boolean,

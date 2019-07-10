@@ -55,8 +55,8 @@
 </template>
 <script>
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 18 }
+  labelCol: {span: 4},
+  wrapperCol: {span: 18}
 }
 const levelNames = {
   0: '低',

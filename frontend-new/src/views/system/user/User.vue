@@ -117,7 +117,7 @@ import UserEdit from './UserEdit'
 
 export default {
   name: 'User',
-  components: { UserInfo, UserAdd, UserEdit, DeptInputTree, RangeDate },
+  components: {UserInfo, UserAdd, UserEdit, DeptInputTree, RangeDate},
   data () {
     return {
       advanced: false,
@@ -150,7 +150,7 @@ export default {
   },
   computed: {
     columns () {
-      let { sortedInfo, filteredInfo } = this
+      let {sortedInfo, filteredInfo} = this
       sortedInfo = sortedInfo || {}
       filteredInfo = filteredInfo || {}
       return [{
@@ -174,9 +174,9 @@ export default {
           }
         },
         filters: [
-          { text: '男', value: '0' },
-          { text: '女', value: '1' },
-          { text: '保密', value: '2' }
+          {text: '男', value: '0'},
+          {text: '女', value: '1'},
+          {text: '保密', value: '2'}
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.ssex || null,
@@ -184,7 +184,7 @@ export default {
       }, {
         title: '邮箱',
         dataIndex: 'email',
-        scopedSlots: { customRender: 'email' },
+        scopedSlots: {customRender: 'email'},
         width: 100
       }, {
         title: '部门',
@@ -206,8 +206,8 @@ export default {
           }
         },
         filters: [
-          { text: '有效', value: '1' },
-          { text: '锁定', value: '0' }
+          {text: '有效', value: '1'},
+          {text: '锁定', value: '0'}
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.status || null,
@@ -220,7 +220,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: { customRender: 'operation' }
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -331,7 +331,7 @@ export default {
       })
     },
     exportExcel () {
-      let { sortedInfo, filteredInfo } = this
+      let {sortedInfo, filteredInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -346,7 +346,7 @@ export default {
       })
     },
     search () {
-      let { sortedInfo, filteredInfo } = this
+      let {sortedInfo, filteredInfo} = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -415,7 +415,7 @@ export default {
         ...params
       }).then((r) => {
         let data = r.data
-        const pagination = { ...this.pagination }
+        const pagination = {...this.pagination}
         pagination.total = data.total
         this.dataSource = data.rows
         this.pagination = pagination

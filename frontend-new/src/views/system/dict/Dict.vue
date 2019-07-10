@@ -108,7 +108,7 @@ import DictEdit from './DictEdit'
 
 export default {
   name: 'Dict',
-  components: { DictAdd, DictEdit },
+  components: {DictAdd, DictEdit},
   data () {
     return {
       advanced: false,
@@ -146,7 +146,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: { customRender: 'operation' },
+        scopedSlots: {customRender: 'operation'},
         fixed: 'right',
         width: 100
       }]
@@ -261,7 +261,7 @@ export default {
         ...params
       }).then((r) => {
         let data = r.data
-        const pagination = { ...this.pagination }
+        const pagination = {...this.pagination}
         pagination.total = data.total
         this.loading = false
         this.dataSource = data.rows

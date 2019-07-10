@@ -20,11 +20,11 @@
 <script>
 import HeaderAvatar from './HeaderAvatar'
 import IMenu from '@/components/menu/menu'
-import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 
 export default {
   name: 'GlobalHeader',
-  components: { IMenu, HeaderAvatar },
+  components: {IMenu, HeaderAvatar},
   props: ['collapsed', 'menuData'],
   computed: {
     ...mapState({
