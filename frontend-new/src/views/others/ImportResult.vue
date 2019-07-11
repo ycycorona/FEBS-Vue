@@ -1,64 +1,70 @@
 <template>
   <a-modal
+    v-model="show"
     class="import-result"
     title="导入结果"
-    v-model="show"
     :centered="true"
     :footer="null"
-    :maskClosable="false"
-    :width=1000
-    @cancel="handleCancel">
+    :mask-closable="false"
+    :width="1000"
+    @cancel="handleCancel"
+  >
     <div class="import-desc">
       <span v-if="importData.length === 0 && errors.length === 0">
         <a-alert
           message="暂无导入记录"
-          type="info">
-        </a-alert>
+          type="info"
+        />
       </span>
       <span v-if="importData.length !== 0 && errors.length !== 0">
         <a-alert
           message="部分导入成功"
-          type="warning">
+          type="warning"
+        >
           <div slot="description">
-            成功导入 <a>{{importData.length}}</a> 条记录，<a>{{errors.length}}</a> 条记录导入失败，共耗时 <a>{{times}}</a> 秒
+            成功导入 <a>{{ importData.length }}</a> 条记录，<a>{{ errors.length }}</a> 条记录导入失败，共耗时 <a>{{ times }}</a> 秒
           </div>
         </a-alert>
       </span>
       <span v-if="importData.length !== 0 && errors.length === 0">
         <a-alert
           message="全部导入成功"
-          type="success">
+          type="success"
+        >
           <div slot="description">
-            成功导入 <a>{{importData.length}}</a> 条记录，共耗时 <a>{{times}}</a> 秒
+            成功导入 <a>{{ importData.length }}</a> 条记录，共耗时 <a>{{ times }}</a> 秒
           </div>
         </a-alert>
       </span>
       <span v-if="importData.length === 0 && errors.length !== 0">
         <a-alert
           message="全部导入失败"
-          type="error">
+          type="error"
+        >
           <div slot="description">
-            <a>{{errors.length}}</a> 条记录导入失败，共耗时  <a>{{times}}</a> 秒
+            <a>{{ errors.length }}</a> 条记录导入失败，共耗时  <a>{{ times }}</a> 秒
           </div>
         </a-alert>
       </span>
     </div>
-    <a-tabs defaultActiveKey="1">
-      <a-tab-pane tab="成功记录" key="1" v-if="importData.length">
-        <a-table ref="successTable"
-                 :columns="successColumns"
-                 :dataSource="importData"
-                 :pagination="pagination"
-                 :scroll="{ x: 900 }">
-        </a-table>
+    <a-tabs default-active-key="1">
+      <a-tab-pane v-if="importData.length" key="1" tab="成功记录">
+        <a-table
+          ref="successTable"
+          :columns="successColumns"
+          :data-source="importData"
+          :pagination="pagination"
+          :scroll="{ x: 900 }"
+        />
       </a-tab-pane>
-      <a-tab-pane tab="失败记录" key="2" v-if="errors.length">
-        <a-table ref="errorTable"
-                 :columns="errorColumns"
-                 :dataSource="errorsData"
-                 :pagination="pagination"
-                 :scroll="{ x: 900 }">
-        </a-table>
+      <a-tab-pane v-if="errors.length" key="2" tab="失败记录">
+        <a-table
+          ref="errorTable"
+          :columns="errorColumns"
+          :data-source="errorsData"
+          :pagination="pagination"
+          :scroll="{ x: 900 }"
+        />
       </a-tab-pane>
     </a-tabs>
   </a-modal>
@@ -80,7 +86,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       pagination: {
         pageSizeOptions: ['5', '10'],
@@ -93,20 +99,20 @@ export default {
     }
   },
   computed: {
-    errorsData () {
-      let arr = []
+    errorsData() {
+      const arr = []
       for (let i = 0; i < this.errors.length; i++) {
-        let error = this.errors[i]
+        const error = this.errors[i]
         let e = {}
-        for (let field of error.errorFields) {
-          e = {...field}
+        for (const field of error.errorFields) {
+          e = { ...field }
           e.row = error.row
           arr.push(e)
         }
       }
       return arr
     },
-    successColumns () {
+    successColumns() {
       return [{
         title: '字段1',
         dataIndex: 'field1'
@@ -121,7 +127,7 @@ export default {
         dataIndex: 'createTime'
       }]
     },
-    errorColumns () {
+    errorColumns() {
       return [{
         title: '行',
         dataIndex: 'row',
@@ -143,15 +149,15 @@ export default {
       }]
     },
     show: {
-      get: function () {
+      get: function() {
         return this.importResultVisible
       },
-      set: function () {
+      set: function() {
       }
     }
   },
   methods: {
-    handleCancel () {
+    handleCancel() {
       this.$emit('close')
     }
   }

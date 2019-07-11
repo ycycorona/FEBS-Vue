@@ -10,7 +10,7 @@ import request from 'utils/request'
 
 Vue.use(Router)
 
-let constRouter = [
+const constRouter = [
   {
     path: '/login',
     name: '登录页',
@@ -23,7 +23,7 @@ let constRouter = [
   }
 ]
 
-let router = new Router({
+const router = new Router({
   routes: constRouter
 })
 
@@ -36,9 +36,9 @@ router.beforeEach((to, from, next) => {
   if (whiteList.indexOf(to.path) !== -1) {
     next()
   }
-  let token = db.get('USER_TOKEN')
-  let user = db.get('USER')
-  let userRouter = get('USER_ROUTER')
+  const token = db.get('USER_TOKEN')
+  const user = db.get('USER')
+  const userRouter = get('USER_ROUTER')
   if (token.length && user) {
     if (!asyncRouter) {
       if (!userRouter) {
@@ -59,23 +59,23 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-function go (to, next) {
+function go(to, next) {
   asyncRouter = filterAsyncRouter(asyncRouter)
   router.addRoutes(asyncRouter)
-  next({...to, replace: true})
+  next({ ...to, replace: true })
 }
 
-function save (name, data) {
+function save(name, data) {
   localStorage.setItem(name, JSON.stringify(data))
 }
 
-function get (name) {
+function get(name) {
   return JSON.parse(localStorage.getItem(name))
 }
 
-function filterAsyncRouter (routes) {
+function filterAsyncRouter(routes) {
   return routes.filter((route) => {
-    let component = route.component
+    const component = route.component
     if (component) {
       switch (route.component) {
         case 'MenuView':
@@ -101,8 +101,8 @@ function filterAsyncRouter (routes) {
   })
 }
 
-function view (path) {
-  return function (resolve) {
+function view(path) {
+  return function(resolve) {
     import(`@/views/${path}.vue`).then(mod => {
       resolve(mod)
     })

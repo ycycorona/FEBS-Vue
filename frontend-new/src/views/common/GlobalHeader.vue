@@ -2,16 +2,16 @@
   <a-layout-header :class="[fixHeader && 'ant-header-fixedHeader', layout === 'side' ? (sidebarOpened ? 'ant-header-side-opened' : 'ant-header-side-closed') : null, theme, 'global-header' ]">
     <div :class="['global-header-wide', layout]">
       <router-link v-if="isMobile || layout === 'head'" to="/" :class="['logo', isMobile ? null : 'pc', theme]">
-        <img width="32" src="/static/img/logo.png"  alt=""/>
-        <h1 v-if="!isMobile">{{systemName}}</h1>
+        <img width="32" src="/static/img/logo.png" alt="">
+        <h1 v-if="!isMobile">{{ systemName }}</h1>
       </router-link>
       <a-divider v-if="isMobile" type="vertical" />
-      <a-icon v-if="layout === 'side'" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse"/>
+      <a-icon v-if="layout === 'side'" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse" />
       <div v-if="layout === 'head'" class="global-header-menu">
-        <i-menu style="height: 64px; line-height: 64px;" class="system-top-menu" :theme="theme" mode="horizontal" :menuData="menuData" @select="onSelect"/>
+        <i-menu style="height: 64px; line-height: 64px;" class="system-top-menu" :theme="theme" mode="horizontal" :menu-data="menuData" @select="onSelect" />
       </div>
       <div :class="['global-header-right', theme]">
-          <header-avatar class="header-item"/>
+        <header-avatar class="header-item" />
       </div>
     </div>
   </a-layout-header>
@@ -20,11 +20,11 @@
 <script>
 import HeaderAvatar from './HeaderAvatar'
 import IMenu from '@/components/menu/menu'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'GlobalHeader',
-  components: {IMenu, HeaderAvatar},
+  components: { IMenu, HeaderAvatar },
   props: ['collapsed', 'menuData'],
   computed: {
     ...mapState({
@@ -34,15 +34,15 @@ export default {
       sidebarOpened: state => state.setting.sidebar.opened,
       fixHeader: state => state.setting.fixHeader
     }),
-    theme () {
+    theme() {
       return this.layout === 'side' ? 'light' : this.$store.state.setting.theme
     }
   },
   methods: {
-    toggleCollapse () {
+    toggleCollapse() {
       this.$emit('toggleCollapse')
     },
-    onSelect (obj) {
+    onSelect(obj) {
       this.$emit('menuSelect', obj)
     }
   }

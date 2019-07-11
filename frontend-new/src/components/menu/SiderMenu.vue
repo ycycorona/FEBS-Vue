@@ -1,27 +1,28 @@
 <template>
   <a-layout-sider
+    v-model="collapsed"
     :class="[theme, 'sider', isMobile ? null : 'shadow', fixSiderbar? 'ant-fixed-sidemenu' : null]"
     width="256px"
     :collapsible="collapsible"
-    v-model="collapsed"
-    :trigger="null">
+    :trigger="null"
+  >
     <div :class="['logo', theme]">
       <router-link to="/">
         <img src="/static/img/logo.png" alt="">
-        <h1 class="animated fadeIn">{{systemName}}</h1>
+        <h1 class="animated fadeIn">{{ systemName }}</h1>
       </router-link>
     </div>
-    <i-menu :theme="theme" :collapsed="collapsed" :menuData="menuData" @select="onSelect"/>
+    <i-menu :theme="theme" :collapsed="collapsed" :menu-data="menuData" @select="onSelect" />
   </a-layout-sider>
 </template>
 
 <script>
 import IMenu from './menu'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'SiderMenu',
-  components: {IMenu},
+  components: { IMenu },
   props: {
     collapsible: {
       type: Boolean,
@@ -51,7 +52,7 @@ export default {
     })
   },
   methods: {
-    onSelect (obj) {
+    onSelect(obj) {
       this.$emit('menuSelect', obj)
     }
   }

@@ -1,46 +1,51 @@
 <template>
   <a-drawer
     title="新增角色"
-    :maskClosable="false"
-    width=650
+    :mask-closable="false"
+    width="650"
     placement="right"
     :closable="false"
-    @close="onClose"
     :visible="roleAddVisiable"
-    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+    @close="onClose"
+  >
     <a-form :form="form">
-      <a-form-item label='角色名称'
-                   v-bind="formItemLayout"
-                   :validateStatus="validateStatus"
-                   :help="help">
-        <a-input @blur="handleRoleNameBlur" v-model="role.roleName" v-decorator="['roleName']"/>
+      <a-form-item
+        label="角色名称"
+        v-bind="formItemLayout"
+        :validate-status="validateStatus"
+        :help="help"
+      >
+        <a-input v-model="role.roleName" v-decorator="['roleName']" @blur="handleRoleNameBlur" />
       </a-form-item>
-      <a-form-item label='角色描述' v-bind="formItemLayout">
+      <a-form-item label="角色描述" v-bind="formItemLayout">
         <a-textarea
-          :rows="4"
           v-model="role.remark"
           v-decorator="[
-          'remark',
-          {rules: [
-            { max: 50, message: '长度不能超过50个字符'}
-          ]}]">
-        </a-textarea>
+            'remark',
+            {rules: [
+              { max: 50, message: '长度不能超过50个字符'}
+            ]}]"
+          :rows="4"
+        />
       </a-form-item>
-      <a-form-item label='权限选择'
-                   style="margin-bottom: 2rem"
-                   :validateStatus="menuSelectStatus"
-                   :help="menuSelectHelp"
-                   v-bind="formItemLayout">
+      <a-form-item
+        label="权限选择"
+        style="margin-bottom: 2rem"
+        :validate-status="menuSelectStatus"
+        :help="menuSelectHelp"
+        v-bind="formItemLayout"
+      >
         <a-tree
           :key="menuTreeKey"
           ref="menuTree"
           :checkable="true"
-          :checkStrictly="checkStrictly"
+          :check-strictly="checkStrictly"
+          :expanded-keys="expandedKeys"
+          :tree-data="menuTreeData"
           @check="handleCheck"
           @expand="handleExpand"
-          :expandedKeys="expandedKeys"
-          :treeData="menuTreeData">
-        </a-tree>
+        />
       </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
@@ -55,17 +60,17 @@
           树操作 <a-icon type="up" />
         </a-button>
       </a-dropdown>
-      <a-popconfirm title="确定放弃编辑？" @confirm="onClose" okText="确定" cancelText="取消">
+      <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
-      <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
     </div>
   </a-drawer>
 </template>
 <script>
 const formItemLayout = {
-  labelCol: {span: 3},
-  wrapperCol: {span: 18}
+  labelCol: { span: 3 },
+  wrapperCol: { span: 18 }
 }
 export default {
   name: 'RoleAdd',
@@ -74,7 +79,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       menuTreeKey: +new Date(),
       loading: false,
@@ -96,33 +101,43 @@ export default {
       checkStrictly: true
     }
   },
+  watch: {
+    roleAddVisiable() {
+      if (this.roleAddVisiable) {
+        this.$get('menu').then((r) => {
+          this.menuTreeData = r.data.rows.children
+          this.allTreeKeys = r.data.ids
+        })
+      }
+    }
+  },
   methods: {
-    reset () {
+    reset() {
       this.menuTreeKey = +new Date()
       this.expandedKeys = this.checkedKeys = []
       this.validateStatus = this.help = ''
       this.loading = false
       this.form.resetFields()
     },
-    onClose () {
+    onClose() {
       this.reset()
       this.$emit('close')
     },
-    expandAll () {
+    expandAll() {
       this.expandedKeys = this.allTreeKeys
     },
-    closeAll () {
+    closeAll() {
       this.expandedKeys = []
     },
-    enableRelate () {
+    enableRelate() {
       this.checkStrictly = false
     },
-    disableRelate () {
+    disableRelate() {
       this.checkStrictly = true
     },
-    handleCheck (checkedKeys) {
+    handleCheck(checkedKeys) {
       this.checkedKeys = checkedKeys
-      let checkedArr = Object.is(checkedKeys.checked, undefined) ? checkedKeys : checkedKeys.checked
+      const checkedArr = Object.is(checkedKeys.checked, undefined) ? checkedKeys : checkedKeys.checked
       if (checkedArr.length) {
         this.menuSelectStatus = ''
         this.menuSelectHelp = ''
@@ -131,11 +146,11 @@ export default {
         this.menuSelectHelp = '请选择相应的权限'
       }
     },
-    handleExpand (expandedKeys) {
+    handleExpand(expandedKeys) {
       this.expandedKeys = expandedKeys
     },
-    handleSubmit () {
-      let checkedArr = Object.is(this.checkedKeys.checked, undefined) ? this.checkedKeys : this.checkedKeys.checked
+    handleSubmit() {
+      const checkedArr = Object.is(this.checkedKeys.checked, undefined) ? this.checkedKeys : this.checkedKeys.checked
       if (this.validateStatus !== 'success') {
         this.handleRoleNameBlur()
       } else if (checkedArr.length === 0) {
@@ -158,8 +173,8 @@ export default {
         })
       }
     },
-    handleRoleNameBlur () {
-      let roleName = this.role.roleName.trim()
+    handleRoleNameBlur() {
+      const roleName = this.role.roleName.trim()
       if (roleName.length) {
         if (roleName.length > 10) {
           this.validateStatus = 'error'
@@ -179,16 +194,6 @@ export default {
       } else {
         this.validateStatus = 'error'
         this.help = '角色名称不能为空'
-      }
-    }
-  },
-  watch: {
-    roleAddVisiable () {
-      if (this.roleAddVisiable) {
-        this.$get('menu').then((r) => {
-          this.menuTreeData = r.data.rows.children
-          this.allTreeKeys = r.data.ids
-        })
       }
     }
   }

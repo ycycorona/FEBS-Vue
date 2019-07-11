@@ -1,51 +1,56 @@
 <template>
   <a-drawer
     title="修改按钮"
-    :maskClosable="false"
-    width=650
+    :mask-closable="false"
+    width="650"
     placement="right"
     :closable="false"
-    @close="onClose"
     :visible="deptEditVisiable"
-    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+    @close="onClose"
+  >
     <a-form :form="form">
-      <a-form-item label='部门名称' v-bind="formItemLayout">
-        <a-input v-decorator="['deptName',
-                   {rules: [
-                    { required: true, message: '部门名称不能为空'},
-                    { max: 20, message: '长度不能超过20个字符'}
-                  ]}]"/>
+      <a-form-item label="部门名称" v-bind="formItemLayout">
+        <a-input
+          v-decorator="['deptName',
+                        {rules: [
+                          { required: true, message: '部门名称不能为空'},
+                          { max: 20, message: '长度不能超过20个字符'}
+                        ]}]"
+        />
       </a-form-item>
-      <a-form-item label='部门排序' v-bind="formItemLayout">
-        <a-input-number v-decorator="['orderNum']" style="width: 100%"/>
+      <a-form-item label="部门排序" v-bind="formItemLayout">
+        <a-input-number v-decorator="['orderNum']" style="width: 100%" />
       </a-form-item>
-      <a-form-item label='上级部门'
-                   style="margin-bottom: 2rem"
-                   v-bind="formItemLayout">
+      <a-form-item
+        label="上级部门"
+        style="margin-bottom: 2rem"
+        v-bind="formItemLayout"
+      >
         <a-tree
           :key="deptTreeKey"
           :checkable="true"
-          :checkStrictly="true"
+          :check-strictly="true"
+          :expanded-keys="expandedKeys"
+          :default-checked-keys="defaultCheckedKeys"
+          :tree-data="deptTreeData"
           @check="handleCheck"
           @expand="handleExpand"
-          :expandedKeys="expandedKeys"
-          :defaultCheckedKeys="defaultCheckedKeys"
-          :treeData="deptTreeData">
-        </a-tree>
+        />
       </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
-      <a-popconfirm title="确定放弃编辑？" @confirm="onClose" okText="确定" cancelText="取消">
+      <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
-      <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
     </div>
   </a-drawer>
 </template>
 <script>
 const formItemLayout = {
-  labelCol: {span: 3},
-  wrapperCol: {span: 18}
+  labelCol: { span: 3 },
+  wrapperCol: { span: 18 }
 }
 export default {
   name: 'DeptEdit',
@@ -54,7 +59,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       loading: false,
       formItemLayout,
@@ -67,29 +72,39 @@ export default {
       deptTreeData: []
     }
   },
+  watch: {
+    deptEditVisiable() {
+      if (this.deptEditVisiable) {
+        this.$get('dept').then((r) => {
+          this.deptTreeData = r.data.rows.children
+          this.deptTreeKey = +new Date()
+        })
+      }
+    }
+  },
   methods: {
-    reset () {
+    reset() {
       this.loading = false
       this.deptTreeKey = +new Date()
       this.expandedKeys = this.checkedKeys = this.defaultCheckedKeys = []
       this.button = {}
       this.form.resetFields()
     },
-    onClose () {
+    onClose() {
       this.reset()
       this.$emit('close')
     },
-    handleCheck (checkedKeys) {
+    handleCheck(checkedKeys) {
       this.checkedKeys = checkedKeys
     },
-    handleExpand (expandedKeys) {
+    handleExpand(expandedKeys) {
       this.expandedKeys = expandedKeys
     },
-    setFormValues ({...dept}) {
+    setFormValues({ ...dept }) {
       this.form.getFieldDecorator('deptName')
-      this.form.setFieldsValue({'deptName': dept.text})
+      this.form.setFieldsValue({ 'deptName': dept.text })
       this.form.getFieldDecorator('orderNum')
-      this.form.setFieldsValue({'orderNum': dept.order})
+      this.form.setFieldsValue({ 'orderNum': dept.order })
       if (dept.parentId !== '0') {
         this.defaultCheckedKeys.push(dept.parentId)
         this.checkedKeys = this.defaultCheckedKeys
@@ -97,8 +112,8 @@ export default {
       }
       this.dept.deptId = dept.id
     },
-    handleSubmit () {
-      let checkedArr = Object.is(this.checkedKeys.checked, undefined) ? this.checkedKeys : this.checkedKeys.checked
+    handleSubmit() {
+      const checkedArr = Object.is(this.checkedKeys.checked, undefined) ? this.checkedKeys : this.checkedKeys.checked
       if (checkedArr.length > 1) {
         this.$message.error('最多只能选择一个上级部门，请修改')
         return
@@ -110,7 +125,7 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.loading = true
-          let dept = this.form.getFieldsValue()
+          const dept = this.form.getFieldsValue()
           dept.parentId = checkedArr[0]
           if (Object.is(dept.parentId, undefined)) {
             dept.parentId = 0
@@ -126,16 +141,6 @@ export default {
           })
         }
       })
-    }
-  },
-  watch: {
-    deptEditVisiable () {
-      if (this.deptEditVisiable) {
-        this.$get('dept').then((r) => {
-          this.deptTreeData = r.data.rows.children
-          this.deptTreeKey = +new Date()
-        })
-      }
     }
   }
 }

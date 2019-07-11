@@ -1,12 +1,12 @@
 <template>
   <div class="exception">
     <div class="img">
-      <img :src="config[type].img" />
+      <img :src="config[type].img">
       <!--<div class="ele" :style="{backgroundImage: `url(${config[type].img})`}"/>-->
     </div>
     <div class="content">
-      <h1>{{config[type].title}}</h1>
-      <div class="desc">{{config[type].desc}}</div>
+      <h1>{{ config[type].title }}</h1>
+      <div class="desc">{{ config[type].desc }}</div>
       <div class="action">
         <a-button type="primary" @click="returnHome">带我回首页</a-button>
       </div>
@@ -20,13 +20,13 @@ import Config from './typeConfig'
 export default {
   name: 'ExceptionPage',
   props: ['type'],
-  data () {
+  data() {
     return {
       config: Config
     }
   },
   methods: {
-    returnHome () {
+    returnHome() {
       this.$router.push('/')
     }
   }

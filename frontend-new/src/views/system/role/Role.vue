@@ -4,21 +4,23 @@
       <!-- 搜索区域 -->
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="12" :sm="24" >
+          <a-row>
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="角色"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.roleName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.roleName" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="创建时间"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <range-date @change="handleDateChange" ref="createTime"></range-date>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <range-date ref="createTime" @change="handleDateChange" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -45,48 +47,49 @@
       <!-- 表格区域 -->
       <a-table
         ref="TableInfo"
-        :rowKey="record => record.roleId"
+        :row-key="record => record.roleId"
         :columns="columns"
-        :dataSource="dataSource"
+        :data-source="dataSource"
         :pagination="pagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         :scroll="{ x: 900 }"
-        @change="handleTableChange">
+        @change="handleTableChange"
+      >
         <template slot="remark" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
-              <div style="max-width: 200px">{{text}}</div>
+              <div style="max-width: 200px">{{ text }}</div>
             </template>
-            <p style="width: 200px;margin-bottom: 0">{{text}}</p>
+            <p style="width: 200px;margin-bottom: 0">{{ text }}</p>
           </a-popover>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'role:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改角色"></a-icon>
+          <a-icon v-hasPermission="'role:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改角色" @click="edit(record)" />
           &nbsp;
-          <a-icon type="eye" theme="twoTone" twoToneColor="#42b983" @click="view(record)" title="查看"></a-icon>
+          <a-icon type="eye" theme="twoTone" two-tone-color="#42b983" title="查看" @click="view(record)" />
         </template>
       </a-table>
       <!-- 角色信息查看 -->
       <role-info
+        :role-info-visiable="roleInfo.visiable"
+        :role-info-data="roleInfo.data"
         @close="handleRoleInfoClose"
-        :roleInfoVisiable="roleInfo.visiable"
-        :roleInfoData="roleInfo.data">
-      </role-info>
+      />
       <!-- 新增角色 -->
       <role-add
+        :role-add-visiable="roleAdd.visiable"
         @close="handleRoleAddClose"
         @success="handleRoleAddSuccess"
-        :roleAddVisiable="roleAdd.visiable">
-      </role-add>
+      />
       <!-- 修改角色 -->
       <role-edit
         ref="roleEdit"
-        :roleInfoData="roleInfo.data"
+        :role-info-data="roleInfo.data"
+        :role-edit-visiable="roleEdit.visiable"
         @close="handleRoleEditClose"
         @success="handleRoleEditSuccess"
-        :roleEditVisiable="roleEdit.visiable">
-      </role-edit>
+      />
     </div>
   </a-card>
 </template>
@@ -99,8 +102,8 @@ import RoleEdit from './RoleEdit'
 
 export default {
   name: 'Role',
-  components: {RangeDate, RoleInfo, RoleAdd, RoleEdit},
-  data () {
+  components: { RangeDate, RoleInfo, RoleAdd, RoleEdit },
+  data() {
     return {
       advanced: false,
       roleInfo: {
@@ -133,8 +136,8 @@ export default {
     }
   },
   computed: {
-    columns () {
-      let {sortedInfo} = this
+    columns() {
+      let { sortedInfo } = this
       sortedInfo = sortedInfo || {}
       return [{
         title: '角色',
@@ -142,7 +145,7 @@ export default {
       }, {
         title: '描述',
         dataIndex: 'remark',
-        scopedSlots: {customRender: 'remark'},
+        scopedSlots: { customRender: 'remark' },
         width: 350
       }, {
         title: '创建时间',
@@ -157,67 +160,67 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'}
+        scopedSlots: { customRender: 'operation' }
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    add () {
+    add() {
       this.roleAdd.visiable = true
     },
-    handleRoleAddClose () {
+    handleRoleAddClose() {
       this.roleAdd.visiable = false
     },
-    handleRoleAddSuccess () {
+    handleRoleAddSuccess() {
       this.roleAdd.visiable = false
       this.$message.success('新增角色成功')
       this.search()
     },
-    view (record) {
+    view(record) {
       this.roleInfo.data = record
       this.roleInfo.visiable = true
     },
-    handleRoleInfoClose () {
+    handleRoleInfoClose() {
       this.roleInfo.visiable = false
     },
-    edit (record) {
+    edit(record) {
       this.$refs.roleEdit.setFormValues(record)
       this.roleInfo.data = record
       this.roleEdit.visiable = true
     },
-    handleRoleEditSuccess () {
+    handleRoleEditSuccess() {
       this.roleEdit.visiable = false
       this.$message.success('修改角色成功')
       this.search()
     },
-    handleRoleEditClose () {
+    handleRoleEditClose() {
       this.roleEdit.visiable = false
     },
-    handleDateChange (value) {
+    handleDateChange(value) {
       if (value) {
         this.queryParams.createTimeFrom = value[0]
         this.queryParams.createTimeTo = value[1]
       }
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除',
         centered: true,
-        onOk () {
-          let roleIds = []
-          for (let key of that.selectedRowKeys) {
+        onOk() {
+          const roleIds = []
+          for (const key of that.selectedRowKeys) {
             roleIds.push(that.dataSource[key].roleId)
           }
           that.$delete('role/' + roleIds.join(',')).then(() => {
@@ -226,13 +229,13 @@ export default {
             that.search()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exprotExccel () {
-      let {sortedInfo} = this
+    exprotExccel() {
+      const { sortedInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -245,8 +248,8 @@ export default {
         ...this.queryParams
       })
     },
-    search () {
-      let {sortedInfo} = this
+    search() {
+      const { sortedInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -259,7 +262,7 @@ export default {
         ...this.queryParams
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置分页
@@ -276,7 +279,7 @@ export default {
       this.$refs.createTime.reset()
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       // 将这两个参数赋值给Vue data，用于后续使用
       this.paginationInfo = pagination
       this.sortedInfo = sorter
@@ -286,7 +289,7 @@ export default {
         ...this.queryParams
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       if (this.paginationInfo) {
         // 如果分页信息不为空，则设置表格当前第几页，每页条数，并设置查询分页参数
@@ -302,8 +305,8 @@ export default {
       this.$get('role', {
         ...params
       }).then((r) => {
-        let data = r.data
-        const pagination = {...this.pagination}
+        const data = r.data
+        const pagination = { ...this.pagination }
         pagination.total = data.total
         this.dataSource = data.rows
         this.pagination = pagination

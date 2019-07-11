@@ -1,29 +1,30 @@
 <template>
   <a-modal
+    v-model="show"
     class="update-avatar"
     title="选择头像"
-    @cancel="handleCancel"
     :width="710"
     :footer="null"
-    v-model="show">
-    <a-tabs defaultActiveKey="1" class="avatar-tabs">
-      <a-tab-pane tab="后田花子" key="1">
+    @cancel="handleCancel"
+  >
+    <a-tabs default-active-key="1" class="avatar-tabs">
+      <a-tab-pane key="1" tab="后田花子">
         <template v-for="(avatar, index) in hthz">
-          <div class="avatar-wrapper" :key="index">
+          <div :key="index" class="avatar-wrapper">
             <img alt="点击选择" :src="'/static/avatar/' + avatar" @click="change(avatar)">
           </div>
         </template>
       </a-tab-pane>
-      <a-tab-pane tab="阿里系" key="2" forceRender>
+      <a-tab-pane key="2" tab="阿里系" force-render>
         <template v-for="(avatar, index) in al">
-          <div class="avatar-wrapper" :key="index">
+          <div :key="index" class="avatar-wrapper">
             <img alt="点击选择" :src="'/static/avatar/' + avatar" @click="change(avatar)">
           </div>
         </template>
       </a-tab-pane>
-      <a-tab-pane tab="脸萌" key="3">
+      <a-tab-pane key="3" tab="脸萌">
         <template v-for="(avatar, index) in lm">
-          <div class="avatar-wrapper" :key="index">
+          <div :key="index" class="avatar-wrapper">
             <img alt="点击选择" :src="'/static/avatar/' + avatar" @click="change(avatar)">
           </div>
         </template>
@@ -58,7 +59,7 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       hthz,
       al,
@@ -68,18 +69,18 @@ export default {
   },
   computed: {
     show: {
-      get: function () {
+      get: function() {
         return this.updateAvatarModelVisible
       },
-      set: function () {
+      set: function() {
       }
     }
   },
   methods: {
-    handleCancel () {
+    handleCancel() {
       this.$emit('cancel')
     },
-    change (avatar) {
+    change(avatar) {
       if (this.updating) {
         this.$message.warning('更换头像中，请勿重复点击')
         return

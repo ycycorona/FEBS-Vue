@@ -1,8 +1,8 @@
 <template>
   <div>
-    <a-tabs defaultActiveKey="controlStrategy" @change="onTabChange">
-      <a-tab-pane tab="管控策略" key="controlStrategy">管控策略</a-tab-pane>
-      <a-tab-pane tab="下发历史" key="sendHistory">下发历史</a-tab-pane>
+    <a-tabs default-active-key="controlStrategy" @change="onTabChange">
+      <a-tab-pane key="controlStrategy" tab="管控策略">管控策略</a-tab-pane>
+      <a-tab-pane key="sendHistory" tab="下发历史">下发历史</a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -10,11 +10,11 @@
 <script>
 export default {
   name: 'ControlStrategyWrap',
+  components: {},
   props: {
 
   },
-  components: {},
-  data () {
+  data() {
     return {
 
     }
@@ -26,7 +26,7 @@ export default {
 
   },
   methods: {
-    onTabChange () {
+    onTabChange() {
 
     }
   }

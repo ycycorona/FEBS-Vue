@@ -3,12 +3,12 @@
     <div class="content">
       <div class="top">
         <div class="header">
-          <img alt="logo" class="logo" src="/static/img/logo.png" />
-          <span class="title">{{systemName}}</span>
+          <img alt="logo" class="logo" src="/static/img/logo.png">
+          <span class="title">{{ systemName }}</span>
         </div>
-        <div class="desc"></div>
+        <div class="desc" />
       </div>
-      <component :is="componentName" @regist="handleRegist" class="main-content"></component>
+      <component :is="componentName" class="main-content" @regist="handleRegist" />
     </div>
     <global-footer :copyright="copyright" />
   </div>
@@ -21,22 +21,22 @@ import Regist from './Regist'
 
 export default {
   name: 'Common',
-  components: {GlobalFooter, Login, Regist},
-  data () {
+  components: { GlobalFooter, Login, Regist },
+  data() {
     return {
       componentName: 'Login'
     }
   },
   computed: {
-    systemName () {
+    systemName() {
       return this.$store.state.setting.systemName
     },
-    copyright () {
+    copyright() {
       return this.$store.state.setting.copyright
     }
   },
   methods: {
-    handleRegist (val) {
+    handleRegist(val) {
       this.componentName = val
     }
   }

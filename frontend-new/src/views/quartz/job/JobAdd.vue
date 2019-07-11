@@ -1,70 +1,79 @@
 <template>
   <a-drawer
     title="新增定时任务"
-    :maskClosable="false"
-    width=650
+    :mask-closable="false"
+    width="650"
     placement="right"
     :closable="false"
-    @close="onClose"
     :visible="jobAddVisiable"
-    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+    @close="onClose"
+  >
     <a-form :form="form">
-      <a-form-item label='Bean名称' v-bind="formItemLayout">
-        <a-input style="width: 100%"
-                        v-model="job.beanName"
-                        v-decorator="['beanName',
-                   {rules: [
-                    { required: true, message: 'Bean名称不能为空'},
-                    { max: 50, message: '长度不能超过50个字符'}
-                  ]}]"/>
+      <a-form-item label="Bean名称" v-bind="formItemLayout">
+        <a-input
+          v-model="job.beanName"
+          v-decorator="['beanName',
+                        {rules: [
+                          { required: true, message: 'Bean名称不能为空'},
+                          { max: 50, message: '长度不能超过50个字符'}
+                        ]}]"
+          style="width: 100%"
+        />
       </a-form-item>
-      <a-form-item label='方法名称' v-bind="formItemLayout">
-        <a-input v-model="job.methodName"
-                 v-decorator="['methodName',
-                   {rules: [
-                    { required: true, message: '方法名称不能为空'},
-                    { max: 50, message: '长度不能超过50个字符'}
-                  ]}]"/>
+      <a-form-item label="方法名称" v-bind="formItemLayout">
+        <a-input
+          v-model="job.methodName"
+          v-decorator="['methodName',
+                        {rules: [
+                          { required: true, message: '方法名称不能为空'},
+                          { max: 50, message: '长度不能超过50个字符'}
+                        ]}]"
+        />
       </a-form-item>
-      <a-form-item label='方法参数' v-bind="formItemLayout">
-        <a-input v-model="job.params"
-                 v-decorator="['params',
-                   {rules: [
-                    { max: 50, message: '长度不能超过50个字符'}
-                  ]}]"/>
+      <a-form-item label="方法参数" v-bind="formItemLayout">
+        <a-input
+          v-model="job.params"
+          v-decorator="['params',
+                        {rules: [
+                          { max: 50, message: '长度不能超过50个字符'}
+                        ]}]"
+        />
       </a-form-item>
-      <a-form-item label='Cron表达式'
-                   v-bind="formItemLayout"
-                   :validateStatus="validateStatus"
-                   :help="help">
+      <a-form-item
+        label="Cron表达式"
+        v-bind="formItemLayout"
+        :validate-status="validateStatus"
+        :help="help"
+      >
         <a-input v-model="job.cronExpression" @blur="checkCron">
-          <a-icon slot="addonAfter" type="read" style="cursor: pointer" @click="open"/>
+          <a-icon slot="addonAfter" type="read" style="cursor: pointer" @click="open" />
         </a-input>
       </a-form-item>
-      <a-form-item label='备注信息' v-bind="formItemLayout">
+      <a-form-item label="备注信息" v-bind="formItemLayout">
         <a-textarea
-          :rows="4"
           v-model="job.remark"
           v-decorator="[
-          'remark',
-          {rules: [
-            { max: 100, message: '长度不能超过100个字符'}
-          ]}]">
-        </a-textarea>
+            'remark',
+            {rules: [
+              { max: 100, message: '长度不能超过100个字符'}
+            ]}]"
+          :rows="4"
+        />
       </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
-      <a-popconfirm title="确定放弃编辑？" @confirm="onClose" okText="确定" cancelText="取消">
+      <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
-      <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
     </div>
   </a-drawer>
 </template>
 <script>
 const formItemLayout = {
-  labelCol: {span: 4},
-  wrapperCol: {span: 18}
+  labelCol: { span: 4 },
+  wrapperCol: { span: 18 }
 }
 export default {
   name: 'JobAdd',
@@ -73,7 +82,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       loading: false,
       formItemLayout,
@@ -86,20 +95,20 @@ export default {
     }
   },
   methods: {
-    reset () {
+    reset() {
       this.loading = false
       this.validateStatus = this.help = ''
-      this.job = {cronExpression: ''}
+      this.job = { cronExpression: '' }
       this.form.resetFields()
     },
-    onClose () {
+    onClose() {
       this.reset()
       this.$emit('close')
     },
-    open () {
+    open() {
       window.open('http://cron.qqe2.com/')
     },
-    handleSubmit () {
+    handleSubmit() {
       if (this.validateStatus !== 'success') {
         this.checkCron()
       }
@@ -116,8 +125,8 @@ export default {
         }
       })
     },
-    checkCron () {
-      let cron = this.job.cronExpression.trim()
+    checkCron() {
+      const cron = this.job.cronExpression.trim()
       if (cron.length) {
         this.$get('job/cron/check?cron=' + cron).then((r) => {
           if (!r.data) {

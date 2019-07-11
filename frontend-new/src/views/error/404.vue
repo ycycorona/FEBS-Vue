@@ -5,7 +5,7 @@
 <script>
 import ExceptionPage from '~/exception/ExceptionPage'
 export default {
-  components: {ExceptionPage}
+  components: { ExceptionPage }
 }
 </script>
 

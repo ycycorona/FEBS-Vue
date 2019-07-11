@@ -3,39 +3,43 @@
     <div :class="advanced ? 'search' : null">
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="12" :sm="24" >
+          <a-row>
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="Bean名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.beanName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.beanName" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="方法名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.methodName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.methodName" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row v-if="advanced">
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="方法参数"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.params"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.params" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="执行时间"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <range-date @change="handleDateChange" ref="createTime"></range-date>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <range-date ref="createTime" @change="handleDateChange" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -43,8 +47,8 @@
         <span style="float: right; margin-top: 3px;">
           <a-button type="primary" @click="search">查询</a-button>
           <a-button style="margin-left: 8px" @click="reset">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
+          <a style="margin-left: 8px" @click="toggleAdvanced">
+            {{ advanced ? '收起' : '展开' }}
             <a-icon :type="advanced ? 'up' : 'down'" />
           </a>
         </span>
@@ -64,65 +68,68 @@
         </a-dropdown>
       </div>
       <!-- 表格区域 -->
-      <a-table ref="TableInfo"
-               :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-               @change="handleTableChange" :scroll="{ x: 1210 }">
+      <a-table
+        ref="TableInfo"
+        :columns="columns"
+        :data-source="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :scroll="{ x: 1210 }"
+        @change="handleTableChange"
+      >
         <template slot="method" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
-              <div>{{text}}</div>
+              <div>{{ text }}</div>
             </template>
-            <p style="width: 200px;margin-bottom: 0">{{text}}</p>
+            <p style="width: 200px;margin-bottom: 0">{{ text }}</p>
           </a-popover>
         </template>
         <template slot="params" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
-              <div style="max-width: 300px;">{{text}}</div>
+              <div style="max-width: 300px;">{{ text }}</div>
             </template>
-            <p style="width: 80px;margin-bottom: 0">{{text}}</p>
+            <p style="width: 80px;margin-bottom: 0">{{ text }}</p>
           </a-popover>
         </template>
         <template slot="operations" slot-scope="text, record">
-          <a-icon v-hasPermission="'job:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改"></a-icon>
+          <a-icon v-hasPermission="'job:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改" @click="edit(record)" />
           &nbsp;
-          <a-dropdown v-hasAnyPermission="'job:run','job:pause','job:resume'">
+          <a-dropdown v-hasAnyPermission="'job:run,job:pause,job:resume'">
             <a class="ant-dropdown-link">
-              <a-icon type="down-circle" style="font-size: 1.1rem"/>
+              <a-icon type="down-circle" style="font-size: 1.1rem" />
             </a>
             <a-menu slot="overlay">
               <a-menu-item v-hasPermission="'job:run'">
                 <a href="javascript:void(0)" @click="runJob(record)">立即执行</a>
               </a-menu-item>
-              <a-menu-item v-hasPermission="'job:pause'" v-if="record.status === '0'">
+              <a-menu-item v-if="record.status === '0'" v-hasPermission="'job:pause'">
                 <a href="javascript:void(0)" @click="pauseJob(record)">暂停任务</a>
               </a-menu-item>
-              <a-menu-item v-hasPermission="'job:resume'" v-if="record.status === '1'">
+              <a-menu-item v-if="record.status === '1'" v-hasPermission="'job:resume'">
                 <a href="javascript:void(0)" @click="resumeJob(record)">恢复任务</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          <a-badge v-hasNoPermission="'job:update','job:run','job:pause','job:resume'" status="warning" text="无权限"></a-badge>
+          <a-badge v-hasNoPermission="'job:update,job:run,job:pause,job:resume'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
     <!-- 新增任务 -->
     <job-add
+      :job-add-visiable="jobAddVisiable"
       @success="handleJobAddSuccess"
       @close="handleJobAddClose"
-      :jobAddVisiable="jobAddVisiable">
-    </job-add>
+    />
     <!-- 修改任务 -->
     <job-edit
       ref="jobEdit"
+      :job-edit-visiable="jobEditVisiable"
       @success="handleJobEditSuccess"
       @close="handleJobEditClose"
-      :jobEditVisiable="jobEditVisiable">
-    </job-edit>
+    />
   </a-card>
 </template>
 
@@ -133,8 +140,8 @@ import RangeDate from '@/components/datetime/RangeDate'
 
 export default {
   name: 'Job',
-  components: {JobAdd, JobEdit, RangeDate},
-  data () {
+  components: { JobAdd, JobEdit, RangeDate },
+  data() {
     return {
       advanced: false,
       dataSource: [],
@@ -157,8 +164,8 @@ export default {
     }
   },
   computed: {
-    columns () {
-      let {sortedInfo, filteredInfo} = this
+    columns() {
+      let { sortedInfo, filteredInfo } = this
       sortedInfo = sortedInfo || {}
       filteredInfo = filteredInfo || {}
       return [{
@@ -170,7 +177,7 @@ export default {
       }, {
         title: '方法参数',
         dataIndex: 'params',
-        scopedSlots: {customRender: 'params'},
+        scopedSlots: { customRender: 'params' },
         width: 120
       }, {
         title: 'Cron表达式',
@@ -184,16 +191,16 @@ export default {
         customRender: (text, row, index) => {
           switch (text) {
             case '0':
-              return <a-tag color="green">正常</a-tag>
+              return <a-tag color='green'>正常</a-tag>
             case '1':
-              return <a-tag color="orange">暂停</a-tag>
+              return <a-tag color='orange'>暂停</a-tag>
             default:
               return text
           }
         },
         filters: [
-          {text: '正常', value: '0'},
-          {text: '暂停', value: '1'}
+          { text: '正常', value: '0' },
+          { text: '暂停', value: '1' }
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.status || null,
@@ -206,20 +213,20 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operations',
-        scopedSlots: {customRender: 'operations'},
+        scopedSlots: { customRender: 'operations' },
         fixed: 'right',
         width: 100
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
       if (!this.advanced) {
         this.queryParams.createTimeFrom = ''
@@ -227,37 +234,37 @@ export default {
         this.queryParams.params = ''
       }
     },
-    handleDateChange (value) {
+    handleDateChange(value) {
       if (value) {
         this.queryParams.createTimeFrom = value[0]
         this.queryParams.createTimeTo = value[1]
       }
     },
-    handleJobAddSuccess () {
+    handleJobAddSuccess() {
       this.jobAddVisiable = false
       this.$message.success('新增定时任务成功')
       this.search()
     },
-    handleJobAddClose () {
+    handleJobAddClose() {
       this.jobAddVisiable = false
     },
-    add () {
+    add() {
       this.jobAddVisiable = true
     },
-    handleJobEditSuccess () {
+    handleJobEditSuccess() {
       this.jobEditVisiable = false
       this.$message.success('修改定时任务成功')
       this.search()
     },
-    handleJobEditClose () {
+    handleJobEditClose() {
       this.jobEditVisiable = false
     },
-    edit (record) {
+    edit(record) {
       this.$refs.jobEdit.setFormValues(record)
       this.jobEditVisiable = true
     },
-    runJob (record) {
-      let jobId = record.jobId
+    runJob(record) {
+      const jobId = record.jobId
       this.$get('job/run/' + jobId).then(() => {
         this.$message.success('执行定时任务成功')
         this.search()
@@ -265,8 +272,8 @@ export default {
         this.$message.error('执行定时任务失败')
       })
     },
-    pauseJob (record) {
-      let jobId = record.jobId
+    pauseJob(record) {
+      const jobId = record.jobId
       this.$get('job/pause/' + jobId).then(() => {
         this.$message.success('暂停定时任务成功')
         this.search()
@@ -274,8 +281,8 @@ export default {
         this.$message.error('暂停定时任务失败')
       })
     },
-    resumeJob (record) {
-      let jobId = record.jobId
+    resumeJob(record) {
+      const jobId = record.jobId
       this.$get('job/resume/' + jobId).then(() => {
         this.$message.success('恢复定时任务成功')
         this.search()
@@ -283,19 +290,19 @@ export default {
         this.$message.error('恢复定时任务失败')
       })
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除',
         centered: true,
-        onOk () {
-          let jobIds = []
-          for (let key of that.selectedRowKeys) {
+        onOk() {
+          const jobIds = []
+          for (const key of that.selectedRowKeys) {
             jobIds.push(that.dataSource[key].jobId)
           }
           that.$delete('job/' + jobIds.join(',')).then(() => {
@@ -304,13 +311,13 @@ export default {
             that.search()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exprotExccel () {
-      let {sortedInfo, filteredInfo} = this
+    exprotExccel() {
+      const { sortedInfo, filteredInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -324,8 +331,8 @@ export default {
         ...filteredInfo
       })
     },
-    search () {
-      let {sortedInfo, filteredInfo} = this
+    search() {
+      const { sortedInfo, filteredInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -339,7 +346,7 @@ export default {
         ...filteredInfo
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置分页
@@ -359,7 +366,7 @@ export default {
       }
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.paginationInfo = pagination
       this.filteredInfo = filters
       this.sortedInfo = sorter
@@ -370,7 +377,7 @@ export default {
         ...filters
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       if (this.paginationInfo) {
         // 如果分页信息不为空，则设置表格当前第几页，每页条数，并设置查询分页参数
@@ -386,8 +393,8 @@ export default {
       this.$get('job', {
         ...params
       }).then((r) => {
-        let data = r.data
-        const pagination = {...this.pagination}
+        const data = r.data
+        const pagination = { ...this.pagination }
         pagination.total = data.total
         this.loading = false
         this.dataSource = data.rows

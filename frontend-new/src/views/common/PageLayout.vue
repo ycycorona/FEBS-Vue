@@ -1,35 +1,35 @@
 <template>
-    <div :class="multipage === true ? 'multi-page':'single-page'">
-      <page-content :breadcrumb="breadcrumb" :title="title" :logo="logo">
-        <slot></slot>
-      </page-content>
-    </div>
+  <div :class="multipage === true ? 'multi-page':'single-page'">
+    <page-content :breadcrumb="breadcrumb" :title="title" :logo="logo">
+      <slot />
+    </page-content>
+  </div>
 </template>
 
 <script>
 import PageContent from './PageContent'
 export default {
   name: 'PageLayout',
-  components: {PageContent},
+  components: { PageContent },
   props: ['logo', 'title'],
-  data () {
+  data() {
     return {
       breadcrumb: []
     }
   },
   computed: {
-    multipage () {
+    multipage() {
       return this.$store.state.setting.multipage
     }
   },
-  mounted () {
+  mounted() {
     this.getBreadcrumb()
   },
-  updated () {
+  updated() {
     this.getBreadcrumb()
   },
   methods: {
-    getBreadcrumb () {
+    getBreadcrumb() {
       this.breadcrumb = this.$route.matched
     }
   }

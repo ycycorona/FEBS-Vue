@@ -2,22 +2,24 @@
   <a-range-picker
     :key="id"
     ref="rangeDate"
-    @change="onChange" style="width: 100%"></a-range-picker>
+    style="width: 100%"
+    @change="onChange"
+  />
 </template>
 
 <script>
 export default {
   name: 'RangeDate',
-  data () {
+  data() {
     return {
       id: +new Date()
     }
   },
   methods: {
-    onChange (date, dateString) {
+    onChange(date, dateString) {
       this.$emit('change', dateString)
     },
-    reset () {
+    reset() {
       this.id = +new Date()
     }
   }

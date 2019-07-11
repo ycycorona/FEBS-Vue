@@ -1,14 +1,14 @@
 <template>
   <div>
-    <a-tabs defaultActiveKey="template" @change="callback" v-model="activeKey">
-      <a-tab-pane tab="template" key="template">
-        <template-mode></template-mode>
+    <a-tabs v-model="activeKey" default-active-key="template" @change="callback">
+      <a-tab-pane key="template" tab="template">
+        <template-mode />
       </a-tab-pane>
-      <a-tab-pane tab="render" key="render">
-        <render-mode></render-mode>
+      <a-tab-pane key="render" tab="render">
+        <render-mode />
       </a-tab-pane>
-      <a-tab-pane tab="renderWithJsx" key="renderWithJsx">
-        <jsx-mode></jsx-mode>
+      <a-tab-pane key="renderWithJsx" tab="renderWithJsx">
+        <jsx-mode />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -20,10 +20,10 @@ import RenderMode from './RenderMode'
 import JsxMode from './JsxMode'
 export default {
   name: 'ScopedSlotTest',
+  components: { TemplateMode, RenderMode, JsxMode },
   props: {
 
   },
-  components: {TemplateMode, RenderMode, JsxMode},
   // render (h) {
   //   return h('Sub', {
   //     scopedSlots: {
@@ -38,7 +38,7 @@ export default {
   //     </Sub>
   //   )
   // },
-  data () {
+  data() {
     return {
       activeKey: 'template'
     }
@@ -50,7 +50,7 @@ export default {
 
   },
   methods: {
-    callback (key) {
+    callback(key) {
       console.log(key)
     }
   }

@@ -2,12 +2,13 @@
   <div class="tree-select">
     <a-card title="人员选择" class="card">
       <treeselect
-      v-model="value"
-      :always-open="true"
-      :append-to-body="true"
-      value-consists-of="BRANCH_PRIORITY"
-      :multiple="true"
-      :options="options" />
+        v-model="value"
+        :always-open="true"
+        :append-to-body="true"
+        value-consists-of="BRANCH_PRIORITY"
+        :multiple="true"
+        :options="options"
+      />
     </a-card>
   </div>
 </template>
@@ -20,16 +21,9 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
   name: 'TreeSelectTest',
+  components: { Treeselect },
   props: {},
-  components: {Treeselect},
-  created () {
-    this.$get('test/tree-select-data')
-      .then(r => {
-        const data = r.data
-        this.options.push(data)
-      })
-  },
-  data () {
+  data() {
     return {
       activeKey: 'template',
       // define the default value
@@ -42,6 +36,13 @@ export default {
   },
   computed: {},
   watch: {},
+  created() {
+    this.$get('test/tree-select-data')
+      .then(r => {
+        const data = r.data
+        this.options.push(data)
+      })
+  },
   methods: {}
 }
 </script>

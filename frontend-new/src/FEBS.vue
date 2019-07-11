@@ -1,7 +1,7 @@
 <template>
   <a-locale-provider :locale="chinese">
     <div id="febs">
-      <router-view/>
+      <router-view />
     </div>
   </a-locale-provider>
 </template>
@@ -13,13 +13,13 @@ import 'moment/locale/zh-cn'
 
 export default {
   name: 'Febs',
-  data () {
+  data() {
     return {
       chinese
     }
   },
-  created () {
-    let _this = this
+  created() {
+    const _this = this
     enquireScreen(isMobile => {
       _this.$store.commit('setting/setDevice', isMobile)
     })

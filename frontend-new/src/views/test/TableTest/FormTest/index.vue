@@ -1,10 +1,11 @@
 <template>
   <div>
-     <a-form :form="form">
-       <a-form-item
+    <a-form :form="form">
+      <a-form-item
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
-        label="Name">
+        label="Name"
+      >
         <a-input
           v-decorator="[
             'username',
@@ -16,7 +17,8 @@
       <a-form-item
         :label-col="formItemLayout.labelCol"
         :wrapper-col="formItemLayout.wrapperCol"
-        label="password">
+        label="password"
+      >
         <a-input
           v-decorator="[
             'password',
@@ -27,35 +29,34 @@
         />
       </a-form-item>
       <a-form-item
-        :wrapper-col="formTailLayout.wrapperCol">
+        :wrapper-col="formTailLayout.wrapperCol"
+      >
         <a-button
-          @click="onSubmit"
           type="primary"
-          html-type="submit">
+          html-type="submit"
+          @click="onSubmit"
+        >
           Submit
         </a-button>
       </a-form-item>
-     </a-form>
+    </a-form>
   </div>
 </template>
 
 <script>
 const formItemLayout = {
-  labelCol: {span: 4},
-  wrapperCol: {span: 8}
+  labelCol: { span: 4 },
+  wrapperCol: { span: 8 }
 }
 const formTailLayout = {
-  labelCol: {span: 4},
-  wrapperCol: {span: 8, offset: 4}
+  labelCol: { span: 4 },
+  wrapperCol: { span: 8, offset: 4 }
 }
 export default {
   name: 'FormTest',
-  props: {},
   components: {},
-  created () {
-
-  },
-  data () {
+  props: {},
+  data() {
     return {
       formItemLayout,
       formTailLayout,
@@ -64,8 +65,11 @@ export default {
   },
   computed: {},
   watch: {},
+  created() {
+
+  },
   methods: {
-    onSubmit () {
+    onSubmit() {
       // 获取表单数据
       console.log(this.form.getFieldsValue(['password']))
     }

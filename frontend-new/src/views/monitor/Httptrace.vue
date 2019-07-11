@@ -4,19 +4,20 @@
       <div class="alert">
         <a-alert type="success" :show-icon="true">
           <div slot="message">
-            共追踪到 {{dataSource.length}} 条近期HTTP请求记录
+            共追踪到 {{ dataSource.length }} 条近期HTTP请求记录
             <a style="margin-left: 24px" @click="search">点击刷新</a>
           </div>
         </a-alert>
       </div>
       <!-- 表格区域 -->
-      <a-table :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :scroll="{ x: 900 }"
-               @change="handleTableChange">
-      </a-table>
+      <a-table
+        :columns="columns"
+        :data-source="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :scroll="{ x: 900 }"
+        @change="handleTableChange"
+      />
     </div>
   </a-card>
 </template>
@@ -26,7 +27,7 @@ import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  data () {
+  data() {
     return {
       advanced: false,
       dataSource: [],
@@ -42,7 +43,7 @@ export default {
     }
   },
   computed: {
-    columns () {
+    columns() {
       return [{
         title: '请求时间',
         dataIndex: 'timestamp',
@@ -55,22 +56,22 @@ export default {
         customRender: (text, row, index) => {
           switch (text) {
             case 'GET':
-              return <a-tag color="#87d068">{text}</a-tag>
+              return <a-tag color='#87d068'>{text}</a-tag>
             case 'POST':
-              return <a-tag color="#2db7f5">{text}</a-tag>
+              return <a-tag color='#2db7f5'>{text}</a-tag>
             case 'PUT':
-              return <a-tag color="#ffba5a">{text}</a-tag>
+              return <a-tag color='#ffba5a'>{text}</a-tag>
             case 'DELETE':
-              return <a-tag color="#f50">{text}</a-tag>
+              return <a-tag color='#f50'>{text}</a-tag>
             default:
               return text
           }
         },
         filters: [
-          {text: 'GET', value: 'GET'},
-          {text: 'POST', value: 'POST'},
-          {text: 'PUT', value: 'PUT'},
-          {text: 'DELETE', value: 'DELETE'}
+          { text: 'GET', value: 'GET' },
+          { text: 'POST', value: 'POST' },
+          { text: 'PUT', value: 'PUT' },
+          { text: 'DELETE', value: 'DELETE' }
         ],
         filterMultiple: true,
         onFilter: (value, record) => record.request.method.includes(value)
@@ -85,15 +86,15 @@ export default {
         dataIndex: 'response.status',
         customRender: (text, row, index) => {
           if (text < 200) {
-            return <a-tag color="pink">{text}</a-tag>
+            return <a-tag color='pink'>{text}</a-tag>
           } else if (text < 201) {
-            return <a-tag color="green">{text}</a-tag>
+            return <a-tag color='green'>{text}</a-tag>
           } else if (text < 399) {
-            return <a-tag color="cyan">{text}</a-tag>
+            return <a-tag color='cyan'>{text}</a-tag>
           } else if (text < 403) {
-            return <a-tag color="orange">{text}</a-tag>
+            return <a-tag color='orange'>{text}</a-tag>
           } else if (text < 501) {
-            return <a-tag color="red">{text}</a-tag>
+            return <a-tag color='red'>{text}</a-tag>
           } else {
             return text
           }
@@ -103,35 +104,35 @@ export default {
         dataIndex: 'timeTaken',
         customRender: (text, row, index) => {
           if (text < 500) {
-            return <a-tag color="green">{text} ms</a-tag>
+            return <a-tag color='green'>{text} ms</a-tag>
           } else if (text < 1000) {
-            return <a-tag color="cyan">{text} ms</a-tag>
+            return <a-tag color='cyan'>{text} ms</a-tag>
           } else if (text < 1500) {
-            return <a-tag color="orange">{text} ms</a-tag>
+            return <a-tag color='orange'>{text} ms</a-tag>
           } else {
-            return <a-tag color="red">{text} ms</a-tag>
+            return <a-tag color='red'>{text} ms</a-tag>
           }
         }
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    search () {
+    search() {
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.fetch()
     },
-    fetch () {
+    fetch() {
       this.loading = true
       this.$get('actuator/httptrace').then((r) => {
-        let data = r.data
+        const data = r.data
         this.loading = false
-        let filterData = []
-        for (let d of data.traces) {
+        const filterData = []
+        for (const d of data.traces) {
           if (d.request.method !== 'OPTIONS' &&
             d.request.uri.indexOf('httptrace') === -1) {
             filterData.push(d)

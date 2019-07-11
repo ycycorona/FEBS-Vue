@@ -1,35 +1,35 @@
 <template>
-    <page-layout :title="title">
-        <keep-alive v-if="multipage">
-          <router-view ref="page"/>
-        </keep-alive>
-        <router-view ref="page" v-else/>
-    </page-layout>
+  <page-layout :title="title">
+    <keep-alive v-if="multipage">
+      <router-view ref="page" />
+    </keep-alive>
+    <router-view v-else ref="page" />
+  </page-layout>
 </template>
 
 <script>
 import PageLayout from './PageLayout'
 export default {
   name: 'PageView',
-  components: {PageLayout},
-  data () {
+  components: { PageLayout },
+  data() {
     return {
       title: ''
     }
   },
   computed: {
-    multipage () {
+    multipage() {
       return this.$store.state.setting.multipage
     }
   },
-  mounted () {
+  mounted() {
     this.getPageHeaderInfo()
   },
-  updated () {
+  updated() {
     this.getPageHeaderInfo()
   },
   methods: {
-    getPageHeaderInfo () {
+    getPageHeaderInfo() {
       this.title = this.$route.name
     }
   }

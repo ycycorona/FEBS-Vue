@@ -1,22 +1,11 @@
 
 <script>
 export default {
-  name: 'subTest',
+  name: 'SubTest',
   props: {
 
   },
-  render (h) {
-    // return (<div>
-    //   {this.$scopedSlots.default({
-    //     text: this.msg
-    //   })}
-    // </div>)
-
-    return h('div', this.$scopedSlots.default({
-      text: this.msg
-    }))
-  },
-  data () {
+  data() {
     return {
       msg: 'scope-slot'
     }
@@ -29,6 +18,17 @@ export default {
   },
   methods: {
 
+  },
+  render(h) {
+    // return (<div>
+    //   {this.$scopedSlots.default({
+    //     text: this.msg
+    //   })}
+    // </div>)
+
+    return h('div', this.$scopedSlots.default({
+      text: this.msg
+    }))
   }
 }
 </script>

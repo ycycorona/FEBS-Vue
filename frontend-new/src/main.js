@@ -22,7 +22,7 @@ Vue.use(VueApexCharts)
 Vue.component('apexchart', VueApexCharts)
 
 Vue.use({
-  install (Vue) {
+  install(Vue) {
     Vue.prototype.$db = db
   }
 })

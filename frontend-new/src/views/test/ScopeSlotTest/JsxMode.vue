@@ -2,10 +2,27 @@
 import ChildCom from './ChildCom'
 export default {
   name: 'JsxMode',
+  components: { ChildCom },
   props: {
 
   },
-  render (h) {
+  data() {
+    return {
+      activeKey: null
+    }
+  },
+  computed: {
+
+  },
+  watch: {
+
+  },
+  methods: {
+    callback(key) {
+      console.log(key)
+    }
+  },
+  render(h) {
     // return h('ChildCom', {
     //   props: {
     //     msg: 'template'
@@ -21,27 +38,10 @@ export default {
     }
     return (
       <ChildCom
-        msg="template"
+        msg='template'
         scopedSlots={scopedSlots}
       ></ChildCom>
     )
-  },
-  components: {ChildCom},
-  data () {
-    return {
-      activeKey: null
-    }
-  },
-  computed: {
-
-  },
-  watch: {
-
-  },
-  methods: {
-    callback (key) {
-      console.log(key)
-    }
   }
 }
 </script>

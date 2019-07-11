@@ -1,59 +1,68 @@
 <template>
   <a-drawer
     title="新增字典"
-    :maskClosable="false"
-    width=650
+    :mask-closable="false"
+    width="650"
     placement="right"
     :closable="false"
-    @close="onClose"
     :visible="dictAddVisiable"
-    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+    @close="onClose"
+  >
     <a-form :form="form">
-      <a-form-item label='键' v-bind="formItemLayout">
-        <a-input-number style="width: 100%"
-                 v-model="dict.keyy"
-                 v-decorator="['keyy',
-                   {rules: [
-                    { required: true, message: '不能为空'}
-                  ]}]"/>
+      <a-form-item label="键" v-bind="formItemLayout">
+        <a-input-number
+          v-model="dict.keyy"
+          v-decorator="['keyy',
+                        {rules: [
+                          { required: true, message: '不能为空'}
+                        ]}]"
+          style="width: 100%"
+        />
       </a-form-item>
-      <a-form-item label='值' v-bind="formItemLayout">
-        <a-input v-model="dict.valuee"
-                 v-decorator="['valuee',
-                   {rules: [
-                    { required: true, message: '不能为空'},
-                    { max: 20, message: '长度不能超过20个字符'}
-                  ]}]"/>
+      <a-form-item label="值" v-bind="formItemLayout">
+        <a-input
+          v-model="dict.valuee"
+          v-decorator="['valuee',
+                        {rules: [
+                          { required: true, message: '不能为空'},
+                          { max: 20, message: '长度不能超过20个字符'}
+                        ]}]"
+        />
       </a-form-item>
-      <a-form-item label='表名' v-bind="formItemLayout">
-        <a-input v-model="dict.tableName"
-                 v-decorator="['tableName',
-                   {rules: [
-                    { required: true, message: '不能为空'},
-                    { max: 20, message: '长度不能超过20个字符'}
-                  ]}]"/>
+      <a-form-item label="表名" v-bind="formItemLayout">
+        <a-input
+          v-model="dict.tableName"
+          v-decorator="['tableName',
+                        {rules: [
+                          { required: true, message: '不能为空'},
+                          { max: 20, message: '长度不能超过20个字符'}
+                        ]}]"
+        />
       </a-form-item>
-      <a-form-item label='字段' v-bind="formItemLayout">
-        <a-input v-model="dict.fieldName"
-                 v-decorator="['fieldName',
-                   {rules: [
-                    { required: true, message: '不能为空'},
-                    { max: 20, message: '长度不能超过20个字符'}
-                  ]}]"/>
+      <a-form-item label="字段" v-bind="formItemLayout">
+        <a-input
+          v-model="dict.fieldName"
+          v-decorator="['fieldName',
+                        {rules: [
+                          { required: true, message: '不能为空'},
+                          { max: 20, message: '长度不能超过20个字符'}
+                        ]}]"
+        />
       </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
-      <a-popconfirm title="确定放弃编辑？" @confirm="onClose" okText="确定" cancelText="取消">
+      <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
-      <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
     </div>
   </a-drawer>
 </template>
 <script>
 const formItemLayout = {
-  labelCol: {span: 3},
-  wrapperCol: {span: 18}
+  labelCol: { span: 3 },
+  wrapperCol: { span: 18 }
 }
 export default {
   name: 'DictAdd',
@@ -62,7 +71,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       loading: false,
       formItemLayout,
@@ -71,16 +80,16 @@ export default {
     }
   },
   methods: {
-    reset () {
+    reset() {
       this.loading = false
       this.dict = {}
       this.form.resetFields()
     },
-    onClose () {
+    onClose() {
       this.reset()
       this.$emit('close')
     },
-    handleSubmit () {
+    handleSubmit() {
       this.form.validateFields((err, values) => {
         if (!err) {
           this.$post('dict', {

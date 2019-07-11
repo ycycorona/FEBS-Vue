@@ -1,18 +1,19 @@
 <template>
   <a-card style="width: 100%" class="daily-article" :loading="loading">
-    <template class="ant-card-actions" slot="actions">
-      <a-icon type="step-backward" @click="getPreArticle" class="article-button"/>
-      <a-icon type="step-forward" @click="getNextArticle" class="article-button"/>
+    <template slot="actions" class="ant-card-actions">
+      <a-icon type="step-backward" class="article-button" @click="getPreArticle" />
+      <a-icon type="step-forward" class="article-button" @click="getNextArticle" />
     </template>
     <a-card-meta
       :title="article.title"
-      :description="article.date.curr + ' · ' + article.author + ' · 字数：' + article.wc"/>
-    <span v-html="article.content" class="article-content"></span>
+      :description="article.date.curr + ' · ' + article.author + ' · 字数：' + article.wc"
+    />
+    <span class="article-content" v-html="article.content" />
   </a-card>
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
       loading: true,
       article: {
@@ -25,23 +26,26 @@ export default {
       today: ''
     }
   },
+  mounted() {
+    this.getArticle()
+  },
   methods: {
-    getPreArticle () {
+    getPreArticle() {
       this.getArticle(this.article.date.prev)
     },
-    getNextArticle () {
+    getNextArticle() {
       if (this.article.date.next > this.today) {
         this.$message.warning('明天的文章小编还没准备好哦')
         return
       }
       this.getArticle(this.article.date.next)
     },
-    getArticle (date = '') {
+    getArticle(date = '') {
       this.$get('article?date=' + date).then((r) => {
         this.loading = false
         let data = JSON.parse(r.data.data)
         data = data.data
-        this.article = {...data}
+        this.article = { ...data }
         if (date === '') {
           this.today = this.article.date.curr
         }
@@ -50,9 +54,6 @@ export default {
         this.$message.error('获取每日文章失败')
       })
     }
-  },
-  mounted () {
-    this.getArticle()
   }
 }
 </script>

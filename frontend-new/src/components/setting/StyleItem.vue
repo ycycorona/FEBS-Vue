@@ -1,6 +1,6 @@
 <template>
   <div class="style">
-    <img :src="img" />
+    <img :src="img">
     <div v-if="selected" class="select-item">
       <a-icon type="check" />
     </div>

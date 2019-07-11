@@ -1,26 +1,27 @@
 <template>
   <!-- :title="() => 'testTableTitle'" -->
   <div>
-    <form-test></form-test>
+    <form-test />
     <a-table
       class="test-table"
       :columns="columns"
-      :rowSelection="rowSelection"
+      :row-selection="rowSelection"
 
       :bordered="true"
-      :rowKey="record => record.login.uuid"
-      :dataSource="data"
+      :row-key="record => record.login.uuid"
+      :data-source="data"
       :pagination="pagination"
       :loading="loading"
-      @change="handleTableChange">
+      @change="handleTableChange"
+    >
       <template slot="name" slot-scope="text">
-        {{text.first}} {{text.last}}
+        {{ text.first }} {{ text.last }}
       </template>
       <template slot="gender" slot-scope="gender">
-        {{gender}}
+        {{ gender }}
       </template>
       <template slot="action" slot-scope="record">
-        {{record.login.uuid}}
+        {{ record.login.uuid }}
       </template>
     </a-table>
   </div>
@@ -33,11 +34,11 @@ const columns = [{
   dataIndex: 'name',
   sorter: true,
   width: '20%',
-  scopedSlots: {customRender: 'name'}
+  scopedSlots: { customRender: 'name' }
 }, {
   title: 'Gender',
   dataIndex: 'gender',
-  scopedSlots: {customRender: 'gender'},
+  scopedSlots: { customRender: 'gender' },
   // filters: [
   //   {text: 'Male', value: 'male'},
   //   {text: 'Female', value: 'female'}
@@ -49,21 +50,18 @@ const columns = [{
 }, {
   title: '操作',
   // key: 'action',
-  scopedSlots: {customRender: 'action'}
+  scopedSlots: { customRender: 'action' }
 }]
 
 export default {
   name: 'TableTest',
+  components: { FormTest },
   props: {},
-  components: {FormTest},
-  created () {
-    this.fetch()
-  },
-  data () {
+  data() {
     const selectedRowKeys = []
     return {
       rowSelection: {
-        onChange (selectedRowKeys, selectedRows) {
+        onChange(selectedRowKeys, selectedRows) {
           console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
           this.selectedRowKeys = selectedRowKeys
         },
@@ -84,9 +82,12 @@ export default {
   },
   computed: {},
   watch: {},
+  created() {
+    this.fetch()
+  },
   methods: {
-    handleTableChange (pagination, filters, sorter) {
-      const pager = {...this.pagination}
+    handleTableChange(pagination, filters, sorter) {
+      const pager = { ...this.pagination }
       pager.current = pagination.current
       this.pagination = pager
       this.fetch({
@@ -97,14 +98,14 @@ export default {
         ...filters
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       console.log('params:', params)
       this.loading = true
       this.$get('https://randomuser.me/api', {
         results: 10,
         ...params
-      }).then(({data}) => {
-        const pagination = {...this.pagination}
+      }).then(({ data }) => {
+        const pagination = { ...this.pagination }
         // Read total count from server
         // pagination.total = data.totalCount;
         pagination.total = 200

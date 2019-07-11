@@ -3,42 +3,46 @@
     <div :class="advanced ? 'search' : null">
       <!-- 搜索区域 -->
       <a-form layout="horizontal">
-        <a-row >
-        <div :class="advanced ? null: 'fold'">
-            <a-col :md="12" :sm="24" >
+        <a-row>
+          <div :class="advanced ? null: 'fold'">
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="用户名"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <a-input v-model="queryParams.username"/>
+                :label-col="{span: 4}"
+                :wrapper-col="{span: 18, offset: 2}"
+              >
+                <a-input v-model="queryParams.username" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="部门"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <dept-input-tree @change="handleDeptChange"
-                                 ref="deptTree">
-                </dept-input-tree>
+                :label-col="{span: 4}"
+                :wrapper-col="{span: 18, offset: 2}"
+              >
+                <dept-input-tree
+                  ref="deptTree"
+                  @change="handleDeptChange"
+                />
               </a-form-item>
             </a-col>
-          <template v-if="advanced">
-            <a-col :md="12" :sm="24" >
-              <a-form-item
-                label="创建时间"
-                :labelCol="{span: 4}"
-                :wrapperCol="{span: 18, offset: 2}">
-                <range-date @change="handleDateChange" ref="createTime"></range-date>
-              </a-form-item>
-            </a-col>
-          </template>
-        </div>
+            <template v-if="advanced">
+              <a-col :md="12" :sm="24">
+                <a-form-item
+                  label="创建时间"
+                  :label-col="{span: 4}"
+                  :wrapper-col="{span: 18, offset: 2}"
+                >
+                  <range-date ref="createTime" @change="handleDateChange" />
+                </a-form-item>
+              </a-col>
+            </template>
+          </div>
           <span style="float: right; margin-top: 3px;">
             <a-button type="primary" @click="search">查询</a-button>
             <a-button style="margin-left: 8px" @click="reset">重置</a-button>
-             <a @click="toggleAdvanced" style="margin-left: 8px">
-              {{advanced ? '收起' : '展开'}}
+            <a style="margin-left: 8px" @click="toggleAdvanced">
+              {{ advanced ? '收起' : '展开' }}
               <a-icon :type="advanced ? 'up' : 'down'" />
             </a>
           </span>
@@ -47,12 +51,12 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add" v-hasPermission="'user:add'">新增</a-button>
-        <a-button @click="batchDelete" v-hasPermission="'user:delete'">删除</a-button>
+        <a-button v-hasPermission="'user:add'" type="primary" ghost @click="add">新增</a-button>
+        <a-button v-hasPermission="'user:delete'" @click="batchDelete">删除</a-button>
         <a-dropdown v-hasAnyPermission="'user:reset,user:export'">
           <a-menu slot="overlay">
-            <a-menu-item v-hasPermission="'user:reset'" key="password-reset" @click="resetPassword">密码重置</a-menu-item>
-            <a-menu-item v-hasPermission="'user:export'" key="export-data" @click="exportExcel">导出Excel</a-menu-item>
+            <a-menu-item key="password-reset" v-hasPermission="'user:reset'" @click="resetPassword">密码重置</a-menu-item>
+            <a-menu-item key="export-data" v-hasPermission="'user:export'" @click="exportExcel">导出Excel</a-menu-item>
           </a-menu>
           <a-button>
             更多操作 <a-icon type="down" />
@@ -62,49 +66,50 @@
       <!-- 表格区域 -->
       <a-table
         ref="TableInfo"
-        :rowKey="record => record.userId"
+        :row-key="record => record.userId"
         :columns="columns"
-        :dataSource="dataSource"
+        :data-source="dataSource"
         :pagination="pagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         :scroll="{ x: 900 }"
-        @change="handleTableChange">
+        @change="handleTableChange"
+      >
         <template slot="email" slot-scope="text">
           <a-popover placement="topLeft">
             <template slot="content">
-              <div>{{text}}</div>
+              <div>{{ text }}</div>
             </template>
-            <p style="width: 150px;margin-bottom: 0">{{text}}</p>
+            <p style="width: 150px;margin-bottom: 0">{{ text }}</p>
           </a-popover>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'user:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改用户"></a-icon>
+          <a-icon v-hasPermission="'user:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改用户" @click="edit(record)" />
           &nbsp;
-          <a-icon v-hasPermission="'user:view'" type="eye" theme="twoTone" twoToneColor="#42b983" @click="view(record)" title="查看"></a-icon>
-          <a-badge v-hasNoPermission="'user:update,user:view'" status="warning" text="无权限"></a-badge>
+          <a-icon v-hasPermission="'user:view'" type="eye" theme="twoTone" two-tone-color="#42b983" title="查看" @click="view(record)" />
+          <a-badge v-hasNoPermission="'user:update,user:view'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
     <!-- 用户信息查看 -->
     <user-info
-      :userInfoData="userInfo.data"
-      :userInfoVisiable="userInfo.visiable"
-      @close="handleUserInfoClose">
-    </user-info>
+      :user-info-data="userInfo.data"
+      :user-info-visiable="userInfo.visiable"
+      @close="handleUserInfoClose"
+    />
     <!-- 新增用户 -->
     <user-add
+      :user-add-visiable="userAdd.visiable"
       @close="handleUserAddClose"
       @success="handleUserAddSuccess"
-      :userAddVisiable="userAdd.visiable">
-    </user-add>
+    />
     <!-- 修改用户 -->
     <user-edit
       ref="userEdit"
+      :user-edit-visiable="userEdit.visiable"
       @close="handleUserEditClose"
       @success="handleUserEditSuccess"
-      :userEditVisiable="userEdit.visiable">
-    </user-edit>
+    />
   </a-card>
 </template>
 
@@ -117,8 +122,8 @@ import UserEdit from './UserEdit'
 
 export default {
   name: 'User',
-  components: {UserInfo, UserAdd, UserEdit, DeptInputTree, RangeDate},
-  data () {
+  components: { UserInfo, UserAdd, UserEdit, DeptInputTree, RangeDate },
+  data() {
     return {
       advanced: false,
       userInfo: {
@@ -149,8 +154,8 @@ export default {
     }
   },
   computed: {
-    columns () {
-      let {sortedInfo, filteredInfo} = this
+    columns() {
+      let { sortedInfo, filteredInfo } = this
       sortedInfo = sortedInfo || {}
       filteredInfo = filteredInfo || {}
       return [{
@@ -174,9 +179,9 @@ export default {
           }
         },
         filters: [
-          {text: '男', value: '0'},
-          {text: '女', value: '1'},
-          {text: '保密', value: '2'}
+          { text: '男', value: '0' },
+          { text: '女', value: '1' },
+          { text: '保密', value: '2' }
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.ssex || null,
@@ -184,7 +189,7 @@ export default {
       }, {
         title: '邮箱',
         dataIndex: 'email',
-        scopedSlots: {customRender: 'email'},
+        scopedSlots: { customRender: 'email' },
         width: 100
       }, {
         title: '部门',
@@ -198,16 +203,16 @@ export default {
         customRender: (text, row, index) => {
           switch (text) {
             case '0':
-              return <a-tag color="red">锁定</a-tag>
+              return <a-tag color='red'>锁定</a-tag>
             case '1':
-              return <a-tag color="cyan">有效</a-tag>
+              return <a-tag color='cyan'>有效</a-tag>
             default:
               return text
           }
         },
         filters: [
-          {text: '有效', value: '1'},
-          {text: '锁定', value: '0'}
+          { text: '有效', value: '1' },
+          { text: '锁定', value: '0' }
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.status || null,
@@ -220,76 +225,76 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'}
+        scopedSlots: { customRender: 'operation' }
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
       if (!this.advanced) {
         this.queryParams.createTimeFrom = ''
         this.queryParams.createTimeTo = ''
       }
     },
-    view (record) {
+    view(record) {
       this.userInfo.data = record
       this.userInfo.visiable = true
     },
-    add () {
+    add() {
       this.userAdd.visiable = true
     },
-    handleUserAddClose () {
+    handleUserAddClose() {
       this.userAdd.visiable = false
     },
-    handleUserAddSuccess () {
+    handleUserAddSuccess() {
       this.userAdd.visiable = false
       this.$message.success('新增用户成功，初始密码为1234qwer')
       this.search()
     },
-    edit (record) {
+    edit(record) {
       this.$refs.userEdit.setFormValues(record)
       this.userEdit.visiable = true
     },
-    handleUserEditClose () {
+    handleUserEditClose() {
       this.userEdit.visiable = false
     },
-    handleUserEditSuccess () {
+    handleUserEditSuccess() {
       this.userEdit.visiable = false
       this.$message.success('修改用户成功')
       this.search()
     },
-    handleUserInfoClose () {
+    handleUserInfoClose() {
       this.userInfo.visiable = false
     },
-    handleDeptChange (value) {
+    handleDeptChange(value) {
       this.queryParams.deptId = value || ''
     },
-    handleDateChange (value) {
+    handleDateChange(value) {
       if (value) {
         this.queryParams.createTimeFrom = value[0]
         this.queryParams.createTimeTo = value[1]
       }
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除',
         centered: true,
-        onOk () {
-          let userIds = []
-          for (let key of that.selectedRowKeys) {
+        onOk() {
+          const userIds = []
+          for (const key of that.selectedRowKeys) {
             userIds.push(that.dataSource[key].userId)
           }
           that.$delete('user/' + userIds.join(',')).then(() => {
@@ -298,24 +303,24 @@ export default {
             that.search()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    resetPassword () {
+    resetPassword() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要重置密码的用户')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定重置选中用户密码?',
         content: '当您点击确定按钮后，这些用户的密码将会重置为1234qwer',
         centered: true,
-        onOk () {
-          let usernames = []
-          for (let key of that.selectedRowKeys) {
+        onOk() {
+          const usernames = []
+          for (const key of that.selectedRowKeys) {
             usernames.push(that.dataSource[key].username)
           }
           that.$put('user/password/reset', {
@@ -325,13 +330,13 @@ export default {
             that.selectedRowKeys = []
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exportExcel () {
-      let {sortedInfo, filteredInfo} = this
+    exportExcel() {
+      const { sortedInfo, filteredInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -345,8 +350,8 @@ export default {
         ...filteredInfo
       })
     },
-    search () {
-      let {sortedInfo, filteredInfo} = this
+    search() {
+      const { sortedInfo, filteredInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -360,7 +365,7 @@ export default {
         ...filteredInfo
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置分页
@@ -383,7 +388,7 @@ export default {
       }
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       // 将这三个参数赋值给Vue data，用于后续使用
       this.paginationInfo = pagination
       this.filteredInfo = filters
@@ -397,7 +402,7 @@ export default {
         ...filters
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       // 显示loading
       this.loading = true
       if (this.paginationInfo) {
@@ -414,8 +419,8 @@ export default {
       this.$get('user', {
         ...params
       }).then((r) => {
-        let data = r.data
-        const pagination = {...this.pagination}
+        const data = r.data
+        const pagination = { ...this.pagination }
         pagination.total = data.total
         this.dataSource = data.rows
         this.pagination = pagination

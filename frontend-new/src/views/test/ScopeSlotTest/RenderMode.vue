@@ -2,23 +2,11 @@
 import ChildCom from './ChildCom'
 export default {
   name: 'RenderMode',
+  components: { ChildCom },
   props: {
 
   },
-  render (h) {
-    return h('ChildCom', {
-      props: {
-        msg: 'template'
-      },
-      scopedSlots: {
-        default (props) {
-          return h('span', `${props.text}`)
-        }
-      }
-    })
-  },
-  components: {ChildCom},
-  data () {
+  data() {
     return {
       activeKey: null
     }
@@ -30,9 +18,21 @@ export default {
 
   },
   methods: {
-    callback (key) {
+    callback(key) {
       console.log(key)
     }
+  },
+  render(h) {
+    return h('ChildCom', {
+      props: {
+        msg: 'template'
+      },
+      scopedSlots: {
+        default(props) {
+          return h('span', `${props.text}`)
+        }
+      }
+    })
   }
 }
 </script>

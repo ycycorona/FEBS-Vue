@@ -1,37 +1,51 @@
 <template>
   <div class="login">
-    <a-form @submit.prevent="doLogin" :form="form">
-      <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;" :activeKey="activeKey"
-              @change="handleTabsChange">
-        <a-tab-pane tab="账户密码登录" key="1">
-          <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon
-                   style="margin-bottom: 24px;"></a-alert>
+    <a-form :form="form" @submit.prevent="doLogin">
+      <a-tabs
+        size="large"
+        :tab-bar-style="{textAlign: 'center'}"
+        style="padding: 0 2px;"
+        :active-key="activeKey"
+        @change="handleTabsChange"
+      >
+        <a-tab-pane key="1" tab="账户密码登录">
+          <a-alert
+            v-show="error"
+            type="error"
+            :closable="true"
+            :message="error"
+            show-icon
+            style="margin-bottom: 24px;"
+          />
           <a-form-item>
             <a-input
-            v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]"
-            size="large">
-              <a-icon slot="prefix" type="user"></a-icon>
+              v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]"
+              size="large"
+            >
+              <a-icon slot="prefix" type="user" />
             </a-input>
           </a-form-item>
           <a-form-item>
             <a-input
-            v-decorator="['password', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
-            size="large" type="password">
-              <a-icon slot="prefix" type="lock"></a-icon>
+              v-decorator="['password', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
+              size="large"
+              type="password"
+            >
+              <a-icon slot="prefix" type="lock" />
             </a-input>
           </a-form-item>
         </a-tab-pane>
-        <a-tab-pane tab="手机号登录" key="2">
+        <a-tab-pane key="2" tab="手机号登录">
           <a-form-item>
             <a-input size="large">
-              <a-icon slot="prefix" type="mobile"></a-icon>
+              <a-icon slot="prefix" type="mobile" />
             </a-input>
           </a-form-item>
           <a-form-item>
             <a-row :gutter="8" style="margin: 0 -4px">
               <a-col :span="16">
                 <a-input size="large">
-                  <a-icon slot="prefix" type="mail"></a-icon>
+                  <a-icon slot="prefix" type="mail" />
                 </a-input>
               </a-col>
               <a-col :span="8" style="padding-left: 4px">
@@ -42,7 +56,7 @@
         </a-tab-pane>
       </a-tabs>
       <a-form-item>
-        <a-button :loading="loading" style="width: 100%; margin-top: 4px" size="large" htmlType="submit" type="primary">
+        <a-button :loading="loading" style="width: 100%; margin-top: 4px" size="large" html-type="submit" type="primary">
           登录
         </a-button>
       </a-form-item>
@@ -54,11 +68,11 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'Login',
-  data () {
+  data() {
     return {
       loading: false,
       error: '',
@@ -67,31 +81,31 @@ export default {
     }
   },
   computed: {
-    systemName () {
+    systemName() {
       return this.$store.state.setting.systemName
     },
-    copyright () {
+    copyright() {
       return this.$store.state.setting.copyright
     }
   },
-  created () {
+  created() {
     this.$db.clear()
     this.$router.options.routes = []
   },
   methods: {
-    doLogin () {
+    doLogin() {
       if (this.activeKey === '1') {
         // 用户名密码登录
         this.form.validateFields(['name', 'password'], (errors, values) => {
           if (!errors) {
             this.loading = true
-            let name = this.form.getFieldValue('name')
-            let password = this.form.getFieldValue('password')
+            const name = this.form.getFieldValue('name')
+            const password = this.form.getFieldValue('password')
             this.$post('login', {
               username: name,
               password: password
             }).then((r) => {
-              let data = r.data.data
+              const data = r.data.data
               this.saveLoginData(data)
               setTimeout(() => {
                 this.loading = false
@@ -110,13 +124,13 @@ export default {
         this.$message.warning('暂未开发')
       }
     },
-    regist () {
+    regist() {
       this.$emit('regist', 'Regist')
     },
-    getCaptcha () {
+    getCaptcha() {
       this.$message.warning('暂未开发')
     },
-    handleTabsChange (val) {
+    handleTabsChange(val) {
       this.activeKey = val
     },
     ...mapMutations({
@@ -132,7 +146,7 @@ export default {
       fixHeader: 'setting/fixHeader',
       setColor: 'setting/setColor'
     }),
-    saveLoginData (data) {
+    saveLoginData(data) {
       this.setToken(data.token)
       this.setExpireTime(data.exipreTime)
       this.setUser(data.user)

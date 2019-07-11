@@ -3,14 +3,14 @@
     <div :class="['page-header-wide', layout]">
       <div class="breadcrumb">
         <a-breadcrumb>
-          <a-breadcrumb-item :key="item.path" v-for="(item, index) in breadcrumb">
-            <span v-if="index === 0"><router-link to="/">{{item.name}}</router-link></span>
-            <span v-else>{{item.name}}</span>
+          <a-breadcrumb-item v-for="(item, index) in breadcrumb" :key="item.path">
+            <span v-if="index === 0"><router-link to="/">{{ item.name }}</router-link></span>
+            <span v-else>{{ item.name }}</span>
           </a-breadcrumb-item>
         </a-breadcrumb>
       </div>
       <div class="detail">
-        <slot></slot>
+        <slot />
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@ export default {
     }
   },
   computed: {
-    layout () {
+    layout() {
       return this.$store.state.setting.layout
     }
   }

@@ -7,19 +7,7 @@ export default {
       type: String
     }
   },
-  render (h) {
-    // return (<div>
-    //   {this.$scopedSlots.default({
-    //     text: this.msg
-    //   })}
-    // </div>)
-
-    // 将参数映射到父组件对应的slot中
-    return h('div', this.$scopedSlots.default({
-      text: this.msg
-    }))
-  },
-  data () {
+  data() {
     return {
     }
   },
@@ -31,6 +19,18 @@ export default {
   },
   methods: {
 
+  },
+  render(h) {
+    // return (<div>
+    //   {this.$scopedSlots.default({
+    //     text: this.msg
+    //   })}
+    // </div>)
+
+    // 将参数映射到父组件对应的slot中
+    return h('div', this.$scopedSlots.default({
+      text: this.msg
+    }))
   }
 }
 </script>

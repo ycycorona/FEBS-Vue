@@ -3,38 +3,42 @@
     <div :class="advanced ? 'search' : null">
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="8" :sm="24" >
+          <a-row>
+            <a-col :md="8" :sm="24">
               <a-form-item
                 label="键"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.keyy"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.keyy" />
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24" >
+            <a-col :md="8" :sm="24">
               <a-form-item
                 label="值"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.valuee"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.valuee" />
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24" >
+            <a-col :md="8" :sm="24">
               <a-form-item
                 label="表名"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.tableName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.tableName" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row v-if="advanced">
-            <a-col :md="8" :sm="24" >
+            <a-col :md="8" :sm="24">
               <a-form-item
                 label="字段"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
                 <a-input v-model="queryParams.fieldName" />
               </a-form-item>
             </a-col>
@@ -43,8 +47,8 @@
         <span style="float: right; margin-top: 3px;">
           <a-button type="primary" @click="search">查询</a-button>
           <a-button style="margin-left: 8px" @click="reset">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{advanced ? '收起' : '展开'}}
+          <a style="margin-left: 8px" @click="toggleAdvanced">
+            {{ advanced ? '收起' : '展开' }}
             <a-icon :type="advanced ? 'up' : 'down'" />
           </a>
         </span>
@@ -64,42 +68,44 @@
         </a-dropdown>
       </div>
       <!-- 表格区域 -->
-      <a-table ref="TableInfo"
-        :rowKey="record => record.dictId"
+      <a-table
+        ref="TableInfo"
+        :row-key="record => record.dictId"
         :columns="columns"
-        :dataSource="dataSource"
+        :data-source="dataSource"
         :pagination="pagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :scroll="{ x: 900 }"
         @change="handleTableChange"
-        :scroll="{ x: 900 }">
+      >
         <template slot="remark" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
-              <div style="max-width: 200px">{{text}}</div>
+              <div style="max-width: 200px">{{ text }}</div>
             </template>
-            <p style="width: 200px;margin-bottom: 0">{{text}}</p>
+            <p style="width: 200px;margin-bottom: 0">{{ text }}</p>
           </a-popover>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'dict:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改字典"></a-icon>
-          <a-badge v-hasNoPermission="'dict:update'" status="warning" text="无权限"></a-badge>
+          <a-icon v-hasPermission="'dict:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改字典" @click="edit(record)" />
+          <a-badge v-hasNoPermission="'dict:update'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
     <!-- 新增字典 -->
     <dict-add
+      :dict-add-visiable="dictAddVisiable"
       @close="handleDictAddClose"
       @success="handleDictAddSuccess"
-     :dictAddVisiable="dictAddVisiable">
-    </dict-add>
+    />
     <!-- 修改字典 -->
     <dict-edit
       ref="dictEdit"
+      :dict-edit-visiable="dictEditVisiable"
       @close="handleDictEditClose"
       @success="handleDictEditSuccess"
-      :dictEditVisiable="dictEditVisiable">
-    </dict-edit>
+    />
   </a-card>
 </template>
 
@@ -109,8 +115,8 @@ import DictEdit from './DictEdit'
 
 export default {
   name: 'Dict',
-  components: {DictAdd, DictEdit},
-  data () {
+  components: { DictAdd, DictEdit },
+  data() {
     return {
       advanced: false,
       dataSource: [],
@@ -131,7 +137,7 @@ export default {
     }
   },
   computed: {
-    columns () {
+    columns() {
       return [{
         title: '键',
         dataIndex: 'keyy'
@@ -147,61 +153,61 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'},
+        scopedSlots: { customRender: 'operation' },
         fixed: 'right',
         width: 100
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
       if (!this.advanced) {
         this.queryParams.fieldName = ''
       }
     },
-    handleDictAddSuccess () {
+    handleDictAddSuccess() {
       this.dictAddVisiable = false
       this.$message.success('新增字典成功')
       this.search()
     },
-    handleDictAddClose () {
+    handleDictAddClose() {
       this.dictAddVisiable = false
     },
-    add () {
+    add() {
       this.dictAddVisiable = true
     },
-    handleDictEditSuccess () {
+    handleDictEditSuccess() {
       this.dictEditVisiable = false
       this.$message.success('修改字典成功')
       this.search()
     },
-    handleDictEditClose () {
+    handleDictEditClose() {
       this.dictEditVisiable = false
     },
-    edit (record) {
+    edit(record) {
       this.$refs.dictEdit.setFormValues(record)
       this.dictEditVisiable = true
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除',
         centered: true,
-        onOk () {
-          let dictIds = []
-          for (let key of that.selectedRowKeys) {
+        onOk() {
+          const dictIds = []
+          for (const key of that.selectedRowKeys) {
             dictIds.push(that.dataSource[key].dictId)
           }
           that.$delete('dict/' + dictIds.join(',')).then(() => {
@@ -210,22 +216,22 @@ export default {
             that.search()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exportExcel () {
+    exportExcel() {
       this.$export('dict/excel', {
         ...this.queryParams
       })
     },
-    search () {
+    search() {
       this.fetch({
         ...this.queryParams
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置分页
@@ -239,13 +245,13 @@ export default {
       this.queryParams = {}
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.paginationInfo = pagination
       this.fetch({
         ...this.queryParams
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       if (this.paginationInfo) {
         // 如果分页信息不为空，则设置表格当前第几页，每页条数，并设置查询分页参数
@@ -261,8 +267,8 @@ export default {
       this.$get('dict', {
         ...params
       }).then((r) => {
-        let data = r.data
-        const pagination = {...this.pagination}
+        const data = r.data
+        const pagination = { ...this.pagination }
         pagination.total = data.total
         this.loading = false
         this.dataSource = data.rows

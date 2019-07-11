@@ -2,39 +2,45 @@
   <a-layout-sider class="sider" width="273">
     <setting-item title="导航栏颜色">
       <img-checkbox-group @change="setTheme">
-        <img-checkbox img="/static/img/side-bar-dark.svg" :checked="dark"
-                      value="dark"/>
-        <img-checkbox img="/static/img/side-bar-light.svg" :checked="!dark"
-                      value="light"/>
+        <img-checkbox
+          img="/static/img/side-bar-dark.svg"
+          :checked="dark"
+          value="dark"
+        />
+        <img-checkbox
+          img="/static/img/side-bar-light.svg"
+          :checked="!dark"
+          value="light"
+        />
       </img-checkbox-group>
     </setting-item>
     <setting-item title="主题颜色">
-      <color-checkbox-group @change="onColorChange" :defaultValues="defaultValues" :multiple="false">
+      <color-checkbox-group :default-values="defaultValues" :multiple="false" @change="onColorChange">
         <template v-for="(color, index) in colorList">
-          <color-checkbox :color="color" :value="index + 1" :key="index"/>
+          <color-checkbox :key="index" :color="color" :value="index + 1" />
         </template>
       </color-checkbox-group>
     </setting-item>
-    <a-divider/>
+    <a-divider />
     <setting-item title="导航栏位置">
       <img-checkbox-group @change="setLayout">
-        <img-checkbox img="/static/img/side-bar-left.svg" :checked="side" value="side"/>
-        <img-checkbox img="/static/img/side-bar-top.svg" :checked="!side" value="head"/>
+        <img-checkbox img="/static/img/side-bar-left.svg" :checked="side" value="side" />
+        <img-checkbox img="/static/img/side-bar-top.svg" :checked="!side" value="head" />
       </img-checkbox-group>
     </setting-item>
     <setting-item>
       <a-list :split="false">
         <a-list-item>
           固定顶栏
-          <a-switch :checked="fixedHeader" slot="actions" size="small" @change="fixHeader"/>
+          <a-switch slot="actions" :checked="fixedHeader" size="small" @change="fixHeader" />
         </a-list-item>
         <a-list-item>
           固定侧边栏
-          <a-switch :checked="fixedSiderbar" slot="actions" size="small" @change="fixSiderbar"/>
+          <a-switch slot="actions" :checked="fixedSiderbar" size="small" @change="fixSiderbar" />
         </a-list-item>
         <a-list-item>
           多页签模式
-          <a-switch :checked="multipage" slot="actions" size="small" @change="setMultipage"/>
+          <a-switch slot="actions" :checked="multipage" size="small" @change="setMultipage" />
         </a-list-item>
       </a-list>
     </setting-item>
@@ -47,8 +53,8 @@ import SettingItem from './SettingItem'
 import StyleItem from './StyleItem'
 import ColorCheckbox from '../checkbox/ColorCheckbox'
 import ImgCheckbox from '../checkbox/ImgCheckbox'
-import {updateTheme} from 'utils/color'
-import {mapState, mapMutations} from 'vuex'
+import { updateTheme } from 'utils/color'
+import { mapState, mapMutations } from 'vuex'
 
 const ColorCheckboxGroup = ColorCheckbox.Group
 const ImgCheckboxGroup = ImgCheckbox.Group
@@ -68,45 +74,45 @@ export default {
       color: state => state.setting.color,
       user: state => state.account.user
     }),
-    dark () {
+    dark() {
       return this.theme === 'dark'
     },
-    side () {
+    side() {
       return this.layout === 'side'
     },
-    defaultValues () {
+    defaultValues() {
       let currentColor = this.$store.state.setting.color
       if (Array.isArray(currentColor)) {
         currentColor = currentColor[0]
       }
-      let index = this.colorList.indexOf(currentColor) + 1
+      const index = this.colorList.indexOf(currentColor) + 1
       return `[${index}]`
     }
   },
   methods: {
-    ...mapMutations({setSettingBar: 'setting/setSettingBar'}),
-    onColorChange (values, colors) {
+    ...mapMutations({ setSettingBar: 'setting/setSettingBar' }),
+    onColorChange(values, colors) {
       if (colors.length > 0) {
         updateTheme(colors)
         this.$store.commit('setting/setColor', colors)
       }
     },
-    setTheme (values) {
+    setTheme(values) {
       this.$store.commit('setting/setTheme', values[0])
     },
-    setLayout (values) {
+    setLayout(values) {
       this.$store.commit('setting/setLayout', values[0])
     },
-    setMultipage (checked) {
+    setMultipage(checked) {
       this.$store.commit('setting/setMultipage', checked)
     },
-    fixSiderbar (checked) {
+    fixSiderbar(checked) {
       this.$store.commit('setting/fixSiderbar', checked)
     },
-    fixHeader (checked) {
+    fixHeader(checked) {
       this.$store.commit('setting/fixHeader', checked)
     },
-    updateUserConfig () {
+    updateUserConfig() {
       this.$put('user/userconfig', {
         multiPage: this.multipage ? '1' : '0',
         theme: this.theme,

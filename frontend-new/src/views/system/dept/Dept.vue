@@ -4,21 +4,23 @@
       <!-- 搜索区域 -->
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="12" :sm="24" >
+          <a-row>
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.deptName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.deptName" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="创建时间"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <range-date @change="handleDateChange" ref="createTime"></range-date>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <range-date ref="createTime" @change="handleDateChange" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -43,32 +45,34 @@
         </a-dropdown>
       </div>
       <!-- 表格区域 -->
-      <a-table :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :scroll="{ x: 900 }"
-               :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-               @change="handleTableChange">
+      <a-table
+        :columns="columns"
+        :data-source="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :scroll="{ x: 900 }"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        @change="handleTableChange"
+      >
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'dept:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改"></a-icon>
-          <a-badge v-hasNoPermission="'dept:update'" status="warning" text="无权限"></a-badge>
+          <a-icon v-hasPermission="'dept:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改" @click="edit(record)" />
+          <a-badge v-hasNoPermission="'dept:update'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
     <!-- 新增部门 -->
     <dept-add
+      :dept-add-visiable="deptAddVisiable"
       @success="handleDeptAddSuccess"
       @close="handleDeptAddClose"
-      :deptAddVisiable="deptAddVisiable">
-    </dept-add>
+    />
     <!-- 修改部门 -->
     <dept-edit
       ref="deptEdit"
+      :dept-edit-visiable="deptEditVisiable"
       @success="handleDeptEditSuccess"
       @close="handleDeptEditClose"
-      :deptEditVisiable="deptEditVisiable">
-    </dept-edit>
+    />
   </a-card>
 </template>
 
@@ -79,8 +83,8 @@ import DeptEdit from './DeptEdit'
 
 export default {
   name: 'Dept',
-  components: {DeptAdd, DeptEdit, RangeDate},
-  data () {
+  components: { DeptAdd, DeptEdit, RangeDate },
+  data() {
     return {
       advanced: false,
       dataSource: [],
@@ -98,8 +102,8 @@ export default {
     }
   },
   computed: {
-    columns () {
-      let {sortedInfo} = this
+    columns() {
+      let { sortedInfo } = this
       sortedInfo = sortedInfo || {}
       return [{
         title: '名称',
@@ -120,72 +124,72 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'},
+        scopedSlots: { customRender: 'operation' },
         fixed: 'right',
         width: 120
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    handleDeptAddClose () {
+    handleDeptAddClose() {
       this.deptAddVisiable = false
     },
-    handleDeptAddSuccess () {
+    handleDeptAddSuccess() {
       this.deptAddVisiable = false
       this.$message.success('新增部门成功')
       this.fetch()
     },
-    add () {
+    add() {
       this.deptAddVisiable = true
     },
-    handleDeptEditClose () {
+    handleDeptEditClose() {
       this.deptEditVisiable = false
     },
-    handleDeptEditSuccess () {
+    handleDeptEditSuccess() {
       this.deptEditVisiable = false
       this.$message.success('修改部门成功')
       this.fetch()
     },
-    edit (record) {
+    edit(record) {
       this.deptEditVisiable = true
       this.$refs.deptEdit.setFormValues(record)
     },
-    handleDateChange (value) {
+    handleDateChange(value) {
       if (value) {
         this.queryParams.createTimeFrom = value[0]
         this.queryParams.createTimeTo = value[1]
       }
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除，如果其包含子记录，也将一并删除！',
         centered: true,
-        onOk () {
+        onOk() {
           that.$delete('dept/' + that.selectedRowKeys.join(',')).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.fetch()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exportExcel () {
-      let {sortedInfo} = this
+    exportExcel() {
+      const { sortedInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -198,8 +202,8 @@ export default {
         ...this.queryParams
       })
     },
-    search () {
-      let {sortedInfo} = this
+    search() {
+      const { sortedInfo } = this
       let sortField, sortOrder
       // 获取当前列的排序和列的过滤规则
       if (sortedInfo) {
@@ -212,7 +216,7 @@ export default {
         ...this.queryParams
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置列排序规则
@@ -223,7 +227,7 @@ export default {
       this.$refs.createTime.reset()
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.sortedInfo = sorter
       this.fetch({
         sortField: sorter.field,
@@ -232,12 +236,12 @@ export default {
         ...filters
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       this.$get('dept', {
         ...params
       }).then((r) => {
-        let data = r.data
+        const data = r.data
         this.loading = false
         this.dataSource = data.rows.children
       })

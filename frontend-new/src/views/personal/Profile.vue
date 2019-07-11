@@ -1,7 +1,7 @@
 <template>
   <div :class="[multipage === true ? 'multi-page':'single-page', 'not-menu-page', 'user-profile']">
     <a-card title="">
-      <a href="javascript:void(0)" slot="extra" @click="updateProfile">编辑资料</a>
+      <a slot="extra" href="javascript:void(0)" @click="updateProfile">编辑资料</a>
       <a-row :gutter="8">
         <a-col :span="6">
           <a-row style="text-align: center">
@@ -12,39 +12,39 @@
           </a-row>
         </a-col>
         <a-col :span="12" style="font-size: 1rem">
-          <p>账户：{{user.username}}</p>
-          <p :title="user.roleName">角色：{{user.roleName? user.roleName: '暂无角色'}}</p>
-          <p>性别：{{sex}}</p>
-          <p>电话：{{user.mobile ? user.mobile : '暂未绑定电话'}}</p>
-          <p>邮箱：{{user.email ? user.email : '暂未绑定邮箱'}}</p>
-          <p>部门：{{user.deptName? user.deptName: '暂无部门'}}</p>
-          <p>描述：{{user.description}}</p>
+          <p>账户：{{ user.username }}</p>
+          <p :title="user.roleName">角色：{{ user.roleName? user.roleName: '暂无角色' }}</p>
+          <p>性别：{{ sex }}</p>
+          <p>电话：{{ user.mobile ? user.mobile : '暂未绑定电话' }}</p>
+          <p>邮箱：{{ user.email ? user.email : '暂未绑定邮箱' }}</p>
+          <p>部门：{{ user.deptName? user.deptName: '暂无部门' }}</p>
+          <p>描述：{{ user.description }}</p>
         </a-col>
       </a-row>
     </a-card>
     <update-avatar
+      :user="user"
+      :update-avatar-model-visible="updateAvatarModelVisible"
       @cancel="handleUpdateAvatarCancel"
       @success="handleUpdateAvatarSuccess"
-      :user="user"
-      :updateAvatarModelVisible="updateAvatarModelVisible">
-    </update-avatar>
+    />
     <update-profile
       ref="updateProfile"
+      :profile-edit-visiable="profileEditVisiable"
       @success="handleProfileEditSuccess"
       @close="handleProfileEditClose"
-      :profileEditVisiable="profileEditVisiable">
-    </update-profile>
+    />
   </div>
 </template>
 <script>
-import {mapState, mapMutations} from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import UpdateAvatar from './UpdateAvatar'
 import UpdateProfile from './UpdateProfile'
 
 export default {
   name: 'Profile',
-  components: {UpdateAvatar, UpdateProfile},
-  data () {
+  components: { UpdateAvatar, UpdateProfile },
+  data() {
     return {
       updateAvatarModelVisible: false,
       profileEditVisiable: false,
@@ -56,10 +56,10 @@ export default {
       multipage: state => state.setting.multipage,
       user: state => state.account.user
     }),
-    avatar () {
+    avatar() {
       return `/static/avatar/${this.user.avatar}`
     },
-    sex () {
+    sex() {
       switch (this.user.ssex) {
         case '0':
           return '男'
@@ -76,28 +76,28 @@ export default {
     ...mapMutations({
       setUser: 'account/setUser'
     }),
-    handleUpdateAvatarCancel () {
+    handleUpdateAvatarCancel() {
       this.updateAvatarModelVisible = false
     },
-    handleUpdateAvatarSuccess (avatar) {
+    handleUpdateAvatarSuccess(avatar) {
       this.updateAvatarModelVisible = false
       this.$message.success('更换头像成功')
-      let user = this.user
+      const user = this.user
       user.avatar = avatar
       this.setUser(user)
     },
-    updateAvatar () {
+    updateAvatar() {
       this.updateAvatarModelVisible = true
       this.userId = this.user.userId
     },
-    updateProfile () {
+    updateProfile() {
       this.$refs.updateProfile.setFormValues(this.user)
       this.profileEditVisiable = true
     },
-    handleProfileEditClose () {
+    handleProfileEditClose() {
       this.profileEditVisiable = false
     },
-    handleProfileEditSuccess () {
+    handleProfileEditSuccess() {
       this.profileEditVisiable = false
       this.$message.success('修改成功')
     }

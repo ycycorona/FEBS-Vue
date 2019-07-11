@@ -17,15 +17,15 @@ const Group = {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       values: [],
       options: []
     }
   },
   computed: {
-    colors () {
-      let colors = []
+    colors() {
+      const colors = []
       this.options.forEach(item => {
         if (item.sChecked) {
           colors.push(item.color)
@@ -34,20 +34,20 @@ const Group = {
       return colors
     }
   },
-  provide () {
+  provide() {
     return {
       groupContext: this
     }
   },
   watch: {
-    values: function (newVal, oldVal) {
+    values: function(newVal, oldVal) {
       if (!(newVal.length === 1 && oldVal.length === 1 && newVal[0] === oldVal[0]) || this.multiple) {
         this.$emit('change', this.values, this.colors)
       }
     }
   },
   methods: {
-    handleChange (option) {
+    handleChange(option) {
       if (!option.checked) {
         this.values = this.values.filter(item => item !== option.value)
       } else {
@@ -64,8 +64,8 @@ const Group = {
       }
     }
   },
-  render (h) {
-    const clear = h('div', {attrs: {style: 'clear: both'}})
+  render(h) {
+    const clear = h('div', { attrs: { style: 'clear: both' }})
     return h(
       'div',
       {},
@@ -89,14 +89,14 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       sChecked: this.checked
     }
   },
   inject: ['groupContext'],
   watch: {
-    'sChecked': function (val) {
+    'sChecked': function(val) {
       const value = {
         value: this.value,
         color: this.color,
@@ -109,7 +109,7 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     const groupContext = this.groupContext
     if (groupContext) {
       this.sChecked = groupContext.defaultValues.indexOf(this.value) >= 0
@@ -117,7 +117,7 @@ export default {
     }
   },
   methods: {
-    toggle () {
+    toggle() {
       this.sChecked = !this.sChecked
     }
   }

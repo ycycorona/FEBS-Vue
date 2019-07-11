@@ -1,7 +1,7 @@
 <template>
   <child-com msg="template">
     <span slot-scope="props">
-      {{props.text}}
+      {{ props.text }}
     </span>
   </child-com>
 </template>
@@ -10,11 +10,11 @@
 import ChildCom from './ChildCom'
 export default {
   name: 'TemplateMode',
+  components: { ChildCom },
   props: {
 
   },
-  components: {ChildCom},
-  data () {
+  data() {
     return {
       activeKey: null
     }
@@ -26,7 +26,7 @@ export default {
 
   },
   methods: {
-    callback (key) {
+    callback(key) {
       console.log(key)
     }
   }

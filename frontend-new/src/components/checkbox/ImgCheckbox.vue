@@ -1,6 +1,6 @@
 <template>
   <div class="img-check-box" @click="toggle">
-    <img :src="img" />
+    <img :src="img">
     <div v-if="sChecked" class="check-item">
       <a-icon type="check" />
     </div>
@@ -22,19 +22,19 @@ const Group = {
       default: () => []
     }
   },
-  data () {
+  data() {
     return {
       values: [],
       options: []
     }
   },
-  provide () {
+  provide() {
     return {
       groupContext: this
     }
   },
   watch: {
-    'values': function (newVal, oldVal) {
+    'values': function(newVal, oldVal) {
       // 此条件是为解决单选时，触发两次chang事件问题
       if (!(newVal.length === 1 && oldVal.length === 1 && newVal[0] === oldVal[0])) {
         this.$emit('change', this.values)
@@ -42,7 +42,7 @@ const Group = {
     }
   },
   methods: {
-    handleChange (option) {
+    handleChange(option) {
       if (!option.checked) {
         this.values = this.values.filter(item => item !== option.value)
       } else {
@@ -59,11 +59,11 @@ const Group = {
       }
     }
   },
-  render (h) {
+  render(h) {
     return h(
       'div',
       {
-        attrs: {style: 'display: flex'}
+        attrs: { style: 'display: flex' }
       },
       [this.$slots.default]
     )
@@ -87,14 +87,14 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       sChecked: this.checked
     }
   },
   inject: ['groupContext'],
   watch: {
-    'sChecked': function (val) {
+    'sChecked': function(val) {
       const option = {
         value: this.value,
         checked: this.sChecked
@@ -106,7 +106,7 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     const groupContext = this.groupContext
     if (groupContext) {
       this.sChecked = groupContext.defaultValues.length > 0 ? groupContext.defaultValues.indexOf(this.value) >= 0 : this.sChecked
@@ -114,7 +114,7 @@ export default {
     }
   },
   methods: {
-    toggle () {
+    toggle() {
       if (this.sChecked) {
         return
       }

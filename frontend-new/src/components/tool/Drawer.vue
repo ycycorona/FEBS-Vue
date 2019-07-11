@@ -1,26 +1,20 @@
 <template>
-  <div >
-    <div :class="['mask', openDrawer ? 'open' : 'close']" @click="close"></div>
+  <div>
+    <div :class="['mask', openDrawer ? 'open' : 'close']" @click="close" />
     <div :class="['drawer', placement, openDrawer ? 'open' : 'close']">
       <div ref="drawer" style="position: relative; height: 100%;">
-        <slot></slot>
+        <slot />
       </div>
-      <div v-if="showHandler" :class="['handler-container', placement]" ref="handler">
-      </div>
+      <div v-if="showHandler" ref="handler" :class="['handler-container', placement]" />
     </div>
   </div>
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'Drawer',
-  data () {
-    return {
-      drawerWidth: 0
-    }
-  },
   props: {
     openDrawer: {
       type: Boolean,
@@ -38,11 +32,13 @@ export default {
       default: true
     }
   },
-  mounted () {
-    this.drawerWidth = this.getDrawerWidth()
+  data() {
+    return {
+      drawerWidth: 0
+    }
   },
   watch: {
-    'drawerWidth': function (val) {
+    'drawerWidth': function(val) {
       if (this.placement === 'left') {
         this.$refs.handler.style.left = val + 'px'
       } else {
@@ -50,14 +46,17 @@ export default {
       }
     }
   },
+  mounted() {
+    this.drawerWidth = this.getDrawerWidth()
+  },
   methods: {
-    close () {
+    close() {
       this.setSettingBar(false)
     },
-    getDrawerWidth () {
+    getDrawerWidth() {
       return this.$refs.drawer.clientWidth
     },
-    ...mapMutations({setSettingBar: 'setting/setSettingBar'})
+    ...mapMutations({ setSettingBar: 'setting/setSettingBar' })
   }
 }
 </script>

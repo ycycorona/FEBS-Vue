@@ -2,8 +2,8 @@
   <div class="footer">
     <div class="copyright">
       Copyright
-      <a-icon type="copyright"/>
-      <span v-html="copyright"></span>
+      <a-icon type="copyright" />
+      <span v-html="copyright" />
     </div>
   </div>
 </template>

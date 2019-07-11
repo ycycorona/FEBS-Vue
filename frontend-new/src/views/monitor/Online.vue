@@ -4,13 +4,14 @@
       <!-- 搜索区域 -->
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="12" :sm="24" >
+          <a-row>
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="用户名"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.username"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.username" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -23,23 +24,25 @@
     </div>
     <div>
       <!-- 表格区域 -->
-      <a-table :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :scroll="{ x: 900 }"
-               @change="handleTableChange">
+      <a-table
+        :columns="columns"
+        :data-source="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :scroll="{ x: 900 }"
+        @change="handleTableChange"
+      >
         <template slot="username" slot-scope="text, record">
           <template v-if="record.id === user.id">
-            {{record.username}}&nbsp;&nbsp;<a-tag color="pink">current</a-tag>
+            {{ record.username }}&nbsp;&nbsp;<a-tag color="pink">current</a-tag>
           </template>
           <template v-else>
-            {{record.username}}
+            {{ record.username }}
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'user:kickout'" type="poweroff" style="color: #f95476" @click="kickout(record)" title="踢出"></a-icon>
-          <a-badge v-hasNoPermission="'user:kickout'" status="warning" text="无权限"></a-badge>
+          <a-icon v-hasPermission="'user:kickout'" type="poweroff" style="color: #f95476" title="踢出" @click="kickout(record)" />
+          <a-badge v-hasNoPermission="'user:kickout'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
@@ -47,11 +50,11 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Online',
-  data () {
+  data() {
     return {
       advanced: false,
       dataSource: [],
@@ -65,11 +68,11 @@ export default {
     }
   },
   computed: {
-    columns () {
+    columns() {
       return [{
         title: '用户名',
         dataIndex: 'username',
-        scopedSlots: {customRender: 'username'}
+        scopedSlots: { customRender: 'username' }
       }, {
         title: '登录时间',
         dataIndex: 'loginTime'
@@ -82,7 +85,7 @@ export default {
       }, {
         title: '操作',
         dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'},
+        scopedSlots: { customRender: 'operation' },
         fixed: 'right',
         width: 120
       }]
@@ -91,22 +94,22 @@ export default {
       user: state => state.account.user
     })
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    search () {
+    search() {
       this.fetch({
         ...this.queryParams
       })
     },
-    kickout (record) {
-      let that = this
+    kickout(record) {
+      const that = this
       this.$confirm({
         title: '确定踢出该用户?',
         content: '当您点击确定按钮后，该用户的登录将会马上失效',
         centered: true,
-        onOk () {
+        onOk() {
           that.$delete(`kickout/${record.id}`).then(() => {
             that.$message.success('踢出用户成功')
             if (that.user.id === record.id) {
@@ -122,22 +125,22 @@ export default {
         }
       })
     },
-    reset () {
+    reset() {
       // 重置查询参数
       this.queryParams = {}
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.fetch({
         ...this.queryParams
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       this.$get('online', {
         ...params
       }).then((r) => {
-        let data = r.data.data
+        const data = r.data.data
         this.loading = false
         this.dataSource = data
       })

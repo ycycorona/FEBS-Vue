@@ -1,4 +1,4 @@
-import {message} from 'ant-design-vue/es'
+import { message } from 'ant-design-vue/es'
 
 let lessNodesAppended
 
@@ -7,7 +7,7 @@ const updateTheme = primaryColor => {
     return
   }
   const hideMessage = message.loading('加载主题...', 0)
-  function buildIt () {
+  function buildIt() {
     if (!window.less) {
       return
     }
@@ -54,4 +54,4 @@ const updateTheme = primaryColor => {
     buildIt()
   }
 }
-export {updateTheme}
+export { updateTheme }

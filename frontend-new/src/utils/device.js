@@ -1,11 +1,11 @@
 import enquireJs from 'enquire.js'
 
-const enquireScreen = function (call) {
+const enquireScreen = function(call) {
   const hanlder = {
-    match: function () {
+    match: function() {
       call && call(true)
     },
-    unmatch: function () {
+    unmatch: function() {
       call && call(false)
     }
   }

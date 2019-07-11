@@ -1,34 +1,34 @@
 <template>
   <a-tree-select
-    :allowClear="true"
-    :dropdownStyle="{ maxHeight: '220px', overflow: 'auto' }"
-    :treeData="deptTreeData"
-    v-model="value">
-  </a-tree-select>
+    v-model="value"
+    :allow-clear="true"
+    :dropdown-style="{ maxHeight: '220px', overflow: 'auto' }"
+    :tree-data="deptTreeData"
+  />
 </template>
 
 <script>
 export default {
   name: 'DetpInputTree',
-  data () {
+  data() {
     return {
       deptTreeData: [],
       value: undefined
     }
   },
-  methods: {
-    reset () {
-      this.value = ''
+  watch: {
+    value(value) {
+      this.$emit('change', value)
     }
   },
-  mounted () {
+  mounted() {
     this.$get('dept').then((r) => {
       this.deptTreeData = r.data.rows.children
     })
   },
-  watch: {
-    value (value) {
-      this.$emit('change', value)
+  methods: {
+    reset() {
+      this.value = ''
     }
   }
 }

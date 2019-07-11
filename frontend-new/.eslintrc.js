@@ -25,6 +25,10 @@ module.exports = {
     "vue/multiline-html-element-content-newline": "off",
     "vue/name-property-casing": ["error", "PascalCase"],
     "vue/no-v-html": "off",
+    'vue/no-unused-vars': 0,
+    'vue/require-prop-types': 0,
+    'vue/require-default-prop': 0,
+    'vue/order-in-components': 2,
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,
@@ -194,6 +198,5 @@ module.exports = {
       'objectsInObjects': false
     }],
     'array-bracket-spacing': [2, 'never'],
-    'vue/no-unused-vars': 'off'
   }
 }

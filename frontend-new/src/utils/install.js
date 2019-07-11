@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-import {hasPermission, hasNoPermission, hasAnyPermission, hasRole, hasAnyRole} from 'utils/permissionDirect'
+import { hasPermission, hasNoPermission, hasAnyPermission, hasRole, hasAnyRole } from 'utils/permissionDirect'
 
 const Plugins = [
   hasPermission,

@@ -1,16 +1,16 @@
 import axios from 'axios'
 import qs from 'qs'
-import {message, Modal, notification} from 'ant-design-vue'
+import { message, Modal, notification } from 'ant-design-vue'
 import moment from 'moment'
 import store from '../store'
 import db from 'utils/localstorage'
 moment.locale('zh-cn')
 
 // 统一配置
-let FEBS_REQUEST = axios.create({
+const FEBS_REQUEST = axios.create({
   baseURL: '/',
   responseType: 'json',
-  validateStatus (status) {
+  validateStatus(status) {
     // 200 外的状态码都认定为失败
     return status === 200
   }
@@ -18,8 +18,8 @@ let FEBS_REQUEST = axios.create({
 
 // 拦截请求
 FEBS_REQUEST.interceptors.request.use((config) => {
-  let expireTime = store.state.account.expireTime
-  let now = moment().format('YYYYMMDDHHmmss')
+  const expireTime = store.state.account.expireTime
+  const now = moment().format('YYYYMMDDHHmmss')
   // 让token早10秒种过期，提升“请重新登录”弹窗体验
   if (now - expireTime >= -10) {
     Modal.error({
@@ -49,7 +49,7 @@ FEBS_REQUEST.interceptors.response.use((config) => {
   return config
 }, (error) => {
   if (error.response) {
-    let errorMessage = error.response.data === null ? '系统内部异常，请联系网站管理员' : error.response.data.message
+    const errorMessage = error.response.data === null ? '系统内部异常，请联系网站管理员' : error.response.data.message
     switch (error.response.status) {
       case 404:
         notification.error({
@@ -79,7 +79,7 @@ FEBS_REQUEST.interceptors.response.use((config) => {
 })
 
 const request = {
-  post (url, params) {
+  post(url, params) {
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
         return qs.stringify(params)
@@ -89,7 +89,7 @@ const request = {
       }
     })
   },
-  put (url, params = {}) {
+  put(url, params = {}) {
     return FEBS_REQUEST.put(url, params, {
       transformRequest: [(params) => {
         return qs.stringify(params)
@@ -99,13 +99,13 @@ const request = {
       }
     })
   },
-  get (url, params = {}) {
-    return FEBS_REQUEST.get(url, {params})
+  get(url, params = {}) {
+    return FEBS_REQUEST.get(url, { params })
   },
-  delete (url, params = {}) {
-    return FEBS_REQUEST.delete(url, {params})
+  delete(url, params = {}) {
+    return FEBS_REQUEST.delete(url, { params })
   },
-  export (url, params = {}) {
+  export(url, params = {}) {
     message.loading('导出数据中')
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
@@ -133,7 +133,7 @@ const request = {
       message.error('导出失败')
     })
   },
-  download (url, params, filename) {
+  download(url, params, filename) {
     message.loading('文件传输中')
     return FEBS_REQUEST.post(url, params, {
       transformRequest: [(params) => {
@@ -160,7 +160,7 @@ const request = {
       message.error('下载失败')
     })
   },
-  upload (url, params) {
+  upload(url, params) {
     return FEBS_REQUEST.post(url, params, {
       headers: {
         'Content-Type': 'multipart/form-data'
