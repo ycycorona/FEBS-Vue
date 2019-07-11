@@ -4,21 +4,23 @@
       <!-- 搜索区域 -->
       <a-form layout="horizontal">
         <div :class="advanced ? null: 'fold'">
-          <a-row >
-            <a-col :md="12" :sm="24" >
+          <a-row>
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.menuName"/>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <a-input v-model="queryParams.menuName" />
               </a-form-item>
             </a-col>
-            <a-col :md="12" :sm="24" >
+            <a-col :md="12" :sm="24">
               <a-form-item
                 label="创建时间"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <range-date @change="handleDateChange" ref="createTime"></range-date>
+                :label-col="{span: 5}"
+                :wrapper-col="{span: 18, offset: 1}"
+              >
+                <range-date ref="createTime" @change="handleDateChange" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -33,12 +35,13 @@
       <div class="operator">
         <a-popconfirm
           title="请选择创建类型"
-          okText="按钮"
-          cancelText="菜单"
+          ok-text="按钮"
+          cancel-text="菜单"
           @cancel="() => createMenu()"
-          @confirm="() => createButton()">
+          @confirm="() => createButton()"
+        >
           <a-icon slot="icon" type="question-circle-o" style="color: orangered" />
-          <a-button type="primary" v-hasPermission="'menu:add'" ghost>新增</a-button>
+          <a-button v-hasPermission="'menu:add'" type="primary" ghost>新增</a-button>
         </a-popconfirm>
         <a-button v-hasPermission="'menu:delete'" @click="batchDelete">删除</a-button>
         <a-dropdown v-hasPermission="'menu:export'">
@@ -51,48 +54,51 @@
         </a-dropdown>
       </div>
       <!-- 表格区域 -->
-      <a-table :columns="columns"
-               :key="key"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-               @change="handleTableChange" :scroll="{ x: 1500 }">
+      <a-table
+        :row-key="record => record.id"
+        :columns="columns"
+        :data-source="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :scroll="{ x: 1500 }"
+        @change="handleTableChange"
+      >
         <template slot="icon" slot-scope="text, record">
-         <a-icon :type="text" />
+          <a-icon :type="text" />
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-hasPermission="'menu:update'" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修改"></a-icon>
-          <a-badge v-hasNoPermission="'menu:update'" status="warning" text="无权限"></a-badge>
+          <a-icon v-hasPermission="'menu:update'" type="setting" theme="twoTone" two-tone-color="#4a9ff5" title="修改" @click="edit(record)" />
+          <a-badge v-hasNoPermission="'menu:update'" status="warning" text="无权限" />
         </template>
       </a-table>
     </div>
     <!-- 新增菜单 -->
     <menu-add
+      :menu-add-visiable="menuAddVisiable"
       @close="handleMenuAddClose"
       @success="handleMenuAddSuccess"
-      :menuAddVisiable="menuAddVisiable">
-    </menu-add>
+    />
     <!-- 修改菜单 -->
     <menu-edit
       ref="menuEdit"
+      :menu-edit-visiable="menuEditVisiable"
       @close="handleMenuEditClose"
       @success="handleMenuEditSuccess"
-      :menuEditVisiable="menuEditVisiable">
-    </menu-edit>
+    />
     <!-- 新增按钮 -->
     <button-add
+      :button-add-visiable="buttonAddVisiable"
       @close="handleButtonAddClose"
       @success="handleButtonAddSuccess"
-      :buttonAddVisiable="buttonAddVisiable">
-    </button-add>
+    />
     <!-- 修改按钮 -->
     <button-edit
       ref="buttonEdit"
+      :button-edit-visiable="buttonEditVisiable"
       @close="handleButtonEditClose"
       @success="handleButtonEditSuccess"
-      :buttonEditVisiable="buttonEditVisiable">
-    </button-edit>
+    />
   </a-card>
 </template>
 
@@ -105,11 +111,10 @@ import ButtonEdit from './ButtonEdit'
 
 export default {
   name: 'Menu',
-  components: {ButtonAdd, ButtonEdit, RangeDate, MenuAdd, MenuEdit},
-  data () {
+  components: { ButtonAdd, ButtonEdit, RangeDate, MenuAdd, MenuEdit },
+  data() {
     return {
       advanced: false,
-      key: +new Date(),
       queryParams: {},
       filteredInfo: null,
       dataSource: [],
@@ -127,8 +132,8 @@ export default {
     }
   },
   computed: {
-    columns () {
-      let {filteredInfo} = this
+    columns() {
+      let { filteredInfo } = this
       filteredInfo = filteredInfo || {}
       return [{
         title: '名称',
@@ -138,23 +143,23 @@ export default {
       }, {
         title: '图标',
         dataIndex: 'icon',
-        scopedSlots: {customRender: 'icon'}
+        scopedSlots: { customRender: 'icon' }
       }, {
         title: '类型',
         dataIndex: 'type',
         customRender: (text, row, index) => {
           switch (text) {
             case '0':
-              return <a-tag color="cyan"> 菜单 </a-tag>
+              return <a-tag color='cyan'> 菜单 </a-tag>
             case '1':
-              return <a-tag color="pink"> 按钮 </a-tag>
+              return <a-tag color='pink'> 按钮 </a-tag>
             default:
               return text
           }
         },
         filters: [
-          {text: '按钮', value: '1'},
-          {text: '菜单', value: '0'}
+          { text: '按钮', value: '1' },
+          { text: '菜单', value: '0' }
         ],
         filterMultiple: false,
         filteredValue: filteredInfo.type || null,
@@ -181,35 +186,35 @@ export default {
         title: '操作',
         dataIndex: 'operation',
         width: 120,
-        scopedSlots: {customRender: 'operation'},
+        scopedSlots: { customRender: 'operation' },
         fixed: 'right'
       }]
     }
   },
-  mounted () {
+  mounted() {
     this.fetch()
   },
   methods: {
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    handleMenuEditClose () {
+    handleMenuEditClose() {
       this.menuEditVisiable = false
     },
-    handleMenuEditSuccess () {
+    handleMenuEditSuccess() {
       this.menuEditVisiable = false
       this.$message.success('修改菜单成功')
       this.fetch()
     },
-    handleButtonEditClose () {
+    handleButtonEditClose() {
       this.buttonEditVisiable = false
     },
-    handleButtonEditSuccess () {
+    handleButtonEditSuccess() {
       this.buttonEditVisiable = false
       this.$message.success('修改按钮成功')
       this.fetch()
     },
-    edit (record) {
+    edit(record) {
       if (record.type === '0') {
         this.$refs.menuEdit.setFormValues(record)
         this.menuEditVisiable = true
@@ -218,71 +223,71 @@ export default {
         this.buttonEditVisiable = true
       }
     },
-    handleButtonAddClose () {
+    handleButtonAddClose() {
       this.buttonAddVisiable = false
     },
-    handleButtonAddSuccess () {
+    handleButtonAddSuccess() {
       this.buttonAddVisiable = false
       this.$message.success('新增按钮成功')
       this.fetch()
     },
-    createButton () {
+    createButton() {
       this.buttonAddVisiable = true
     },
-    handleMenuAddClose () {
+    handleMenuAddClose() {
       this.menuAddVisiable = false
     },
-    handleMenuAddSuccess () {
+    handleMenuAddSuccess() {
       this.menuAddVisiable = false
       this.$message.success('新增菜单成功')
       this.fetch()
     },
-    createMenu () {
+    createMenu() {
       this.menuAddVisiable = true
     },
-    handleDateChange (value) {
+    handleDateChange(value) {
       if (value) {
         this.queryParams.createTimeFrom = value[0]
         this.queryParams.createTimeTo = value[1]
       }
     },
-    batchDelete () {
+    batchDelete() {
       if (!this.selectedRowKeys.length) {
         this.$message.warning('请选择需要删除的记录')
         return
       }
-      let that = this
+      const that = this
       this.$confirm({
         title: '确定删除所选中的记录?',
         content: '当您点击确定按钮后，这些记录将会被彻底删除，如果其包含子记录，也将一并删除！',
         centered: true,
-        onOk () {
+        onOk() {
           that.$delete('menu/' + that.selectedRowKeys.join(',')).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.fetch()
           })
         },
-        onCancel () {
+        onCancel() {
           that.selectedRowKeys = []
         }
       })
     },
-    exprotExccel () {
-      let {filteredInfo} = this
+    exprotExccel() {
+      const { filteredInfo } = this
       this.$export('menu/excel', {
         ...this.queryParams,
         ...filteredInfo
       })
     },
-    search () {
-      let {filteredInfo} = this
+    search() {
+      const { filteredInfo } = this
       this.fetch({
         ...this.queryParams,
         ...filteredInfo
       })
     },
-    reset () {
+    reset() {
       // 取消选中
       this.selectedRowKeys = []
       // 重置列过滤器规则
@@ -293,7 +298,7 @@ export default {
       this.$refs.createTime.reset()
       this.fetch()
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       // 将这两个个参数赋值给Vue data，用于后续使用
       this.filteredInfo = filters
       this.fetch({
@@ -303,12 +308,12 @@ export default {
         ...filters
       })
     },
-    fetch (params = {}) {
+    fetch(params = {}) {
       this.loading = true
       this.$get('menu', {
         ...params
       }).then((r) => {
-        let data = r.data
+        const data = r.data
         this.loading = false
         if (Object.is(data.rows.children, undefined)) {
           this.dataSource = data.rows

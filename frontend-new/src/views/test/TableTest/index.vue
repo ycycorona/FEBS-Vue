@@ -1,29 +1,33 @@
 <template>
   <!-- :title="() => 'testTableTitle'" -->
-  <a-table
-    class="test-table"
-    :columns="columns"
-    :rowSelection="rowSelection"
+  <div>
+    <form-test></form-test>
+    <a-table
+      class="test-table"
+      :columns="columns"
+      :rowSelection="rowSelection"
 
-    :bordered="true"
-    :rowKey="record => record.login.uuid"
-    :dataSource="data"
-    :pagination="pagination"
-    :loading="loading"
-    @change="handleTableChange">
-    <template slot="name" slot-scope="text">
-      {{text.first}} {{text.last}}
-    </template>
-    <template slot="gender" slot-scope="gender">
-      {{gender}}
-    </template>
-    <template slot="action" slot-scope="record">
-      {{record.login.uuid}}
-    </template>
-  </a-table>
+      :bordered="true"
+      :rowKey="record => record.login.uuid"
+      :dataSource="data"
+      :pagination="pagination"
+      :loading="loading"
+      @change="handleTableChange">
+      <template slot="name" slot-scope="text">
+        {{text.first}} {{text.last}}
+      </template>
+      <template slot="gender" slot-scope="gender">
+        {{gender}}
+      </template>
+      <template slot="action" slot-scope="record">
+        {{record.login.uuid}}
+      </template>
+    </a-table>
+  </div>
 </template>
 
 <script>
+import FormTest from './FormTest'
 const columns = [{
   title: 'Name',
   dataIndex: 'name',
@@ -51,7 +55,7 @@ const columns = [{
 export default {
   name: 'TableTest',
   props: {},
-  components: {},
+  components: {FormTest},
   created () {
     this.fetch()
   },

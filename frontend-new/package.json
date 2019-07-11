@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-analyze": "vue-cli-service build --mode analyze"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.0.38",
@@ -30,6 +31,7 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "mockjs2": "^1.0.5",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "webpack-bundle-analyzer": "^3.3.2"
   }
 }

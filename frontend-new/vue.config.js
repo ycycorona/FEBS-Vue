@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 function resolve (dir) {
   return path.join(__dirname, dir)
@@ -20,6 +21,13 @@ module.exports = {
       .set('vue$', 'vue/dist/vue.esm.js')
       .set('~', resolve('src/components'))
       .set('utils', resolve('src/utils'))
+    // 打包体积分析
+    if (process.env.IS_ANALYZE) {
+      config.plugin('webpack-report')
+        .use(BundleAnalyzerPlugin, [{
+          analyzerMode: 'static',
+        }]);
+    }
   },
 
   css: {

@@ -65,13 +65,14 @@
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
-               :columns="columns"
-               :dataSource="dataSource"
-               :pagination="pagination"
-               :loading="loading"
-               :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-               @change="handleTableChange"
-               :scroll="{ x: 900 }">
+        :rowKey="record => record.dictId"
+        :columns="columns"
+        :dataSource="dataSource"
+        :pagination="pagination"
+        :loading="loading"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        @change="handleTableChange"
+        :scroll="{ x: 900 }">
         <template slot="remark" slot-scope="text, record">
           <a-popover placement="topLeft">
             <template slot="content">
