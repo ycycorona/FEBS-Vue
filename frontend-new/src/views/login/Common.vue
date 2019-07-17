@@ -3,7 +3,7 @@
     <div class="content">
       <div class="top">
         <div class="header">
-          <img alt="logo" class="logo" src="/static/img/logo.png">
+          <img alt="logo" class="logo" src="@/assets/imgs/logo.png">
           <span class="title">{{ systemName }}</span>
         </div>
         <div class="desc" />

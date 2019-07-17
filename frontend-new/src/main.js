@@ -18,9 +18,9 @@ Vue.config.productionTip = false
 Vue.use(Antd)
 Vue.use(db)
 Vue.use(VueApexCharts)
-
 Vue.component('apexchart', VueApexCharts)
 
+import '@/assets/style/less/Common.less'
 Vue.use({
   install(Vue) {
     Vue.prototype.$db = db

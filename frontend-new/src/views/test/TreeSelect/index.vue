@@ -37,7 +37,7 @@ export default {
   computed: {},
   watch: {},
   created() {
-    this.$get('test/tree-select-data')
+    this.$get('/test/tree-select-data')
       .then(r => {
         const data = r.data
         this.options.push(data)

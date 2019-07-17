@@ -6,13 +6,19 @@
     :collapsible="collapsible"
     :trigger="null"
   >
-    <div :class="['logo', theme]">
-      <router-link to="/">
-        <img src="/static/img/logo.png" alt="">
-        <h1 class="animated fadeIn">{{ systemName }}</h1>
+    <div :class="['logo', 'theme', {'collapsed': collapsed}]">
+      <router-link to="/" class="router-link-wrap">
+        <div style="line-height: 60px;">
+          <img src="@/assets/imgs/logo.png" style="width: 42px;">
+        </div>
+        <div :class="{'collapsed': collapsed}" style="padding: 3px 0 0 10px">
+          <h1>敏感区域智能</h1>
+          <h1>手机管控系统</h1>
+        </div>
+
       </router-link>
     </div>
-    <i-menu :theme="theme" :collapsed="collapsed" :menu-data="menuData" @select="onSelect" />
+    <i-menu :theme="theme" :collapsed="collapsed" :menu-data="menuData" class="menu" @select="onSelect" />
   </a-layout-sider>
 </template>
 
@@ -60,6 +66,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  .router-link-wrap {
+    display: flex
+  }
+  .router-link-wrap  .collapsed {
+    display: none
+  }
+  .menu {
+    padding-top: 20px
+  }
   .shadow {
     box-shadow: 1px 0 6px rgba(0, 21, 41, .35);
   }
@@ -78,11 +93,14 @@ export default {
       overflow-y: auto;
       height: 100%;
     }
+    .logo.collapsed {
+      padding-left: 24px !important;
+    }
     .logo {
       height: 59px;
       position: relative;
-      line-height: 59px;
-      padding-left: 24px;
+      // line-height: 59px;
+      padding-left: 35px;
       -webkit-transition: all .3s;
       transition: all .3s;
       overflow: hidden;
@@ -97,20 +115,9 @@ export default {
         }
       }
       h1 {
-        color: #fff;
-        font-size: 20px;
-        margin: 0 0 0 12px;
-        font-family: Chinese Quote,-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
-        font-weight: 600;
-        display: inline-block;
-        height: 32px;
-        line-height: 32px;
-        vertical-align: middle;
-      }
-      img {
-        width: 32px;
-        display: inline-block;
-        vertical-align: middle;
+        font-size: 18px;
+        padding: 0;
+        margin: 0
       }
     }
   }

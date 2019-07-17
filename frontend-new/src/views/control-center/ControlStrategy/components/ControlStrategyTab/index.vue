@@ -1,0 +1,170 @@
+<template>
+  <div class="control-strategy-tab">
+    <div class="float-add-btn">
+      <a-button
+        type="primary"
+        style="border-radius:45px!important;"
+        @click="createControlStrategyPop"
+      >
+        <a-icon type="plus" /><span style="margin-left: 3px;">新建管控策略</span>
+      </a-button>
+    </div>
+    <!-- 表格区域 -->
+    <a-table
+      ref="control-strategy-tab-table"
+      class="full-width-table"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 900}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      :loading="loading"
+      @change="handleTableChange"
+    >
+      <template slot="detail" slot-scope="text">
+        <a-icon v-hasPermission="'user:view'" type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" @click="detailPop" />
+      </template>
+      <template slot="operation" slot-scope="text, record">
+        <span class="operation-btn" @click="openSendConfirm"><icon-send title="下发" />下发</span>
+        <span class="operation-btn" @click="openEditPop"><icon-edit title="编辑" />编辑</span>
+        <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
+      </template>
+      <template slot="receivedUserNum" slot-scope="receivedUserNum">
+        <span>{{ receivedUserNum }}</span>
+      </template>
+    </a-table>
+    <CreateControlStrategyPop
+      :create-control-strategy-pop-visiable="createControlStrategyPopVisiable"
+      @close="handleCreateControlStrategyClose"
+      @success="handleCreateControlStrategySuccess"
+    ></CreateControlStrategyPop>
+  </div>
+</template>
+
+<script>
+import IconEdit from '@/components/icons/IconEdit'
+import IconDelete from '@/components/icons/IconDelete'
+import IconSend from '@/components/icons/IconSend'
+import CreateControlStrategyPop from './CreateControlStrategyPop'
+export default {
+  name: 'ControlStrategyTab',
+  components: { IconEdit, IconDelete, IconSend, CreateControlStrategyPop },
+  props: {},
+  data() {
+    return {
+      columns: [
+        {
+          title: '策略名称',
+          dataIndex: 'strategyName',
+          width: '15%'
+        },
+        {
+          title: '创建人',
+          dataIndex: 'createdBy',
+          width: '10%'
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createTime',
+          width: '15%'
+        },
+        {
+          title: '修改时间',
+          dataIndex: 'editTime',
+          width: '15%'
+        },
+        {
+          title: '详情',
+          width: '10%',
+          scopedSlots: { customRender: 'detail' }
+        },
+        {
+          title: '已接收用户',
+          dataIndex: 'receivedUserNum',
+          width: '15%',
+          scopedSlots: { customRender: 'receivedUserNum' }
+        },
+        {
+          title: '操作',
+          width: '20%',
+          scopedSlots: { customRender: 'operation' }
+        }
+      ],
+      pagination: {
+        total: 0,
+        pageSizeOptions: ['10', '20', '30', '40', '100'],
+        defaultCurrent: 1,
+        defaultPageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
+      },
+      loading: false,
+      dataSource: null,
+      createControlStrategyPopVisiable: false
+    }
+  },
+  computed: {},
+  watch: {},
+  created() {
+    this.fetch({ pageSize: 10, pageNum: 1 })
+  },
+  methods: {
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination)
+      this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
+    },
+    fetch(params = {}) {
+      // 显示loading
+      this.loading = true
+      this.$get('/control-strategy/list', {
+        ...params
+      }).then((r) => {
+        const data = r.data
+        const pagination = { ...this.pagination }
+        this.dataSource = data.rows
+        pagination.total = data.total
+        this.pagination = pagination
+        this.loading = false
+      })
+    },
+    // 打开新建控制策略弹窗
+    createControlStrategyPop() {
+      this.createControlStrategyPopVisiable = true
+    },
+    // 新建策略弹窗关闭
+    handleCreateControlStrategyClose() {
+      this.createControlStrategyPopVisiable = false
+    },
+    // 新建策略成功
+    handleCreateControlStrategySuccess() {
+      this.createControlStrategyPopVisiable = false
+    },
+    // 查看详情弹窗
+    detailPop() {
+
+    },
+    // 打开下发弹窗
+    openSendConfirm() {
+
+    },
+    // 打开编辑策略弹窗
+    openEditPop() {
+
+    },
+    // 打开删除策略弹窗
+    openDelPop() {
+
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+
+.float-add-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+</style>
