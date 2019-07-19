@@ -11,7 +11,8 @@
     style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
     @close="onClose"
   >
-    <a-form :form="form">
+    <tab-title title="策略生效条件"></tab-title>
+    <a-form :form="formCondition">
       <a-row :gutter="24">
         <a-col :span="18">
           <a-form-item label="策略名称" v-bind="formItemLayout">
@@ -29,7 +30,7 @@
         <a-col :span="18">
           <a-form-item label="日期" v-bind="formItemLayout">
             <a-range-picker
-              v-decorator="['dateRange.value',
+              v-decorator="['dateRange',
                             {rules: [
                               { required: !dateRangeDisable, type: 'array', message: '日期不能为空'}
                             ]}]"
@@ -38,11 +39,79 @@
             </a-range-picker>
 
           </a-form-item>
-
         </a-col>
         <a-col :span="4">
           <a-form-item label="长期：" :wrapper-col="{ span: 12 }" :label-col="{ span: 12 }">
             <a-switch v-decorator="['isLongTerm']" @change="isLongTermChange" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="24">
+        <a-col :span="18">
+          <a-form-item label="管控区域" v-bind="formItemLayout">
+            <a-select v-decorator="['controlArea']" placeholder="根据策略需要是否填写本条件">
+              <a-select-option value="电子围栏1">电子围栏1</a-select-option>
+              <a-select-option value="电子围栏2">电子围栏2</a-select-option>
+              <a-select-option value="电子围栏3">电子围栏3</a-select-option>
+              <a-select-option value="电子围栏4">电子围栏4</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+    <tab-title title="策略内容"></tab-title>
+    <a-form :form="formContent">
+      <a-row :gutter="24">
+        <a-col :span="18">
+          <a-form-item label="指令类型" v-bind="formItemLayout">
+            <a-select
+              v-decorator="['directiveTypes',
+                            {rules: [
+                              { required: true, type: 'array', message: '指令不能为空'}
+                            ]}]"
+              placeholder="请选择指令类型"
+              mode="multiple"
+              @change="onDirectiveTypesChange"
+            >
+              <a-select-option value="应用黑名单">应用黑名单</a-select-option>
+              <a-select-option value="电子围栏">电子围栏</a-select-option>
+              <a-select-option value="禁用摄像头">禁用摄像头</a-select-option>
+              <a-select-option value="图片提取">图片提取</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="24">
+        <a-col :span="18">
+          <a-form-item v-if="isGeoFenceSelector" label="电子围栏" v-bind="formItemLayout">
+            <a-select
+              v-decorator="['geoFenceConfig',{rules: [
+                { required: true, type: 'array', message: '电子围栏不能为空'}
+              ]}]"
+              placeholder="点击选择电子围栏"
+            >
+              <a-select-option value="电子围栏1">电子围栏1</a-select-option>
+              <a-select-option value="电子围栏2">电子围栏2</a-select-option>
+              <a-select-option value="电子围栏3">电子围栏3</a-select-option>
+              <a-select-option value="电子围栏4">电子围栏4</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="24">
+        <a-col :span="18">
+          <a-form-item v-if="isExtractImgs" label="图片提取配置" v-bind="formItemLayout">
+            <a-select
+              v-decorator="['geoFenceConfig', {rules: [
+                { required: true, type: 'array', message: '指令不能为空'}
+              ]}]"
+              placeholder="点击选择电子围栏"
+            >
+              <a-select-option value="电子围栏1">电子围栏1</a-select-option>
+              <a-select-option value="电子围栏2">电子围栏2</a-select-option>
+              <a-select-option value="电子围栏3">电子围栏3</a-select-option>
+              <a-select-option value="电子围栏4">电子围栏4</a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
       </a-row>
@@ -58,17 +127,18 @@
 
 <script>
 import moment from 'moment'
+import TabTitle from '@/components/fragment/TabTitle'
 const formItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 20 }
 }
-const formTailLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 8, offset: 4 }
-}
+// const formTailLayout = {
+//   labelCol: { span: 4 },
+//   wrapperCol: { span: 8, offset: 4 }
+// }
 export default {
   name: 'CreateControlStrategyPop',
-  components: { },
+  components: { TabTitle },
   props: {
     createControlStrategyPopVisiable: {
       required: true,
@@ -79,10 +149,13 @@ export default {
     return {
       moment,
       loading: false,
-      form: this.$form.createForm(this),
+      formCondition: this.$form.createForm(this),
+      formContent: this.$form.createForm(this),
       mForm: { isLongTerm: false },
       formItemLayout,
-      dateRangeDisable: false
+      dateRangeDisable: false,
+      isGeoFenceSelector: false,
+      isExtractImgs: false
     }
   },
   computed: {
@@ -96,12 +169,20 @@ export default {
       this.$emit('close')
     },
     async handleSubmit() {
-      this.form.validateFields((err, fieldsValue) => {
+      let validateFlag = true
+      this.formCondition.validateFields((err, fieldsValue) => {
         if (err) {
-          return
+          validateFlag = false
         }
         console.log(fieldsValue)
       })
+      this.formContent.validateFields((err, fieldsValue) => {
+        if (err) {
+          validateFlag = false
+        }
+        console.log(fieldsValue)
+      })
+      if (!validateFlag) { return }
 
       this.loading = true
 
@@ -114,14 +195,27 @@ export default {
       this.loading = false
       this.$emit('success')
     },
+    // 长期按钮改变
     isLongTermChange(val) {
       if (val) {
-        this.form.setFieldsValue({
+        this.formCondition.setFieldsValue({
           dateRange: undefined
         })
         this.dateRangeDisable = true
       } else {
         this.dateRangeDisable = false
+      }
+    },
+    onDirectiveTypesChange(val) {
+      if (val.find(item => item === '电子围栏')) {
+        this.isGeoFenceSelector = true
+      } else {
+        this.isGeoFenceSelector = false
+      }
+      if (val.find(item => item === '图片提取')) {
+        this.isExtractImgs = true
+      } else {
+        this.isExtractImgs = false
       }
     }
   }
@@ -129,5 +223,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
+#dateRange {
+  width: 100%
+}
 </style>

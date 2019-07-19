@@ -3,7 +3,7 @@
     <div class="content">
       <div class="top">
         <div class="header">
-          <img alt="logo" class="logo" src="@/assets/imgs/logo.png">
+          <img alt="logo" class="logo" src="@/assets/imgs/logo-blue.png">
           <span class="title">{{ systemName }}</span>
         </div>
         <div class="desc" />
@@ -66,10 +66,10 @@ export default {
             text-decoration: none;
           }
           .logo {
-            width: 40px;
-            height: 19px;
+            width: 50px;
+            // height: 19px;
             vertical-align: center;
-            margin-right: 16px;
+            margin-right: 0;
           }
           .title {
             font-size: 28px;

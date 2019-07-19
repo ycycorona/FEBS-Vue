@@ -10,7 +10,7 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
     rows: [
       {
         id: 1,
-        strategyName: '日常策略',
+        strategyName: '一营日常策略',
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
@@ -18,7 +18,7 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
       },
       {
         id: 2,
-        strategyName: '会议室开会',
+        strategyName: '一营临时策略',
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',

@@ -25,8 +25,8 @@
         <a-icon v-hasPermission="'user:view'" type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" @click="detailPop" />
       </template>
       <template slot="operation" slot-scope="text, record">
-        <span class="operation-btn" @click="openSendConfirm"><icon-send title="下发" />下发</span>
-        <span class="operation-btn" @click="openEditPop"><icon-edit title="编辑" />编辑</span>
+        <span class="operation-btn" @click="openSendPop"><icon-send title="下发" />下发</span>
+        <span class="operation-btn" @click="openEditPop"><icon-edit title="修改" />编辑</span>
         <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
       </template>
       <template slot="receivedUserNum" slot-scope="receivedUserNum">
@@ -38,6 +38,7 @@
       @close="handleCreateControlStrategyClose"
       @success="handleCreateControlStrategySuccess"
     ></CreateControlStrategyPop>
+    <user-picker-pop :visible.sync="userPickerPopVisible"></user-picker-pop>
   </div>
 </template>
 
@@ -46,9 +47,11 @@ import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import IconSend from '@/components/icons/IconSend'
 import CreateControlStrategyPop from './CreateControlStrategyPop'
+import UserPickerPop from '@/components/UserPickerPop'
 export default {
   name: 'ControlStrategyTab',
-  components: { IconEdit, IconDelete, IconSend, CreateControlStrategyPop },
+  components: { IconEdit, IconDelete, IconSend, CreateControlStrategyPop,
+    UserPickerPop },
   props: {},
   data() {
     return {
@@ -101,7 +104,8 @@ export default {
       },
       loading: false,
       dataSource: null,
-      createControlStrategyPopVisiable: false
+      createControlStrategyPopVisiable: false,
+      userPickerPopVisible: false
     }
   },
   computed: {},
@@ -145,8 +149,8 @@ export default {
 
     },
     // 打开下发弹窗
-    openSendConfirm() {
-
+    openSendPop() {
+      this.userPickerPopVisible = true
     },
     // 打开编辑策略弹窗
     openEditPop() {
