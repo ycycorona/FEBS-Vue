@@ -3,10 +3,9 @@
     <!-- 表格区域 -->
     <a-table
       ref="strategy-send-tab-table"
-      class="full-width-table"
       :row-key="record => record.id"
       :columns="columns"
-      :scroll="{x: 900}"
+      :scroll="{x: 1200}"
       :data-source="dataSource"
       :pagination="pagination"
       :loading="loading"
@@ -14,10 +13,13 @@
     >
 
       <template slot="detail">
-        详情
+        <a-icon type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" />
       </template>
       <template slot="receivedUserNum" slot-scope="receivedUserNum">
         <span>{{ receivedUserNum }}</span>
+      </template>
+      <template slot="receivedDeviceNum" slot-scope="receivedDeviceNum">
+        <span>{{ receivedDeviceNum }}</span>
       </template>
     </a-table>
   </div>
@@ -53,21 +55,21 @@ export default {
           width: '15%'
         },
         {
-          title: '详情',
+          title: '策略详情',
           width: '10%',
           scopedSlots: { customRender: 'detail' }
         },
         {
-          title: '已接收用户',
+          title: '已下发用户',
           dataIndex: 'receivedUserNum',
           width: '15%',
           scopedSlots: { customRender: 'receivedUserNum' }
         },
         {
-          title: '状态',
-          dataIndex: 'status',
+          title: '接收设备',
+          dataIndex: 'receivedDeviceNum',
           width: '20%',
-          scopedSlots: { customRender: 'status' }
+          scopedSlots: { customRender: 'receivedDeviceNum' }
         }
       ],
       pagination: {

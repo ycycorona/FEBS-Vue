@@ -1,9 +1,10 @@
 <template>
   <a-layout>
-    <drawer v-if="isMobile" :open-drawer="collapsed" @change="onDrawerChange">
+    <!-- <drawer v-if="isMobile" :open-drawer="collapsed" @change="onDrawerChange">
       <sider-menu :theme="theme" :menu-data="menuData" :collapsed="false" :collapsible="false" @menuSelect="onMenuSelect" />
-    </drawer>
-    <sider-menu v-else-if="layout === 'side'" :theme="theme" :menu-data="menuData" :collapsed="collapsed" :collapsible="true" />
+    </drawer> -->
+    <!-- v-else-if="layout === 'side'" -->
+    <sider-menu :theme="theme" :menu-data="menuData" :collapsed="collapsed" :collapsible="true" />
     <drawer :open-drawer="settingBar" placement="right">
       <setting />
     </drawer>
@@ -44,7 +45,7 @@ export default {
   },
   computed: {
     paddingLeft() {
-      return this.fixSiderbar && this.layout === 'side' && !this.isMobile ? `${this.sidebarOpened ? 256 : 80}px` : '0'
+      return this.fixSiderbar && this.layout === 'side' ? `${this.sidebarOpened ? 256 : 80}px` : '0'
     },
     ...mapState({
       sidebarOpened: state => state.setting.sidebar.opened,

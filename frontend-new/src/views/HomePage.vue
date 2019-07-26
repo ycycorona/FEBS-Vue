@@ -1,6 +1,6 @@
 <template>
   <div :class="[multipage === true ? 'multi-page':'single-page', 'not-menu-page', 'home-page']">
-    <a-row :gutter="8" class="head-info">
+    <!-- <a-row :gutter="8" class="head-info">
       <a-card class="head-info-card">
         <a-col :span="12">
           <div class="head-info-avatar">
@@ -121,7 +121,7 @@
           </table>
         </a-card>
       </a-col>
-    </a-row>
+    </a-row> -->
   </div>
 </template>
 <script>
@@ -246,7 +246,7 @@ export default {
           sevenUserVistCount.push(0)
         }
       }
-      this.$refs.count.updateSeries([
+      /*       this.$refs.count.updateSeries([
         {
           name: '您',
           data: sevenUserVistCount
@@ -264,7 +264,7 @@ export default {
           text: '近七日系统访问记录',
           align: 'left'
         }
-      }, true, true)
+      }, true, true) */
     }).catch((r) => {
       console.error(r)
       this.$message.error('获取首页信息失败')

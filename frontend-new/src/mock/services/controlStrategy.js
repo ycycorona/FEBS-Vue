@@ -14,7 +14,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 2,
@@ -22,7 +23,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 3,
@@ -30,7 +32,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 4,
@@ -38,7 +41,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 5,
@@ -46,7 +50,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 6,
@@ -54,7 +59,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 7,
@@ -62,7 +68,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 8,
@@ -70,7 +77,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 9,
@@ -78,7 +86,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       },
       {
         id: 10,
@@ -86,7 +95,8 @@ Mock.mock(/\/control-strategy\/list/, 'get', ({ url, type, body }) => {
         createdBy: '管理员',
         createTime: '2019-07-03 15:31',
         editTime: '2019-07-03 15:31',
-        receivedUserNum: 500
+        receivedUserNum: 500,
+        receivedDeviceNum: 700
       }
     ]
   }
@@ -107,8 +117,8 @@ Mock.mock(/\/control-strategy-send-history\/list/, 'get', ({ url, type, body }) 
       createdBy: '管理员',
       sendUser: '下发人' + id,
       sendTime: '2019-07-03 15:31',
-      receivedUserNum: 500,
-      status: '执行中'
+      receivedUserNum: 562,
+      receivedDeviceNum: '895'
     }
   }
 

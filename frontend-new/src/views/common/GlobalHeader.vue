@@ -1,11 +1,11 @@
 <template>
   <a-layout-header :class="[fixHeader && 'ant-header-fixedHeader', layout === 'side' ? (sidebarOpened ? 'ant-header-side-opened' : 'ant-header-side-closed') : null, theme, 'global-header' ]">
     <div :class="['global-header-wide', layout]">
-      <router-link v-if="isMobile || layout === 'head'" to="/" :class="['logo', isMobile ? null : 'pc', theme]">
+      <!-- <router-link v-if="isMobile || layout === 'head'" to="/" :class="['logo', isMobile ? null : 'pc', theme]">
         <img width="32" src="/static/img/logo.png" alt="">
         <h1 v-if="!isMobile">{{ systemName }}</h1>
       </router-link>
-      <a-divider v-if="isMobile" type="vertical" />
+      <a-divider v-if="isMobile" type="vertical" /> -->
       <a-icon v-if="layout === 'side'" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse" />
       <div v-if="layout === 'head'" class="global-header-menu">
         <i-menu style="height: 64px; line-height: 64px;" class="system-top-menu" :theme="theme" mode="horizontal" :menu-data="menuData" @select="onSelect" />
@@ -84,6 +84,7 @@ export default {
         padding: 0 24px;
       }
       &.side{
+        min-width: 200px;
       }
       .logo {
         height: 64px;

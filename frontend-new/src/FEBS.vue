@@ -19,10 +19,10 @@ export default {
     }
   },
   created() {
-    const _this = this
-    enquireScreen(isMobile => {
-      _this.$store.commit('setting/setDevice', isMobile)
-    })
+    // const _this = this
+    // enquireScreen(isMobile => {
+    //   _this.$store.commit('setting/setDevice', isMobile)
+    // })
   }
 }
 </script>

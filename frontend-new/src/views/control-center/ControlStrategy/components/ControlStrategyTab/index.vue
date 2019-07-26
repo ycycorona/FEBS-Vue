@@ -12,17 +12,16 @@
     <!-- 表格区域 -->
     <a-table
       ref="control-strategy-tab-table"
-      class="full-width-table"
       :row-key="record => record.id"
       :columns="columns"
-      :scroll="{x: 900}"
+      :scroll="{x: 1200}"
       :data-source="dataSource"
       :pagination="pagination"
       :loading="loading"
       @change="handleTableChange"
     >
       <template slot="detail" slot-scope="text">
-        <a-icon v-hasPermission="'user:view'" type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" @click="detailPop" />
+        <a-icon type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" @click="detailPop" />
       </template>
       <template slot="operation" slot-scope="text, record">
         <span class="operation-btn" @click="openSendPop"><icon-send title="下发" />下发</span>
@@ -31,6 +30,12 @@
       </template>
       <template slot="receivedUserNum" slot-scope="receivedUserNum">
         <span>{{ receivedUserNum }}</span>
+      </template>
+      <template slot="receivedDeviceNum" slot-scope="receivedDeviceNum">
+        <span>{{ receivedDeviceNum }}</span>
+      </template>
+      <template slot="strategyType" slot-scope="strategyType">
+        <span>长期</span>
       </template>
     </a-table>
     <CreateControlStrategyPop
@@ -58,38 +63,41 @@ export default {
       columns: [
         {
           title: '策略名称',
-          dataIndex: 'strategyName',
-          width: '15%'
+          dataIndex: 'strategyName'
+        },
+        {
+          title: '策略类型',
+          dataIndex: 'strategyType',
+          scopedSlots: { customRender: 'strategyType' }
         },
         {
           title: '创建人',
-          dataIndex: 'createdBy',
-          width: '10%'
+          dataIndex: 'createdBy'
         },
         {
           title: '创建时间',
-          dataIndex: 'createTime',
-          width: '15%'
+          dataIndex: 'createTime'
         },
         {
           title: '修改时间',
-          dataIndex: 'editTime',
-          width: '15%'
+          dataIndex: 'editTime'
         },
         {
-          title: '详情',
-          width: '10%',
-          scopedSlots: { customRender: 'detail' }
-        },
-        {
-          title: '已接收用户',
+          title: '已下发用户',
           dataIndex: 'receivedUserNum',
-          width: '15%',
           scopedSlots: { customRender: 'receivedUserNum' }
         },
         {
+          title: '接收设备',
+          dataIndex: 'receivedDeviceNum',
+          scopedSlots: { customRender: 'receivedDeviceNum' }
+        },
+        {
+          title: '详情',
+          scopedSlots: { customRender: 'detail' }
+        },
+        {
           title: '操作',
-          width: '20%',
           scopedSlots: { customRender: 'operation' }
         }
       ],
