@@ -27,6 +27,7 @@ Vue.use({
   }
 })
 
+import '@/utils/filters'
 Vue.prototype.$post = request.post
 Vue.prototype.$get = request.get
 Vue.prototype.$put = request.put

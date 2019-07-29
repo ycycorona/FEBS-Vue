@@ -66,10 +66,48 @@
       @change="handleTableChange"
     >
       <template slot="longTermStrategy" slot-scope="longTermStrategy, record">
-        {{ longTermStrategy }} {{ record.id }}
+        <a-popover
+          placement="bottom"
+          title="策略详情"
+          arrow-point-at-center
+          trigger="click"
+          class="strategy-blue-title-popover-content"
+          overlay-class-name="strategy-blue-title-popover"
+        >
+          <template slot="content">
+            <tab-title title="条件"></tab-title>
+            <template>
+              <simple-li title="策略名称:">会议室开会</simple-li>
+              <simple-li title="策略类型:">临时</simple-li>
+              <simple-li title="日期:">2019-07-16 ~ 2019-07-17</simple-li>
+              <simple-li title="时间:">8:00 ~ 12:00</simple-li>
+              <simple-li title="管控区域:">电子围栏一</simple-li>
+            </template>
+            <tab-title title="指令"></tab-title>
+            <template>
+              <simple-li title="指令1:">应用黑名单</simple-li>
+              <simple-li title="指令2:">电子围栏三</simple-li>
+            </template>
+          </template>
+          <span slot="default" class="popover-trigger">
+            {{ longTermStrategy }}
+            <a-tag color="green">
+              已激活
+            </a-tag>
+          </span>
+        </a-popover>
+      </template>
+      <!-- 临时策略 -->
+      <template slot="temporaryStrategy" slot-scope="temporaryStrategy, record">
+        {{ temporaryStrategy }}
+        <a-tag color="orange">
+          未激活
+        </a-tag>
+        <a-tag>
+          已失效
+        </a-tag>
       </template>
       <template slot="controledDeviceNum" slot-scope="controledDeviceNum, record">
-
         <a-popover
           placement="bottom"
           title="受控设备"
@@ -96,15 +134,47 @@
           <span slot="default" class="popover-trigger">{{ controledDeviceNum }}</span>
         </a-popover>
       </template>
+      <template slot="deviceStatus" slot-scope="deviceStatus">
+        <a-tag :color="deviceStatus | deviceStatusColorFil">
+          {{ deviceStatus | deviceStatusFil }}
+        </a-tag>
+      </template>
+      <template slot="violationRecord" slot-scope="violationRecord">
+        <a-popover
+          placement="left"
+          title="违规记录"
+          arrow-point-at-center
+          trigger="click"
+          class="red-title-popover-content"
+          overlay-class-name="red-title-popover"
+        >
+          <template slot="content">
+            <div
+              v-for="(item,index) in violationRecordList"
+              :key="index"
+              class="violation-record-li-wrap"
+            >
+              <div class="time">2019-06-23 10:10</div>
+              <div class="msg">
+                <span class="user-name">战士002</span> <span>离开电子围栏</span>
+              </div>
+              <a-divider class="inline-divider" />
+            </div>
+          </template>
+          <span slot="default" style="color:red;cursor: pointer">{{ violationRecord }}</span>
+        </a-popover>
+      </template>
     </a-table>
   </div>
 </template>
 
 <script>
+import TabTitle from '@/components/fragment/TabTitle'
+import SimpleLi from '@/components/fragment/SimpleLi'
 
 export default {
   name: 'ControlStatus',
-  components: { },
+  components: { TabTitle, SimpleLi },
   props: {
 
   },
@@ -130,7 +200,7 @@ export default {
           temporaryStrategy: '外出训练策略',
           currentActiveStra: 'temporaryStrategy',
           controledDeviceNum: 2,
-          deviceStatus: '1',
+          deviceStatus: '0',
           violationRecord: '4'
         }
       ],
@@ -141,6 +211,48 @@ export default {
           type: 'EML-AL00',
           version: '1.0.0',
           status: '在线'
+        }
+      ],
+      violationRecordList: [
+        {
+          name: '战士1',
+          time: '2019-05-01 13:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
+        },
+        {
+          name: '战士2',
+          time: '2019-05-01 14:11',
+          msg: '离开电子围栏'
         }
       ],
       columns_1: [
@@ -178,7 +290,8 @@ export default {
         },
         {
           title: '临时策略',
-          dataIndex: 'temporaryStrategy'
+          dataIndex: 'temporaryStrategy',
+          scopedSlots: { customRender: 'temporaryStrategy' }
         },
         {
           title: '受控设备',
@@ -187,11 +300,13 @@ export default {
         },
         {
           title: '设备状态',
-          dataIndex: 'deviceStatus'
+          dataIndex: 'deviceStatus',
+          scopedSlots: { customRender: 'deviceStatus' }
         },
         {
-          title: '违规记录',
-          dataIndex: 'violationRecord'
+          title: '违规记录(次)',
+          dataIndex: 'violationRecord',
+          scopedSlots: { customRender: 'violationRecord' }
         }
       ],
       pagination: {
@@ -223,5 +338,17 @@ export default {
 <style lang="less" scoped>
 .left-align {
   text-align: left
+}
+.violation-record-li-wrap {
+  .time, .msg {
+    font-size: 12px;
+
+    .user-name {
+      padding-right: 0.5rem
+    }
+  }
+  .time {
+    color: #A9A9A9;
+  }
 }
 </style>

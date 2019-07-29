@@ -19,6 +19,15 @@
 i {
   cursor: pointer;
 }
+span {
+  &.bold {
+    font-weight: 700
+  }
+  &.padding-right {
+    padding-right: 5px
+  }
+}
+
 
 // 表格
 .full-width-table {
@@ -92,4 +101,65 @@ i {
     cursor: pointer;
     color: #1875F0;
   }
+}
+
+.red-title-popover {
+  .ant-popover-content .ant-popover-arrow {
+    background-color: #fff;
+    border-color: #fff;
+    // border-left-color: #349EF6;
+  }
+  .ant-popover-inner .ant-popover-title {
+    background-color: #FF6565;
+    color: #fff
+  }
+  .ant-popover-inner-content {
+    height: 400px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 2;
+  }
+  .ant-popover-arrow {
+    z-index: 1;
+  }
+}
+.red-title-popover-content {
+  &.popover-trigger {
+    cursor: pointer;
+    color: #FF6565;
+  }
+}
+
+.strategy-blue-title-popover {
+  .ant-popover-content .ant-popover-arrow {
+    background-color: #1875F0;
+    border-color: #1875F0;
+    // border-left-color: #349EF6;
+  }
+  .ant-popover-inner .ant-popover-title {
+    background-color: #1875F0;
+    color: #fff
+  }
+  .ant-popover-inner-content {
+    width:250px;
+    height: 400px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 2;
+  }
+  .ant-popover-arrow {
+    z-index: 1;
+  }
+
+}
+.strategy-blue-title-popover-content {
+  &.popover-trigger {
+    cursor: pointer;
+    // color: #1875F0;
+  }
+}
+
+// 分割线 divider
+.inline-divider.ant-divider-horizontal {
+  margin: 12px 0;
 }
