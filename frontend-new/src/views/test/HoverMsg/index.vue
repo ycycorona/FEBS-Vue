@@ -65,6 +65,15 @@ export default {
   created() {
 
   },
+  mounted() {
+    window.addEventListener('resize', function(e) {
+      console.log(e)
+    })
+    const event = document.createEvent('HTMLEvents')
+    event.initEvent('resize', true, true)
+    event.eventType = 'message'
+    window.dispatchEvent(event)
+  },
   methods: {
     handleTableChange() {
 

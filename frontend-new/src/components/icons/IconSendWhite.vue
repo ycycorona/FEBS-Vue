@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import svg from '@/assets/icons/send.svg'
+import svg from '@/assets/icons/send-white.svg'
 export default {
   name: 'IconSend',
   data() {

@@ -17,6 +17,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'PageContent',
   props: {
@@ -37,7 +38,11 @@ export default {
     layout() {
       return this.$store.state.setting.layout
     }
+  },
+  mounted() {
+
   }
+
 }
 </script>
 

@@ -13,32 +13,32 @@
       <a-layout-content :style="{minHeight: minHeight, margin: '20px 14px 0'}" :class="fixHeader ? 'fixed-header-content' : null">
         <slot />
       </a-layout-content>
-      <a-layout-footer style="padding: .29rem 0" class="copyright">
+      <!-- <a-layout-footer style="padding: .29rem 0" class="copyright">
         <global-footer :copyright="copyright" />
-      </a-layout-footer>
+      </a-layout-footer> -->
     </a-layout>
   </a-layout>
 </template>
 
 <script>
 import GlobalHeader from './GlobalHeader'
-import GlobalFooter from './GlobalFooter'
+// import GlobalFooter from './GlobalFooter'
 import Drawer from '~/tool/Drawer'
 import SiderMenu from '~/menu/SiderMenu'
 import Setting from '~/setting/Setting'
 import { mapState, mapMutations } from 'vuex'
 import { triggerWindowResizeEvent } from 'utils/common'
 
-const minHeight = window.innerHeight - 64 - 24 - 66
+// const minHeight = window.innerHeight - 64 - 24 - 66
 
 let menuData = []
-
+let keepHeight
 export default {
   name: 'GlobalLayout',
-  components: { Setting, SiderMenu, Drawer, GlobalFooter, GlobalHeader },
+  components: { Setting, SiderMenu, Drawer, /* GlobalFooter ,*/ GlobalHeader },
   data() {
     return {
-      minHeight: minHeight + 'px',
+      minHeight: 0,
       collapsed: false,
       menuData: menuData
     }
@@ -66,6 +66,18 @@ export default {
         return true
       } else return meta.isShow
     })
+  },
+  mounted() {
+    // 动态调节PageContent的高度
+    keepHeight = () => {
+      const height = window.innerHeight - 76
+      this.minHeight = `${height}px`
+    }
+    keepHeight()
+    window.addEventListener('resize', keepHeight)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', keepHeight)
   },
   methods: {
     ...mapMutations({ setSidebar: 'setting/setSidebar' }),
