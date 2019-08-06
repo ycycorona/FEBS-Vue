@@ -67,6 +67,7 @@ export default {
       this.confirmLoading = true
       setTimeout(() => {
         this.$emit('update:visible', false)
+        this.$emit('success', 'test')
         this.confirmLoading = false
       }, 2000)
     },

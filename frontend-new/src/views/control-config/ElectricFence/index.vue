@@ -1,173 +1,168 @@
 <template>
-  <div class="electric-fence-wrap full-width table-page-search-wrapper">
-    <!-- 表单区域 -->
-    <a-spin :spinning="isMapLoading">
-      <a-form layout="inline">
-        <a-row :gutter="24">
-          <a-col :span="10" :xl="8">
-            <a-form-item
-              label="电子围栏名称"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceName'
-                ]"
-                placeholder="请输入电子围栏名称"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              label="性质"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceType'
-                ]"
-                placeholder="请选择电子围栏性质"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              class="padding-left"
-              label="中心位置"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceName'
-                ]"
-                placeholder="请输入关键字进行搜索"
-              />
-            </a-form-item>
-
-          </a-col>
-          <a-col :span="2" :xl="2">
-            <a-button type="primary">搜索</a-button>
-          </a-col>
-          <a-col :span="4" :xl="3">
-            <a-form-item
-              label="半径"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceRadius'
-                ]"
-                placeholder="请输入半径"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="4" :xl="3">
-            <a-form-item
-              label="经度"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceX'
-                ]"
-                placeholder="请输入经度"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="4" :xl="3">
-            <a-form-item
-              label="纬度"
-            >
-              <a-input
-                v-decorator="[
-                  'electricFenceY'
-                ]"
-                placeholder="请输入纬度"
-              />
-            </a-form-item>
-          </a-col>
-
-        </a-row>
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-button v-if="!isHaveCurrentCircle" type="primary" class="margin-right" @click="activeAddCircleTool">围栏添加</a-button>
-            <template v-else>
-              <a-button :disabled="isEditCircleToolOn" type="danger" class="margin-right" @click="delCurrentCircle">删除已有围栏</a-button>
-              <a-button v-if="!isEditCircleToolOn" type="primary" @click="activeEditCircleTool">围栏编辑</a-button>
-              <a-button v-else type="danger" @click="deActiveEditCircleTool">停止 围栏编辑</a-button>
-            </template>
-          <!-- <a-button type="primary">搜索</a-button> -->
-          </a-col>
-        </a-row>
-      </a-form>
-    </a-spin>
-    <a-alert
-      v-if="isAddCircleToolOn"
-      style="margin-top:8px"
-      :message="addCircleToolTips"
-      type="info"
-      show-icon
-    />
-    <a-alert
-      v-if="isEditCircleToolOn"
-      style="margin-top:8px"
-      :message="editCircleToolTips"
-      type="info"
-      show-icon
-    />
-    <electric-fence-map
-      ref="electric-fence-map"
-      style="margin-top:8px"
-      @map-init-success="isMapLoading=false"
-      @add-circle-tool-off="isAddCircleToolOn=false"
-      @add-circle-tool-on="isAddCircleToolOn=true"
-      @circle-editor-off="isEditCircleToolOn=false"
-      @circle-editor-on="isEditCircleToolOn=true"
-      @have-current-circle="isHaveCurrentCircle=true"
-      @no-current-circle="isHaveCurrentCircle=false"
-    ></electric-fence-map>
+  <div class="electric-fence-list full-width">
+    <div class="add-btn-wrap">
+      <span class="left-text">电子围栏</span>
+      <a-button
+        class="right-btn"
+        type="primary"
+        style="border-radius:45px!important;"
+        @click="createElectricFencePop"
+      >
+        <a-icon type="plus" @click="createElectricFencePopVisiable=true" /><span style="margin-left: 3px;">新建电子围栏</span>
+      </a-button>
+    </div>
+    <!-- 表格区域 -->
+    <a-table
+      ref="electric-fence-list-table"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 1200}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      :loading="loading"
+      @change="handleTableChange"
+    >
+      <template slot="electricFenceType" slot-scope="electricFenceType">
+        <span>内</span>
+      </template>
+      <template slot="operation" slot-scope="text, record">
+        <span class="operation-btn" @click="openEditPop"><icon-edit title="修改" />编辑</span>
+        <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
+      </template>
+    </a-table>
+    <create-electric-fence-pop
+      :visible.sync="createElectricFencePopVisiable"
+      @success="handleCreateElectricFenceSuccess"
+    ></create-electric-fence-pop>
   </div>
 </template>
+
 <script>
-import ElectricFenceMap from '@/components/utils/ElectricFenceMap'
+import IconEdit from '@/components/icons/IconEdit'
+import IconDelete from '@/components/icons/IconDelete'
+import CreateElectricFencePop from './components/CreateElectricFencePop'
 export default {
-  name: 'ElectricFence',
-  components: { ElectricFenceMap },
+  name: 'ElectricFenceList',
+  components: { IconEdit, IconDelete, CreateElectricFencePop },
+  props: {},
   data() {
     return {
-      isMapLoading: true,
-      isAddCircleToolOn: false,
-      isEditCircleToolOn: false,
-      addCircleToolTips: '请在地图中画圈，以新建电子围栏',
-      editCircleToolTips: '请在地图中拖拽电子围栏，编辑中心点位置和半径',
-      isHaveCurrentCircle: false
+      columns: [
+        {
+          title: '电子围栏名称',
+          dataIndex: 'electricFenceName'
+        },
+        {
+          title: '性质',
+          dataIndex: 'electricFenceType',
+          scopedSlots: { customRender: 'electricFenceType' }
+        },
+        {
+          title: '中心位置',
+          dataIndex: 'center'
+        },
+        {
+          title: '半径',
+          dataIndex: 'radius'
+        },
+        {
+          title: '经度',
+          dataIndex: 'electricFenceX'
+        },
+        {
+          title: '纬度',
+          dataIndex: 'electricFenceY'
+        },
+        {
+          title: '创建人',
+          dataIndex: 'createdBy'
+        },
+        {
+          title: '创建时间',
+          dataIndex: 'createTime'
+        },
+        {
+          title: '操作',
+          scopedSlots: { customRender: 'operation' }
+        }
+      ],
+      pagination: {
+        total: 0,
+        pageSizeOptions: ['10', '20', '30', '40', '100'],
+        defaultCurrent: 1,
+        defaultPageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
+      },
+      loading: false,
+      dataSource: null,
+      createElectricFencePopVisiable: false
     }
   },
-  computed: { },
+  computed: {},
   watch: {},
   created() {
-
+    this.fetch({ pageSize: 10, pageNum: 1 })
   },
   methods: {
-    activeAddCircleTool() {
-      this.$refs['electric-fence-map'].activeAddCircleTool()
+    handleTableChange(pagination, filters, sorter) {
+      console.log(pagination)
+      this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
-    activeEditCircleTool() {
-      this.$refs['electric-fence-map'].activeEditCircleTool()
+    fetch(params = {}) {
+      // 显示loading
+      this.loading = true
+      this.$get('/control-config/electric-fence/list', {
+        ...params
+      }).then((r) => {
+        const data = r.data
+        const pagination = { ...this.pagination }
+        this.dataSource = data.rows
+        pagination.total = data.total
+        this.pagination = pagination
+        this.loading = false
+      })
     },
-    deActiveEditCircleTool() {
-      this.$refs['electric-fence-map'].deActiveEditCircleTool()
+    // 打开新建控制策略弹窗
+    createElectricFencePop() {
+      this.createElectricFencePopVisiable = true
     },
-    // 删除已有围栏
-    delCurrentCircle() {
-      this.$refs['electric-fence-map'].delCurrentCircle()
+    // 新建策略弹窗关闭
+    handleCreateElectricFencePopClose() {
+      this.createElectricFencePopVisiable = false
+    },
+    // 新建策略成功
+    handleCreateElectricFenceSuccess() {
+      this.createElectricFencePopVisiable = false
+    },
+    // 查看详情弹窗
+    detailPop() {
+
+    },
+    openEditPop() {
+
+    },
+    openDelPop() {
+
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.padding-left  /deep/ .ant-form-item-label {
-    padding-left: 27px;
-}
-.margin-right {
-  margin-right: 10px
+@import "~@/utils/utils.less";
+.add-btn-wrap {
+  .clearfix();
+  .left-text{
+    float: left;
+    color: #4E4E4E;
+    font-size: 18px;
+    font-weight: 700
+  }
+  .right-btn{
+    float: right;
+  }
+  margin-bottom: 5px
 }
 </style>

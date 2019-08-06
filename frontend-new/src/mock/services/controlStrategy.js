@@ -140,6 +140,5 @@ Mock.mock(/\/control-strategy-send-history\/list/, 'get', ({ url, type, body }) 
       res.rows.push(getItem(i))
     }
   }
-  console.log(res)
   return res
 })

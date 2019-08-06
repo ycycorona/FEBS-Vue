@@ -1,5 +1,10 @@
 <template>
-  <div style="width: 100%;height:500px" />
+  <div style="width: 100%;height:500px;position:relative">
+    <div class="search-info-wrap">
+      <a-input id="map-text-search" addon-before="请输入关键字" />
+    </div>
+    <div style="width: 100%;height:500px" />
+  </div>
 </template>
 
 <script>
@@ -10,7 +15,7 @@ import { lazyAMapApiLoaderInstance } from 'vue-amap'
 Vue.use(VueAMap)
 VueAMap.initAMapApiLoader({
   key: '614fac7b5072ab20e6d7d4c600da8a7a',
-  plugin: ['Scale', 'ToolBar', 'MouseTool', 'CircleEditor'],
+  plugin: ['Scale', 'ToolBar', 'MouseTool', 'CircleEditor', 'Geocoder', 'Autocomplete'],
   v: '1.4.10' // 高德 sdk 版本为 1.4.4
   // uiVersion: '1.0.11' // 高德UI版本号
 })
@@ -30,10 +35,13 @@ export default {
         lng: '',
         lat: '',
         radius: ''
-      }
+      },
+      geocoder: null,
+      autocomplete: null
     }
   },
   computed: {
+
   },
   watch: {
     currentCircle(newVal) {
@@ -42,6 +50,16 @@ export default {
       } else {
         this.$emit('no-current-circle')
       }
+    },
+    circleData() {
+      this.geocoder.getAddress([this.circleData.lng, this.circleData.lat], (status, result) => {
+        if (status === 'complete' && result.regeocode) {
+          console.log(status, result)
+          this.$emit('fence-change', Object.assign({}, this.circleData, { formattedAddress: result.regeocode.formattedAddress }))
+        } else {
+          console.log.error('根据经纬度查询地址失败')
+        }
+      })
     }
   },
   mounted() {
@@ -51,7 +69,15 @@ export default {
       console.log('高德地图初始化完成')
       // eslint-disable-next-line
       this.mouseTool = new AMap.MouseTool(this.aMapIns)
-
+      // eslint-disable-next-line
+      this.geocoder = new AMap.Geocoder()
+      // eslint-disable-next-line
+      this.autocomplete =  new AMap.Autocomplete({input: "map-text-search"})
+      this.autocomplete.on('select', ({ poi, type }) => {
+        if (poi.location) {
+          this.setCenterPoint(poi.location.lng, poi.location.lat)
+        }
+      })
       // 画圈完成回调函数
       // eslint-disable-next-line
       AMap.event.addListener(this.mouseTool, 'draw', (e) => {
@@ -85,6 +111,10 @@ export default {
       this.aMapIns.addControl(scale) // 添加比例尺
       this.aMapIns.addControl(toolBar) // 添加工具栏
     },
+    // 设置地图中心点
+    setCenterPoint(lng, lat) {
+      this.aMapIns.setCenter([lng, lat])
+    },
     // 激活画圈插件
     activeAddCircleTool() {
       this.aMapIns.setDefaultCursor('crosshair')
@@ -99,11 +129,10 @@ export default {
       }
       // eslint-disable-next-line
       this.circleEditor = new AMap.CircleEditor(this.aMapIns, this.currentCircle)
-      this.circleEditor.on('move', (e) => {
-        this.circleChange({ lng: e.lnglat.lng, lat: e.lnglat.lat })
-      })
-      this.circleEditor.on('adjust', (e) => {
-        this.circleChange({ radius: e.radius })
+      this.circleEditor.on('end', (e) => {
+        this.circleChange({ lng: this.currentCircle.getCenter().getLng(),
+          lat: this.currentCircle.getCenter().getLat(),
+          radius: this.currentCircle.getRadius() })
       })
       this.circleEditor.open()
       this.isEditCircleToolOn = true
@@ -126,8 +155,23 @@ export default {
     },
     circleChange(obj) {
       // lng, lat, radius
-      Object.assign(this.circleData, obj)
-      console.log(this.circleData)
+      const emptyObj = {}
+      Object.assign(emptyObj, this.circleData, obj)
+      this.circleData = emptyObj
+    },
+    addFenceFromParams(lng, lat, radius) {
+      // eslint-disable-next-line
+      const circle = new AMap.Circle({
+        // eslint-disable-next-line
+        center: new AMap.LngLat(lng, lat), // 圆心位置
+        radius: radius // 半径
+      })
+      if (this.currentCircle) {
+        this.delCurrentCircle()
+      }
+      circle.setMap(this.aMapIns)
+      this.setCenterPoint(Number(lng), Number(lat))
+      this.currentCircle = circle
     }
   }
 }
@@ -137,6 +181,16 @@ export default {
 
 </style>
 
-<style lang="scss" scoped>
-
+<style lang="less" scoped>
+.search-info-wrap {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  box-shadow: 0 2px 6px 0 rgba(114, 124, 245, .5);
+  border-width: 0;
+  border-radius: .25rem;
+  background-color: #ffffff;
+  z-index: 1;
+}
 </style>
