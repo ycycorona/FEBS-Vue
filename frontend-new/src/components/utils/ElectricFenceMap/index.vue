@@ -57,7 +57,7 @@ export default {
           console.log(status, result)
           this.$emit('fence-change', Object.assign({}, this.circleData, { formattedAddress: result.regeocode.formattedAddress }))
         } else {
-          console.log.error('根据经纬度查询地址失败')
+          console.error('根据经纬度查询地址失败')
         }
       })
     }
@@ -151,7 +151,15 @@ export default {
       }
       this.currentCircle.setMap(null)
       this.currentCircle = null
-      this.$emit('no-current-circle')
+    },
+    // 设置圆属性
+    manualChangeCircle({ lng, lat, radius }) {
+      console.log(lng, lat, radius)
+      this.currentCircle.setOptions({
+        // eslint-disable-next-line
+        radius, center: new AMap.LngLat(lng, lat)
+      })
+      this.circleChange({ lng, lat, radius })
     },
     circleChange(obj) {
       // lng, lat, radius
@@ -159,6 +167,7 @@ export default {
       Object.assign(emptyObj, this.circleData, obj)
       this.circleData = emptyObj
     },
+    // 从参数新建圆圈
     addFenceFromParams(lng, lat, radius) {
       // eslint-disable-next-line
       const circle = new AMap.Circle({

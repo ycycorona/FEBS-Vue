@@ -1,14 +1,56 @@
 <template>
-  <div class="control-strategy-tab">
-    <div class="float-add-btn">
-      <a-button
-        type="primary"
-        style="border-radius:45px!important;"
-        @click="createControlStrategyPop"
-      >
-        <a-icon type="plus" /><span style="margin-left: 3px;">新建管控策略</span>
-      </a-button>
+  <div class="control-strategy-tab table-page-search-wrapper">
+    <div class="float-add-btn-wrap">
+      <div class="float-add-btn">
+        <a-button
+          type="primary"
+          style="border-radius:45px!important;"
+          @click="createControlStrategyPop"
+        >
+          <a-icon type="plus" /><span style="margin-left: 3px;">新建管控策略</span>
+        </a-button>
+      </div>
     </div>
+    <!-- 表单区域 -->
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item label="策略名称" v-bind="formItemLayout">
+            <a-input
+              v-decorator="[
+                'strategyName'
+              ]"
+              placeholder="请选择"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="策略类型" v-bind="formItemLayout">
+            <a-select
+              v-decorator="['strategyType']"
+              placeholder="策略类型"
+            >
+              <a-select-option :value="0">长期策略</a-select-option>
+              <a-select-option :value="1">临时策略</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="日期" v-bind="formItemLayout">
+            <a-range-picker
+              v-decorator="['dateRange']"
+            >
+            </a-range-picker>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
+    </a-form>
     <!-- 表格区域 -->
     <a-table
       ref="control-strategy-tab-table"
@@ -20,46 +62,52 @@
       :loading="loading"
       @change="handleTableChange"
     >
-      <template slot="detail" slot-scope="text">
-        <a-icon type="eye" theme="twoTone" two-tone-color="#42b983" title="详情" @click="detailPop" />
-      </template>
       <template slot="operation" slot-scope="text, record">
-        <span class="operation-btn" @click="openSendPop"><icon-send title="下发" />下发</span>
-        <span class="operation-btn" @click="openEditPop"><icon-edit title="修改" />编辑</span>
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-send title="管控策略管理" />策略管理</span>
         <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
       </template>
-      <template slot="receivedUserNum" slot-scope="receivedUserNum">
-        <span>{{ receivedUserNum }}</span>
+      <template slot="pickUserCount" slot-scope="pickUserCount">
+        <span class="blue-click">{{ pickUserCount }}</span>
       </template>
-      <template slot="receivedDeviceNum" slot-scope="receivedDeviceNum">
-        <span>{{ receivedDeviceNum }}</span>
+      <template slot="deviceNum" slot-scope="record">
+        <span class="blue-click">{{ record.pickPhoneCount }}/{{ record.pickPhoneCount+record.failPhoneCount }}</span>
       </template>
       <template slot="strategyType" slot-scope="strategyType">
-        <span>长期</span>
+        <span>{{ strategyTypeShortMap[strategyType] }}</span>
+      </template>
+      <template slot="editRecord" slot-scope="editRecord">
+        <span class="normal-click">查看</span>
       </template>
     </a-table>
     <CreateControlStrategyPop
-      :create-control-strategy-pop-visiable="createControlStrategyPopVisiable"
-      @close="handleCreateControlStrategyClose"
-      @success="handleCreateControlStrategySuccess"
+      edit-id="editId"
+      :is-edit-page="editControlStrategyPopVisiable"
+      :visible="createControlStrategyPopVisiable || editControlStrategyPopVisiable"
+      @close="handleControlStrategyClose"
+      @success="handleControlStrategySuccess"
     ></CreateControlStrategyPop>
     <user-picker-pop :visible.sync="userPickerPopVisible"></user-picker-pop>
   </div>
 </template>
 
 <script>
-import IconEdit from '@/components/icons/IconEdit'
+const formItemLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 }
+}
+import { strategyTypeShortMap } from '@/utils/params'
 import IconDelete from '@/components/icons/IconDelete'
 import IconSend from '@/components/icons/IconSend'
 import CreateControlStrategyPop from './CreateControlStrategyPop'
 import UserPickerPop from '@/components/UserPickerPop'
 export default {
   name: 'ControlStrategyTab',
-  components: { IconEdit, IconDelete, IconSend, CreateControlStrategyPop,
+  components: { IconDelete, IconSend, CreateControlStrategyPop,
     UserPickerPop },
   props: {},
   data() {
     return {
+      filterForm: this.$form.createForm(this),
       columns: [
         {
           title: '策略名称',
@@ -72,29 +120,24 @@ export default {
         },
         {
           title: '创建人',
-          dataIndex: 'createdBy'
+          dataIndex: 'createUserName'
         },
         {
           title: '创建时间',
           dataIndex: 'createTime'
         },
         {
-          title: '修改时间',
-          dataIndex: 'editTime'
-        },
-        {
           title: '已下发用户',
-          dataIndex: 'receivedUserNum',
-          scopedSlots: { customRender: 'receivedUserNum' }
+          dataIndex: 'pickUserCount',
+          scopedSlots: { customRender: 'pickUserCount' }
         },
         {
-          title: '接收设备',
-          dataIndex: 'receivedDeviceNum',
-          scopedSlots: { customRender: 'receivedDeviceNum' }
+          title: '未接收设备/全部设备',
+          scopedSlots: { customRender: 'deviceNum' }
         },
         {
-          title: '详情',
-          scopedSlots: { customRender: 'detail' }
+          title: '修改记录',
+          scopedSlots: { customRender: 'editRecord' }
         },
         {
           title: '操作',
@@ -113,7 +156,11 @@ export default {
       loading: false,
       dataSource: null,
       createControlStrategyPopVisiable: false,
-      userPickerPopVisible: false
+      editControlStrategyPopVisiable: false,
+      editId: '',
+      userPickerPopVisible: false,
+      formItemLayout,
+      strategyTypeShortMap
     }
   },
   computed: {},
@@ -122,6 +169,23 @@ export default {
     this.fetch({ pageSize: 10, pageNum: 1 })
   },
   methods: {
+    search() {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+
+      }
+      if (values.dateRange) {
+        params.startDate = values.dateRange[0].format('YYYY-MM-DD')
+        params.endDate = values.dateRange[1].format('YYYY-MM-DD')
+      }
+      params.strategyType = values.strategyType
+      params.strategyName = values.strategyName
+      // this.fetch({startDate: })
+      console.log(params)
+    },
+    resetFilterForm() {
+      this.filterForm.resetFields()
+    },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination)
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
@@ -129,7 +193,7 @@ export default {
     fetch(params = {}) {
       // 显示loading
       this.loading = true
-      this.$get('/control-strategy/list', {
+      this.$get('/business/cmd-strategy/getStrategyByPage', {
         ...params
       }).then((r) => {
         const data = r.data
@@ -144,25 +208,28 @@ export default {
     createControlStrategyPop() {
       this.createControlStrategyPopVisiable = true
     },
-    // 新建策略弹窗关闭
-    handleCreateControlStrategyClose() {
-      this.createControlStrategyPopVisiable = false
+    // 策略弹窗关闭
+    handleControlStrategyClose() {
+      this.resetControlStrategyParams()
     },
-    // 新建策略成功
-    handleCreateControlStrategySuccess() {
+    // 策略成功
+    handleControlStrategySuccess() {
+      this.resetControlStrategyParams()
+    },
+    // 重置策略管理弹窗的交互参数
+    resetControlStrategyParams() {
       this.createControlStrategyPopVisiable = false
+      this.editControlStrategyPopVisiable = false
+      this.editId = ''
     },
     // 查看详情弹窗
     detailPop() {
 
     },
-    // 打开下发弹窗
-    openSendPop() {
-      this.userPickerPopVisible = true
-    },
     // 打开编辑策略弹窗
-    openEditPop() {
-
+    openEditPop(id) {
+      this.editId = id
+      this.editControlStrategyPopVisiable = true
     },
     // 打开删除策略弹窗
     openDelPop() {
@@ -173,10 +240,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
-.float-add-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
+.float-add-btn-wrap {
+  height: 45px;
+  position: relative;
+  .float-add-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
 }
+
 </style>

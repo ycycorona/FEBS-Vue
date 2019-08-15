@@ -43,15 +43,13 @@
             </a-col>
           </a-row>
           <a-row :gutter="24">
-            <a-col :span="8" :xl="6">
+            <a-col :span="10" :xl="8">
               <a-form-item
                 class="padding-left"
                 label="中心位置"
               >
-                <a-select
-                  v-decorator="[
-                    'centerAddress'
-                  ]"
+                <!-- <a-select
+
                   show-search
                   placeholder="请输入关键字进行搜索"
                   style="width: 100%"
@@ -61,15 +59,22 @@
                   @search="fetchAddressList"
                   @change="handleCenterAddressChange"
                 >
+
                   <a-spin v-if="fetching" slot="notFoundContent" size="small" />
                   <a-select-option v-for="d in addressOpts" :key="d.value">{{ d.text }}</a-select-option>
-                </a-select>
+                </a-select> -->
+                <a-input
+                  v-decorator="[
+                    'centerAddress'
+                  ]"
+                  read-only
+                ></a-input>
               </a-form-item>
 
             </a-col>
-            <a-col :span="2" :xl="2">
+            <!-- <a-col :span="2" :xl="2">
               <a-button type="primary" @click="addFenceFromCenter">添加围栏</a-button>
-            </a-col>
+            </a-col> -->
             <a-col :span="4" :xl="3">
               <a-form-item
                 label="半径"
@@ -145,7 +150,7 @@
         @circle-editor-off="isEditCircleToolOn=false"
         @circle-editor-on="isEditCircleToolOn=true"
         @have-current-circle="isHaveCurrentCircle=true"
-        @no-current-circle="isHaveCurrentCircle=false"
+        @no-current-circle="onCircleDelete"
       ></electric-fence-map>
     </div>
   </a-modal>
@@ -223,6 +228,7 @@ export default {
       this.isHaveCurrentCircle = false
       this.confirmLoading = false
     },
+    // 电子围栏改变
     onFenceChange({ formattedAddress, lng, lat, radius }) {
       this.form.setFieldsValue({
         'electricFenceRadius': radius,
@@ -231,55 +237,37 @@ export default {
         'electricFenceY': lat
 
       })
-      console.log(formattedAddress, lng, lat, radius)
-    },
-    fetchAddressList(val) {
-      if (val.match(/^[a-zA-Z]*$/)) { return }
-      const opt = []
-      this.$refs['electric-fence-map'].autocomplete.search(val, (s, r) => {
-        console.log(r)
-        if (r === 'NO_PARAMS' || _.isEmpty(r) || r.location) { return }
-        r.tips.forEach(item => {
-          if (item.location !== '') {
-            const resAddress = `${item.name}-${item.district}`
-            opt.push({
-              value: `${item.location.lng},${item.location.lat},${resAddress}`, text: resAddress
-            })
-          }
-        })
-        this.addressOpts = opt
-      })
-      // data.push({ value: 1, text: val + 'aaa' })
-      // this.addressOpts = data
-    },
-    handleCenterAddressChange(value) {
-      console.log(value)
-      // this.fetchAddressList(value)
-    },
-    // 从中心点 添加围栏
-    addFenceFromCenter() {
-      const arr = this.form.getFieldValue('centerAddress').split(',')
-      if (!this.form.getFieldValue('electricFenceRadius')) {
-        this.form.setFieldsValue({
-          electricFenceRadius: 10,
-          electricFenceX: arr[0],
-          electricFenceY: arr[1]
-        })
-      } else {
-        this.form.setFieldsValue({
-          electricFenceX: arr[0],
-          electricFenceY: arr[1]
-        })
-      }
-      const values = this.form.getFieldsValue(['electricFenceX', 'electricFenceY', 'electricFenceRadius'])
-      this.$refs['electric-fence-map'].addFenceFromParams(
-        values.electricFenceX,
-        values.electricFenceY,
-        values.electricFenceRadius,
-      )
     },
     onValuesChange(props, values) {
-      console.log(values)
+      this.updateCircleOptions(values)
+    },
+    updateCircleOptions(values) {
+      const obj_1 = Object.assign({}, {
+        electricFenceX: this.form.getFieldValue('electricFenceX'),
+        electricFenceY: this.form.getFieldValue('electricFenceY'),
+        electricFenceRadius: this.form.getFieldValue('electricFenceRadius')
+      }, values)
+      // 是否参数不全
+      const flag = Object.keys(obj_1).findIndex((key) => {
+        return !obj_1[key]
+      })
+
+      if (flag > -1 || flag === undefined) { return }
+      const obj_2 = {
+        lng: obj_1.electricFenceX,
+        lat: obj_1.electricFenceY,
+        radius: obj_1.electricFenceRadius
+
+      }
+      // 是否是从地图触发变化
+      const isUnchange = _.isEqual(obj_2, this.$refs['electric-fence-map'].circleData)
+      if (!isUnchange && this.isHaveCurrentCircle) {
+        this.$refs['electric-fence-map'].manualChangeCircle(obj_2)
+      }
+    },
+    onCircleDelete() {
+      this.onFenceChange({ formattedAddress: '', lng: '', lat: '', radius: '' })
+      this.isHaveCurrentCircle = false
     }
   }
 }

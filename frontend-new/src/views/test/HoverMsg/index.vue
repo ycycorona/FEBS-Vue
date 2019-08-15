@@ -16,17 +16,25 @@
       </template>
       <p slot="default" class="hover-test">hoverTest</p>
     </a-popover>
+    <a-form>
+      <MultiTimeRangePicker v-model="ranges">
+
+      </MultiTimeRangePicker>
+    </a-form>
+    <!-- <input v-model="arrTest[0]" type="text"> -->
   </div>
 </template>
 
 <script>
-
+import MultiTimeRangePicker from '@/components/MultiTimeRangePicker'
 export default {
   name: 'HoverMsg',
-  components: { },
+  components: { MultiTimeRangePicker },
   props: {},
   data() {
     return {
+      arrTest: ['123'],
+      ranges: [['00:01', '23:57']],
       columns: [
         {
           title: '设备名称',
@@ -61,13 +69,16 @@ export default {
     }
   },
   computed: {},
-  watch: {},
+  watch: {
+    arrTest(val) {
+      console.log(val)
+    }
+  },
   created() {
-
   },
   mounted() {
     window.addEventListener('resize', function(e) {
-      console.log(e)
+
     })
     const event = document.createEvent('HTMLEvents')
     event.initEvent('resize', true, true)
@@ -77,6 +88,11 @@ export default {
   methods: {
     handleTableChange() {
 
+    },
+    onClick() {
+      this.arrTest[0] = new Date().valueOf()
+      // Vue.set(this.arrTest, 0, new Date().valueOf())
+      // console.log(this.arrTest)
     }
   }
 }

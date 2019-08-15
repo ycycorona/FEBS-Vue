@@ -140,7 +140,7 @@ export default {
     border-right: 0 solid #ccc !important;
   }
   .ant-drawer-body {
-    padding-bottom: 3rem !important;
+    padding-bottom: 4rem !important;
   }
   .page-tabs .ant-tabs-close-x {
     color:#fff !important;

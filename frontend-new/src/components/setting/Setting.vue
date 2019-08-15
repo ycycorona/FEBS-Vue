@@ -93,8 +93,8 @@ export default {
     ...mapMutations({ setSettingBar: 'setting/setSettingBar' }),
     onColorChange(values, colors) {
       if (colors.length > 0) {
-        updateTheme(colors)
-        this.$store.commit('setting/setColor', colors)
+        updateTheme(colors[0])
+        this.$store.commit('setting/setColor', colors[0])
       }
     },
     setTheme(values) {
