@@ -1,19 +1,18 @@
 <template>
   <a-row :gutter="24" style="margin:0 0;margin-bottom: 0!important">
-    <a-col v-for="(item, index) in timeRanges" :key="index" :span="18">
+    <a-col v-for="(item, index) in timeRanges" :key="index" :span="22">
       <a-form-item :label="index!==0?'':'时间'" :label-col="{ span: 5 }" :wrapper-col="{ span: 19, offset: index!==0?5:0}">
         <time-range-picker
           v-model="timeRanges[index]"
           :start-time-limit="index===0 ? undefined : timeRanges[index-1][1]"
-          :disabled="index!==timeRanges.length-1"
+          :disabled="index!==timeRanges.length-1 || disabled"
           @change="onTimeRangeChange"
         >
         </time-range-picker>
       </a-form-item>
     </a-col>
-    <a-col :span="4" style="">
+    <a-col v-if="timeRanges.length>1 && !disabled" :span="2" style="">
       <a-button
-        v-if="timeRanges.length>1"
         type="danger"
         shape="circle"
         icon="delete"
@@ -24,9 +23,9 @@
     <!-- <a-col :span="20">
 
     </a-col> -->
-    <a-col :span="4" :offset="4" style="padding-left:0;margin-bottom:14px;margin-top: -2px;">
+    <a-col v-if="isShowBtn && !disabled" :span="4" :offset="4" style="padding-left:22px;margin-bottom:14px;margin-top: -2px;">
       <a-button
-        v-if="isShowBtn"
+
         @click="addFormItem"
       >添加</a-button>
     </a-col>
@@ -45,6 +44,10 @@ export default {
   props: {
     value: {
       type: Array
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -58,6 +61,7 @@ export default {
     },
     isShowBtn() {
       const l = this.timeRanges.length
+      if (l === 0) { return false }
       let flag
       if (this.timeRanges[l - 1][1] !== '23:59') {
         flag = true
@@ -68,20 +72,23 @@ export default {
     }
   },
   watch: {
-    timeRanges(val) {
-      this.$emit('change', cloneDeep(val))
+    value(val) {
+      this.setValue(val)
     }
   },
   created() {
-    if (this.value) {
-      this.timeRanges = cloneDeep(this.value)
-    } else {
-      this.timeRanges = [['00:01', '23:59']]
-    }
+    this.setValue(this.value)
   },
   methods: {
-    onTimeRangeChange() {
-
+    setValue(val) {
+      if (val && val.length !== 0) {
+        this.timeRanges = cloneDeep(this.value)
+      } else {
+        this.timeRanges = [['00:01', '23:59']]
+      }
+    },
+    onTimeRangeChange(val) {
+      this.$emit('change', this.timeRanges)
     },
     removeFormItem() {
       this.timeRanges.splice(-1, 1)

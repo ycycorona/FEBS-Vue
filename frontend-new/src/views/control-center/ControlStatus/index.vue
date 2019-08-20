@@ -1,62 +1,59 @@
 <template>
   <div class="full-width control-status-wrap table-page-search-wrapper">
     <!-- 表单区域 -->
-    <a-form layout="inline">
-      <div>
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              label="用户名"
-            >
-              <a-input
-                v-decorator="[
-                  'username'
-                ]"
-                placeholder="请输入用户名"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              label="组织架构"
-              :label-col="{span: 8}"
-              :wrapper-col="{span: 16}"
-            >
-              <a-input
-                v-decorator="[
-                  'dept'
-                ]"
-                placeholder="请选择"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              label="策略名称"
-              :label-col="{span: 8}"
-              :wrapper-col="{span: 16}"
-            >
-              <a-input
-                v-decorator="[
-                  'strategyName'
-                ]"
-                placeholder="请选择"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <span>
-              <a-button style="margin-left: 15px" type="primary">查询</a-button>
-              <a-button style="margin-left: 8px">重置</a-button>
-            </span>
-          </a-col>
-        </a-row>
-      </div>
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item
+            label="用户名"
+          >
+            <a-input
+              v-decorator="[
+                'username'
+              ]"
+              placeholder="请输入用户名"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item
+            label="组织架构"
+            :label-col="{span: 8}"
+            :wrapper-col="{span: 16}"
+          >
+            <DeptInputTree
+              v-decorator="[
+                'dept'
+              ]"
+            ></DeptInputTree>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item
+            label="策略名称"
+            :label-col="{span: 8}"
+            :wrapper-col="{span: 16}"
+          >
+            <a-select
+              v-decorator="[
+                'strategyName'
+              ]"
+              :options="strategyOpt"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
     </a-form>
     <!-- 表格区域 -->
     <a-table
       ref="control-status-list-table"
-      :row-key="record => record.id"
+      :row-key="record => record.userId"
       :columns="columns"
       :scroll="{x: 1200}"
       :data-source="dataSource"
@@ -64,7 +61,7 @@
       :loading="loading"
       @change="handleTableChange"
     >
-      <template slot="longTermStrategy" slot-scope="longTermStrategy, record">
+      <template slot="longStrategyName" slot-scope="longStrategyName, record">
         <a-popover
           placement="bottom"
           title="策略详情"
@@ -72,41 +69,81 @@
           trigger="click"
           class="strategy-blue-title-popover-content"
           overlay-class-name="strategy-blue-title-popover"
+          @visibleChange="longStrategyPopoverVisibleChange(record.longStrategyId, arguments[0])"
         >
-          <template slot="content">
-            <tab-title title="条件"></tab-title>
+          <template v-if="longStrategyDetail" slot="content">
+            <simple-li title="策略名称:">{{ longStrategyDetail.strategyName }}</simple-li>
+            <tab-title title="策略生效条件"></tab-title>
             <template>
-              <simple-li title="策略名称:">会议室开会</simple-li>
-              <simple-li title="策略类型:">临时</simple-li>
-              <simple-li title="日期:">2019-07-16 ~ 2019-07-17</simple-li>
-              <simple-li title="时间:">8:00 ~ 12:00</simple-li>
-              <simple-li title="管控区域:">电子围栏一</simple-li>
+              <simple-li title="策略类型:">{{ longStrategyDetail.strategyTypeName }}</simple-li>
+              <simple-li title="日期:">{{ longStrategyDetail.startDate }} ~ {{ longStrategyDetail.endDate }}</simple-li>
+              <simple-li title="时间:">{{ longStrategyDetail.startEndTime }}</simple-li>
+              <simple-li title="管控区域:">{{ longStrategyDetail.controlZoneFence.fenceName }}</simple-li>
             </template>
             <tab-title title="指令"></tab-title>
-            <template>
-              <simple-li title="指令1:">应用黑名单</simple-li>
-              <simple-li title="指令2:">电子围栏三</simple-li>
+            <template v-for="(directive, index) in longStrategyDetail.cmdTypeAndConfig">
+              <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
             </template>
           </template>
           <span slot="default" class="popover-trigger">
-            {{ longTermStrategy }}
-            <a-tag color="green">
-              已激活
-            </a-tag>
+            <template v-if="longStrategyName">
+              {{ longStrategyName }}
+              <a-tag v-if="record.activeStrategy===0" color="green">
+                已激活
+              </a-tag>
+              <a-tag v-else color="orange">
+                未激活
+              </a-tag>
+            </template>
+            <span v-else>-</span>
           </span>
         </a-popover>
       </template>
       <!-- 临时策略 -->
-      <template slot="temporaryStrategy" slot-scope="temporaryStrategy, record">
-        {{ temporaryStrategy }}
-        <a-tag color="orange">
-          未激活
-        </a-tag>
-        <a-tag>
-          已失效
-        </a-tag>
+      <template slot="temporaryStrategyName" slot-scope="temporaryStrategyName, record">
+        <a-popover
+          placement="bottom"
+          title="策略详情"
+          arrow-point-at-center
+          trigger="click"
+          class="strategy-blue-title-popover-content"
+          overlay-class-name="strategy-blue-title-popover"
+          @visibleChange="temporaryStrategyPopoverVisibleChange(record.temporaryStrategyId, arguments[0])"
+        >
+          <template v-if="temporaryStrategyDetail" slot="content">
+            <simple-li title="策略名称:">{{ temporaryStrategyDetail.strategyName }}</simple-li>
+            <tab-title title="策略生效条件"></tab-title>
+            <template>
+              <simple-li title="策略类型:">{{ temporaryStrategyDetail.strategyTypeName }}</simple-li>
+              <simple-li title="日期:">{{ temporaryStrategyDetail.startDate }} ~ {{ temporaryStrategyDetail.endDate }}</simple-li>
+              <simple-li title="时间:">{{ temporaryStrategyDetail.startEndTime }}</simple-li>
+              <simple-li title="管控区域:">{{ temporaryStrategyDetail.controlZoneFence ?
+                temporaryStrategyDetail.controlZoneFence.fenceName : '' }}</simple-li>
+            </template>
+            <tab-title title="指令"></tab-title>
+            <template v-for="(directive, index) in temporaryStrategyDetail.cmdTypeAndConfig">
+              <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
+            </template>
+          </template>
+          <span slot="default" class="popover-trigger">
+            <template v-if="temporaryStrategyName">
+              {{ temporaryStrategyName }}
+              <a-tag v-if="record.activeStrategy===1" color="green">
+                已激活
+              </a-tag>
+              <a-tag v-else color="orange">
+                未激活
+              </a-tag>
+              <a-tag v-if="record.isExpire===1">
+                已过期
+              </a-tag>
+            </template>
+            <span v-else>-</span>
+          </span>
+        </a-popover>
       </template>
-      <template slot="controledDeviceNum" slot-scope="controledDeviceNum, record">
+      <!-- 受控设备 -->
+      <template slot="phoneCount" slot-scope="phoneCount, record">
         <a-popover
           placement="bottom"
           title="受控设备"
@@ -114,167 +151,131 @@
           trigger="click"
           class="blue-title-popover-content"
           overlay-class-name="blue-title-popover"
+          @visibleChange="onControlDevicesPopoverVisibleChange(record.userId, arguments[0])"
         >
           <template slot="content">
             <a-table
               size="small"
               :row-key="record => record.id"
-              :columns="columns_1"
+              :columns="controlDevicesColumns"
               :scroll="{x: 550}"
-              :data-source="dataSource_1"
+              :data-source="controlDevicesDetail"
               :pagination="false"
-              @change="handleTableChange"
             >
-              <template slot="status" slot-scope="status">
-                <a-tag color="blue">{{ status }}</a-tag>
+              <template slot="linestate" slot-scope="linestate">
+                <a-tag :color="linestate | deviceStatusColorFil">{{ linestate | deviceStatusFil }}</a-tag>
               </template>
             </a-table>
           </template>
-          <span slot="default" class="popover-trigger">{{ controledDeviceNum }}</span>
+          <span slot="default" class="popover-trigger">{{ phoneCount }}</span>
         </a-popover>
       </template>
-      <template slot="deviceStatus" slot-scope="deviceStatus">
-        <a-tag :color="deviceStatus | deviceStatusColorFil">
-          {{ deviceStatus | deviceStatusFil }}
+      <!-- 设备状态 -->
+      <template slot="offLineCount" slot-scope="offLineCount">
+        <a-tag :color="offLineCount>0 ? 'red' : 'blue'">
+          {{ offLineCount>0 ?'离线' : '在线' }}
         </a-tag>
+        <template v-if="offLineCount>0">
+          {{ offLineCount }}
+        </template>
       </template>
-      <template slot="violationRecord" slot-scope="violationRecord">
+      <!-- 报警记录 -->
+      <template slot="alarmCount" slot-scope="alarmCount, record">
         <a-popover
           placement="left"
-          title="违规记录"
+          title="报警记录"
           arrow-point-at-center
           trigger="click"
           class="red-title-popover-content"
-          overlay-class-name="red-title-popover"
+          overlay-class-name="red-title-popover alarm-pop-wrap"
+          @visibleChange="onAlarmRecordsPopoverVisibleChange(record.userId, arguments[0])"
         >
           <template slot="content">
             <div
-              v-for="(item,index) in violationRecordList"
+              v-for="(item,index) in alarmRecordsDetail"
               :key="index"
               class="violation-record-li-wrap"
             >
-              <div class="time">2019-06-23 10:10</div>
-              <div class="msg">
-                <span class="user-name">战士002</span> <span>离开电子围栏</span>
+              <div class="flex-wrap">
+                <div class="flex-item">
+                  <div class="time">{{ item.createTime }}</div>
+                  <div class="msg">
+                    <span class="user-name">{{ record.userName }}</span> <span>{{ item.alarmContent }}</span>
+                  </div>
+                </div>
+                <div class="flex-item" style="text-align: right">
+                  <a-button v-if="item.dealStatus===0" type="primary" size="small" ghost style="vertical-align: -6px;" @click="handleAlarm(item.id)">处理</a-button>
+                  <a-button v-else type="default" size="small" disabled style="vertical-align: -6px;">已处理</a-button>
+                </div>
               </div>
               <a-divider class="inline-divider" />
             </div>
           </template>
-          <span slot="default" style="color:red;cursor: pointer">{{ violationRecord }}</span>
+          <span slot="default" style="color:red;cursor: pointer">{{ alarmCount }}</span>
         </a-popover>
       </template>
+      <template slot="operation" slot-scope="record">
+        <span class="operation-btn" @click="openDevicesManageModal(record.userId)"><IconDeviceManage></IconDeviceManage>设备管理</span>
+      </template>
     </a-table>
+    <a-modal
+      v-model="deviceManageVisible"
+      :width="1200"
+      title="设备管理"
+      :body-style="{height: '600px'}"
+      destroy-on-close
+      v-bind="{footer: null}"
+      :mask-closable="false"
+    >
+      <a-row :gutter="16" style="height:100%">
+        <a-col :span="24">
+          <DevicesManage
+            :user-id="deviceManageUserId"
+          ></DevicesManage>
+        </a-col>
+      </a-row>
+    </a-modal>
   </div>
 </template>
 
 <script>
 import TabTitle from '@/components/fragment/TabTitle'
 import SimpleLi from '@/components/fragment/SimpleLi'
-
+import IconDeviceManage from '@/components/icons/IconDeviceManage'
+import DeptInputTree from '@/views/system/dept/DeptInputTree'
+import DevicesManage from './components/DevicesManage'
 export default {
   name: 'ControlStatus',
-  components: { TabTitle, SimpleLi },
+  components: { TabTitle, SimpleLi, IconDeviceManage, DeptInputTree,
+    DevicesManage },
   props: {
 
   },
   data() {
     return {
       filterForm: this.$form.createForm(this),
-      advanced: false,
-      dataSource: [
-        {
-          id: 0,
-          userName: '战士001',
-          longTermStrategy: '一团日常管控策略',
-          temporaryStrategy: '外出训练策略',
-          currentActiveStra: 'longTermStrategy',
-          controledDeviceNum: 2,
-          deviceStatus: '1',
-          violationRecord: '4'
-        },
-        {
-          id: 1,
-          userName: '战士002',
-          longTermStrategy: '一团日常管控策略',
-          temporaryStrategy: '外出训练策略',
-          currentActiveStra: 'temporaryStrategy',
-          controledDeviceNum: 2,
-          deviceStatus: '0',
-          violationRecord: '4'
-        }
-      ],
-      dataSource_1: [
-        {
-          id: 0,
-          name: 'HUAWEIP20',
-          type: 'EML-AL00',
-          version: '1.0.0',
-          status: '在线'
-        }
-      ],
-      violationRecordList: [
-        {
-          name: '战士1',
-          time: '2019-05-01 13:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        },
-        {
-          name: '战士2',
-          time: '2019-05-01 14:11',
-          msg: '离开电子围栏'
-        }
-      ],
-      columns_1: [
-        {
-          title: '设备名称',
-          dataIndex: 'name'
-        },
+      dataSource: null,
+      deviceManageVisible: false,
+      deviceManageUserId: '',
+      // longStrategyDetailPopLoading: false,
+      // temporaryStrategyDetailPopLoading: false,
+      controlDevicesDetail: [],
+      alarmRecordsDetail: [],
+      longStrategyDetail: null,
+      temporaryStrategyDetail: null,
+      controlDevicesColumns: [
         {
           title: '型号',
-          dataIndex: 'type'
+          dataIndex: 'phoneModel'
         },
         {
-          title: '版本',
-          dataIndex: 'version'
+          title: 'IMEI',
+          dataIndex: 'phoneImei'
         },
         {
           title: '状态',
-          dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '操作',
-          scopedSlots: { customRender: 'operation' }
+          dataIndex: 'linestate',
+          scopedSlots: { customRender: 'linestate' }
         }
       ],
       columns: [
@@ -283,29 +284,37 @@ export default {
           dataIndex: 'userName'
         },
         {
+          title: '部门',
+          dataIndex: 'deptName'
+        },
+        {
           title: '长期策略',
-          dataIndex: 'longTermStrategy',
-          scopedSlots: { customRender: 'longTermStrategy' }
+          dataIndex: 'longStrategyName',
+          scopedSlots: { customRender: 'longStrategyName' }
         },
         {
           title: '临时策略',
-          dataIndex: 'temporaryStrategy',
-          scopedSlots: { customRender: 'temporaryStrategy' }
+          dataIndex: 'temporaryStrategyName',
+          scopedSlots: { customRender: 'temporaryStrategyName' }
         },
         {
           title: '受控设备',
-          dataIndex: 'controledDeviceNum',
-          scopedSlots: { customRender: 'controledDeviceNum' }
+          dataIndex: 'phoneCount',
+          scopedSlots: { customRender: 'phoneCount' }
         },
         {
           title: '设备状态',
-          dataIndex: 'deviceStatus',
-          scopedSlots: { customRender: 'deviceStatus' }
+          dataIndex: 'offLineCount',
+          scopedSlots: { customRender: 'offLineCount' }
         },
         {
-          title: '违规记录(次)',
-          dataIndex: 'violationRecord',
-          scopedSlots: { customRender: 'violationRecord' }
+          title: '报警记录(次)',
+          dataIndex: 'alarmCount',
+          scopedSlots: { customRender: 'alarmCount' }
+        },
+        {
+          title: '操作',
+          scopedSlots: { customRender: 'operation' }
         }
       ],
       pagination: {
@@ -317,6 +326,7 @@ export default {
         showSizeChanger: true,
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
+      strategyOpt: [],
       loading: false
     }
   },
@@ -326,9 +336,150 @@ export default {
   watch: {
 
   },
+  async created() {
+    this.strategyOpt = await this.getStrategyOpt() || []
+    this.fetch({ pageSize: 10, pageNum: 1 })
+  },
   methods: {
-    handleTableChange() {
+    search() {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+        deptId: values.dept,
+        strategyId: values.values,
+        userName: values.username
+      }
+      // params.strategyType = values.strategyType
+      // params.strategyName = values.strategyName
+      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
+    },
+    resetFilterForm() {
+      this.filterForm.resetFields()
+    },
+    handleTableChange(pagination, filters, sorter) {
+      this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
+    },
+    fetch(params = {}) {
+      // 显示loading
+      this.loading = true
+      this.$get('/business/controlUserStatus/getControlStatusByPage', {
+        ...params
+      }).then((r) => {
+        const data = r.data
+        const pagination = { ...this.pagination }
+        this.dataSource = data.rows
+        pagination.total = data.total
+        this.pagination = pagination
+      }).catch()
+        .finally(() => {
+          this.loading = false
+        })
+    },
+    getStrategyOpt() {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/cmd-strategy/getStrategyList')
+          .then(r => {
+            if (r.data.state === 1) {
+              resolve(this.strategyOptTransform(r.data.data))
+            } else {
+              reject()
+            }
+          })
+      })
+    },
+    strategyOptTransform(raw) {
+      return raw.map(item => {
+        return {
+          value: item.id,
+          label: item.strategyName
+        }
+      })
+    },
+    // 点击长期策略悬窗
+    async longStrategyPopoverVisibleChange(id, flag) {
+      if (!flag) {
+        this.longStrategyDetail = null
+        return
+      }
+      this.longStrategyDetail = await this.getStrategyDetail(id)
+      // console.log(this.longStrategyDetail)
+    },
+    // 点击短期策略悬窗
+    async temporaryStrategyPopoverVisibleChange(id, flag) {
+      if (!flag) {
+        this.temporaryStrategyDetail = null
+        return
+      }
+      this.temporaryStrategyDetail = await this.getStrategyDetail(id)
+      // console.log(this.temporaryStrategyDetail)
+    },
+    async onControlDevicesPopoverVisibleChange(id, flag) {
+      if (!flag) {
+        this.controlDevicesDetail = []
+        return
+      }
+      this.controlDevicesDetail = await this.getcontrolDevicesDetail(id)
+      console.log(this.controlDevicesDetail)
+    },
+    async onAlarmRecordsPopoverVisibleChange(id, flag) {
+      if (!flag) {
+        this.alarmRecordsDetail = []
+        return
+      }
+      this.alarmRecordsDetail = await this.getAlarmRecordsDetail(id)
+      console.log(this.alarmRecordsDetail)
+    },
+    getStrategyDetail(id) {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/cmd-strategy/getStrategyDetailAndUsers',
+          {
+            strategyId: id
+          })
+          .then(r => {
+            if (r.data.state === 1) {
+              resolve(r.data.data)
+            } else {
+              reject()
+            }
+          })
+      })
+    },
+    getcontrolDevicesDetail(id) {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/controlUserStatus/getPhoneListByUserid',
+          {
+            userId: id
+          })
+          .then(r => {
+            if (r.data.state === 1) {
+              resolve(r.data.rows)
+            } else {
+              reject()
+            }
+          })
+      })
+    },
+    getAlarmRecordsDetail(id) {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/controlUserStatus/getAlarmListByUserid',
+          {
+            userId: id
+          })
+          .then(r => {
+            if (r.data.state === 1) {
+              resolve(r.data.rows)
+            } else {
+              reject()
+            }
+          })
+      })
+    },
+    // 处理报警
+    handleAlarm(id) {
 
+    },
+    openDevicesManageModal(userId) {
+      this.deviceManageVisible = true
+      this.deviceManageUserId = userId
     }
   }
 }
@@ -349,5 +500,11 @@ export default {
   .time {
     color: #A9A9A9;
   }
+}
+.flex-wrap {
+  display: flex
+}
+.flex-item {
+  flex: 1 1 auto
 }
 </style>

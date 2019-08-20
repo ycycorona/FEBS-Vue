@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="bold padding-right">{{ title }}</span><span><slot name="default"></slot></span>
+    <span v-if="title" class="bold padding-right">{{ title }}</span><span><slot name="default"></slot></span>
   </div>
 </template>
 

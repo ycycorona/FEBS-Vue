@@ -63,30 +63,49 @@
       @change="handleTableChange"
     >
       <template slot="operation" slot-scope="text, record">
-        <span class="operation-btn" @click="openEditPop(record.id)"><icon-send title="管控策略管理" />策略管理</span>
-        <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-strategy-manage title="管控策略管理" />策略管理</span>
+        <a-popconfirm title="确定删除吗?" ok-text="是" cancel-text="否" @confirm="deleteStrategy">
+          <span class="operation-btn"><icon-delete title="删除" />删除</span>
+        </a-popconfirm>
       </template>
-      <template slot="pickUserCount" slot-scope="pickUserCount">
-        <span class="blue-click">{{ pickUserCount }}</span>
+      <template slot="pickUserCount" slot-scope="pickUserCount, record">
+        <span class="blue-click" @click="showUserCountPop(record.id)">{{ pickUserCount }}</span>
       </template>
       <template slot="deviceNum" slot-scope="record">
-        <span class="blue-click">{{ record.pickPhoneCount }}/{{ record.pickPhoneCount+record.failPhoneCount }}</span>
+        <span class="blue-click" @click="showDeviceListPop(record.id)">{{ record.pickPhoneCount }}/{{ record.pickPhoneCount+record.failPhoneCount }}</span>
       </template>
       <template slot="strategyType" slot-scope="strategyType">
         <span>{{ strategyTypeShortMap[strategyType] }}</span>
       </template>
-      <template slot="editRecord" slot-scope="editRecord">
-        <span class="normal-click">查看</span>
+      <template slot="editRecord" slot-scope="record">
+        <span class="normal-click" @click="showEditRecordsPop(record.id)">查看</span>
       </template>
     </a-table>
     <CreateControlStrategyPop
-      edit-id="editId"
+      :edit-id="editId"
       :is-edit-page="editControlStrategyPopVisiable"
-      :visible="createControlStrategyPopVisiable || editControlStrategyPopVisiable"
+      :visible.sync="createControlStrategyPopVisible"
       @close="handleControlStrategyClose"
       @success="handleControlStrategySuccess"
     ></CreateControlStrategyPop>
-    <user-picker-pop :visible.sync="userPickerPopVisible"></user-picker-pop>
+    <user-picker-pop
+      ref="userPickerPop"
+      model-title="已下发人员"
+      :opt="{footer: null}"
+      :read-only="true"
+      :value="userPickerPopValue"
+      :visible.sync="readUserSelectedPopVisible"
+      @close="userPickerPopValue=[];"
+    ></user-picker-pop>
+    <device-list-pop
+      :visible.sync="deviceListPopVisible"
+      :strategy-id="editId"
+    ></device-list-pop>
+    <edit-records
+      :visible.sync="editRecordsPopVisible"
+      :strategy-id="editId"
+    >
+    </edit-records>
   </div>
 </template>
 
@@ -97,13 +116,17 @@ const formItemLayout = {
 }
 import { strategyTypeShortMap } from '@/utils/params'
 import IconDelete from '@/components/icons/IconDelete'
-import IconSend from '@/components/icons/IconSend'
+import IconStrategyManage from '@/components/icons/IconStrategyManage'
 import CreateControlStrategyPop from './CreateControlStrategyPop'
 import UserPickerPop from '@/components/UserPickerPop'
+import DeviceListPop from './components/DeviceList/DeviceListPop'
+import EditRecords from './components/EditRecords/EditRecords'
+
 export default {
   name: 'ControlStrategyTab',
-  components: { IconDelete, IconSend, CreateControlStrategyPop,
-    UserPickerPop },
+  components: { IconDelete, CreateControlStrategyPop,
+    IconStrategyManage, UserPickerPop, DeviceListPop, EditRecords
+  },
   props: {},
   data() {
     return {
@@ -158,12 +181,25 @@ export default {
       createControlStrategyPopVisiable: false,
       editControlStrategyPopVisiable: false,
       editId: '',
-      userPickerPopVisible: false,
       formItemLayout,
-      strategyTypeShortMap
+      strategyTypeShortMap,
+      readUserSelectedPopVisible: false,
+      deviceListPopVisible: false,
+      editRecordsPopVisible: false,
+      userPickerPopValue: []
     }
   },
-  computed: {},
+  computed: {
+    createControlStrategyPopVisible: {
+      set(val) {
+        this.createControlStrategyPopVisiable = val
+        this.editControlStrategyPopVisiable = val
+      },
+      get() {
+        return this.createControlStrategyPopVisiable || this.editControlStrategyPopVisiable
+      }
+    }
+  },
   watch: {},
   created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
@@ -180,14 +216,12 @@ export default {
       }
       params.strategyType = values.strategyType
       params.strategyName = values.strategyName
-      // this.fetch({startDate: })
-      console.log(params)
+      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
     resetFilterForm() {
       this.filterForm.resetFields()
     },
     handleTableChange(pagination, filters, sorter) {
-      console.log(pagination)
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
     fetch(params = {}) {
@@ -201,8 +235,10 @@ export default {
         this.dataSource = data.rows
         pagination.total = data.total
         this.pagination = pagination
-        this.loading = false
-      })
+      }).catch()
+        .finally(() => {
+          this.loading = false
+        })
     },
     // 打开新建控制策略弹窗
     createControlStrategyPop() {
@@ -212,14 +248,15 @@ export default {
     handleControlStrategyClose() {
       this.resetControlStrategyParams()
     },
-    // 策略成功
+    // 策略新建/编辑成功
     handleControlStrategySuccess() {
       this.resetControlStrategyParams()
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 重置策略管理弹窗的交互参数
     resetControlStrategyParams() {
-      this.createControlStrategyPopVisiable = false
-      this.editControlStrategyPopVisiable = false
+      // this.createControlStrategyPopVisiable = false
+      // this.editControlStrategyPopVisiable = false
       this.editId = ''
     },
     // 查看详情弹窗
@@ -232,8 +269,34 @@ export default {
       this.editControlStrategyPopVisiable = true
     },
     // 打开删除策略弹窗
-    openDelPop() {
+    deleteStrategy() {
 
+    },
+    // 查看已下发的用户
+    showUserCountPop(id) {
+      this.$get('/business/cmd-strategy/getPickUsers', {
+        strategyId: id
+      })
+        .then(r => {
+          if (r.data.state === 1) {
+            this.userPickerPopValue = r.data.data
+            this.readUserSelectedPopVisible = true
+          }
+        })
+    },
+    // 查看绑定设备列表
+    showDeviceListPop(id) {
+      this.editId = id
+      this.deviceListPopVisible = true
+    },
+    // 查看修改记录
+    showEditRecordsPop(id) {
+      this.editId = id
+      this.editRecordsPopVisible = true
+    },
+    //
+    changeEditId(id) {
+      this.editId = id
     }
   }
 }

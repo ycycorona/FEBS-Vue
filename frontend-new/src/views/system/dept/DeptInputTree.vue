@@ -4,6 +4,7 @@
     :allow-clear="true"
     :dropdown-style="{ maxHeight: '220px', overflow: 'auto' }"
     :tree-data="deptTreeData"
+    placeholder="请选择"
   />
 </template>
 

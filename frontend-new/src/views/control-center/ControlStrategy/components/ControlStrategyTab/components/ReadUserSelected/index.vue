@@ -1,5 +1,5 @@
 <template>
-  <div class="UserPicker">
+  <div class="read-user-selected">
     <a-modal
       :width="900"
       title="选择接收用户"
@@ -13,44 +13,63 @@
       <a-row :gutter="16" style="height:100%">
         <!-- class="col-border-right" -->
         <a-col :span="24">
-          <treeselect
-            ref="tree-select"
-            v-model="treeValue"
-            :readonly="true"
-            :always-open="true"
-            value-consists-of="BRANCH_PRIORITY"
-            :multiple="true"
-            placeholder="请选择人员"
-            :options="options"
-            :default-expand-level="Infinity"
-            :show-count="true"
-            @select="onTreeSelect"
-            @deselect="onDeselect"
-          >
-            <label slot="option-label" slot-scope="{ node, shouldShowCount, count, labelClassName, countClassName }" :class="labelClassName">
-              {{ node.label }}
-              <!-- {{ node.isBranch ? 'Branch' : 'Leaf' }}: {{ node.label }} -->
-              <!-- {{ console.log(node) }} -->
-              <span v-if="showCountTag(node)" :class="countClassName">({{ count }})</span>
-            </label>
-          </treeselect>
+          <a-tree
+            v-model="checkedKeys"
+            checkable
+            :expanded-keys="expandedKeys"
+            :auto-expand-parent="autoExpandParent"
+            :selected-keys="selectedKeys"
+            :tree-data="treeData"
+            @expand="onExpand"
+            @check="onCheck"
+          />
         </a-col>
-        <!-- <a-col :span="12">
-          <div>123</div>
-        </a-col> -->
+
       </a-row>
     </a-modal>
   </div>
 </template>
 
 <script>
-// import the component
-import Treeselect from '@riophae/vue-treeselect'
-// import the styles
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+
+const treeData = [{
+  title: '0-0',
+  key: '0-0',
+  children: [{
+    title: '0-0-0',
+    key: '0-0-0',
+    children: [
+      { title: '0-0-0-0', key: '0-0-0-0', disableCheckbox: true },
+      { title: '0-0-0-1', key: '0-0-0-1' },
+      { title: '0-0-0-2', key: '0-0-0-2' }
+    ]
+  }, {
+    title: '0-0-1',
+    key: '0-0-1',
+    children: [
+      { title: '0-0-1-0', key: '0-0-1-0' },
+      { title: '0-0-1-1', key: '0-0-1-1' },
+      { title: '0-0-1-2', key: '0-0-1-2' }
+    ]
+  }, {
+    title: '0-0-2',
+    key: '0-0-2'
+  }]
+}, {
+  title: '0-1',
+  key: '0-1',
+  children: [
+    { title: '0-1-0-0', key: '0-1-0-0' },
+    { title: '0-1-0-1', key: '0-1-0-1' },
+    { title: '0-1-0-2', key: '0-1-0-2' }
+  ]
+}, {
+  title: '0-2',
+  key: '0-2'
+}]
 export default {
-  name: 'UserPickerPop',
-  components: { Treeselect },
+  name: 'ReadUserSelected',
+  components: { },
   props: {
     visible: {
       default: true,
@@ -67,7 +86,12 @@ export default {
       options: [],
       selectUser: [],
       treeValue: [],
-      console
+      console,
+      expandedKeys: ['0-0-0', '0-0-1'],
+      autoExpandParent: true,
+      checkedKeys: ['0-0-0'],
+      selectedKeys: [],
+      treeData
     }
   },
   computed: {
@@ -77,32 +101,33 @@ export default {
     visible: {
       immediate: true,
       handler(newVal) {
+        const valueWithPrefix = this.value.map(item => `user_${item}`)
         if (newVal) {
         // 显示
-          this.treeValue = [].concat(this.value)
+          this.treeValue = [].concat(valueWithPrefix)
         } else {
         // 销毁
           this.selectUser = []
         }
       }
+    },
+    checkedKeys(val) {
+      // console.log('onCheck', val)
     }
   },
   created() {
     this.$get('/business/cmd-strategy/getAllTree')
       .then(r => {
         const data = r.data.data
-        // data.isDisabled = true
         this.options = data
       })
   },
   methods: {
     handSubmit() {
-      this.confirmLoading = true
-      setTimeout(() => {
-        this.$emit('update:visible', false)
-        this.$emit('success', this.selectUser)
-        this.confirmLoading = false
-      }, 2000)
+      // this.confirmLoading = true
+      this.$emit('update:visible', false)
+      this.$emit('success', this.selectUser)
+      // this.confirmLoading = false
     },
     onClose() {
       this.$emit('update:visible', false)
@@ -122,6 +147,17 @@ export default {
     showCountTag(node) {
       return node.isBranch
       // return node.isBranch && node.count.ALL_DESCENDANTS === node.count.LEAF_CHILDREN
+    },
+    onExpand(expandedKeys) {
+      console.log('onExpand', expandedKeys)
+      // if not set autoExpandParent to false, if children expanded, parent can not collapse.
+      // or, you can remove all expanded children keys.
+      this.expandedKeys = expandedKeys
+      this.autoExpandParent = false
+    },
+    onCheck(checkedKeys) {
+      console.log('onCh', this.checkedKeys.length)
+      this.checkedKeys = []
     }
   }
 }
