@@ -64,7 +64,7 @@
     >
       <template slot="operation" slot-scope="text, record">
         <span class="operation-btn" @click="openEditPop(record.id)"><icon-strategy-manage title="管控策略管理" />策略管理</span>
-        <a-popconfirm title="确定删除吗?" ok-text="是" cancel-text="否" @confirm="deleteStrategy">
+        <a-popconfirm title="确定删除吗?" ok-text="是" cancel-text="否" @confirm="deleteStrategy(record.id)">
           <span class="operation-btn"><icon-delete title="删除" />删除</span>
         </a-popconfirm>
       </template>
@@ -97,6 +97,7 @@
       :visible.sync="readUserSelectedPopVisible"
       @close="userPickerPopValue=[];"
     ></user-picker-pop>
+    <!-- 设备列表 -->
     <device-list-pop
       :visible.sync="deviceListPopVisible"
       :strategy-id="editId"
@@ -259,18 +260,33 @@ export default {
       // this.editControlStrategyPopVisiable = false
       this.editId = ''
     },
-    // 查看详情弹窗
-    detailPop() {
-
-    },
     // 打开编辑策略弹窗
     openEditPop(id) {
       this.editId = id
       this.editControlStrategyPopVisiable = true
     },
-    // 打开删除策略弹窗
-    deleteStrategy() {
-
+    // 删除策略
+    deleteStrategy(strategyId) {
+      return new Promise((resolve, reject) => {
+        this.$delete('/business/cmd-strategy/deleteByStrategyId', {
+          strategyId
+        })
+          .then(res => {
+            if (res.data.state === 1) {
+              resolve(res.data.message)
+              this.$message.info('策略删除成功')
+              this.fetch({ pageSize: 10, pageNum: 1 })
+            } else {
+              this.$error({
+                title: '删除失败',
+                content: res.data.message,
+                onOk() {
+                  this.fetch({ pageSize: 10, pageNum: 1 })
+                }
+              })
+            }
+          })
+      })
     },
     // 查看已下发的用户
     showUserCountPop(id) {

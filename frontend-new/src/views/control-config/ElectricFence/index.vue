@@ -1,7 +1,7 @@
 <template>
   <div class="electric-fence-list full-width">
     <div class="add-btn-wrap">
-      <span class="left-text">电子围栏</span>
+      <span class="left-text">电子围栏配置</span>
       <a-button
         class="right-btn"
         type="primary"
@@ -22,16 +22,18 @@
       :loading="loading"
       @change="handleTableChange"
     >
-      <template slot="electricFenceType" slot-scope="electricFenceType">
-        <span>内</span>
+      <template slot="rule" slot-scope="rule">
+        <span>{{ rule | fenceTypeFil }}</span>
       </template>
       <template slot="operation" slot-scope="text, record">
-        <span class="operation-btn" @click="openEditPop"><icon-edit title="修改" />编辑</span>
+        <span class="operation-btn" @click="editElectricFencePop(record.id)"><icon-edit title="修改" />编辑</span>
         <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
       </template>
     </a-table>
     <create-electric-fence-pop
       :visible.sync="createElectricFencePopVisiable"
+      :edit-id.sync="currentEditId"
+      :is-edit.sync="isEdit"
       @success="handleCreateElectricFenceSuccess"
     ></create-electric-fence-pop>
   </div>
@@ -40,7 +42,7 @@
 <script>
 import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
-import CreateElectricFencePop from './components/CreateElectricFencePop'
+import CreateElectricFencePop from './components/CreateElectricFencePop/CreateElectricFencePop'
 export default {
   name: 'ElectricFenceList',
   components: { IconEdit, IconDelete, CreateElectricFencePop },
@@ -50,16 +52,16 @@ export default {
       columns: [
         {
           title: '电子围栏名称',
-          dataIndex: 'electricFenceName'
+          dataIndex: 'fenceName'
         },
         {
           title: '性质',
-          dataIndex: 'electricFenceType',
-          scopedSlots: { customRender: 'electricFenceType' }
+          dataIndex: 'rule',
+          scopedSlots: { customRender: 'rule' }
         },
         {
           title: '中心位置',
-          dataIndex: 'center'
+          dataIndex: 'centerName'
         },
         {
           title: '半径',
@@ -67,15 +69,15 @@ export default {
         },
         {
           title: '经度',
-          dataIndex: 'electricFenceX'
+          dataIndex: 'centerLng'
         },
         {
           title: '纬度',
-          dataIndex: 'electricFenceY'
+          dataIndex: 'centerLat'
         },
         {
           title: '创建人',
-          dataIndex: 'createdBy'
+          dataIndex: 'createName'
         },
         {
           title: '创建时间',
@@ -97,7 +99,9 @@ export default {
       },
       loading: false,
       dataSource: null,
-      createElectricFencePopVisiable: false
+      createElectricFencePopVisiable: false,
+      currentEditId: '',
+      isEdit: false
     }
   },
   computed: {},
@@ -113,7 +117,7 @@ export default {
     fetch(params = {}) {
       // 显示loading
       this.loading = true
-      this.$get('/control-config/electric-fence/list', {
+      this.$get('/business/electronic-fence/getElectronicFenceListByPage', {
         ...params
       }).then((r) => {
         const data = r.data
@@ -128,21 +132,24 @@ export default {
     createElectricFencePop() {
       this.createElectricFencePopVisiable = true
     },
+    editElectricFencePop(fenceId) {
+      this.isEdit = true
+      this.currentEditId = fenceId
+      this.createElectricFencePopVisiable = true
+    },
     // 新建策略弹窗关闭
     handleCreateElectricFencePopClose() {
-      this.createElectricFencePopVisiable = false
+
     },
     // 新建策略成功
     handleCreateElectricFenceSuccess() {
-      this.createElectricFencePopVisiable = false
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 查看详情弹窗
     detailPop() {
 
     },
-    openEditPop() {
 
-    },
     openDelPop() {
 
     }

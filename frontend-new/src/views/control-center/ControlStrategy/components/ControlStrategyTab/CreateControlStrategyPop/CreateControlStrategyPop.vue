@@ -89,11 +89,9 @@
                 :disabled="readOnly"
                 allow-clear
                 placeholder="根据策略需要是否填写本条件"
+                :options="fencesOpt"
               >
-                <a-select-option :value="1">电子围栏1</a-select-option>
-                <a-select-option :value="2">电子围栏2</a-select-option>
-                <a-select-option :value="3">电子围栏3</a-select-option>
-                <a-select-option :value="4">电子围栏4</a-select-option>
+
               </a-select>
             </a-form-item>
           </a-col>
@@ -133,7 +131,7 @@
                 :disabled="readOnly"
                 placeholder="点击选择电子围栏"
                 mode="multiple"
-                :options="directiveConfigMap[12]"
+                :options="fencesOpt"
               >
               </a-select>
             </a-form-item>
@@ -184,7 +182,7 @@
       </div>
     </template>
     <user-picker-pop
-      :read-only="true"
+      :read-only="readOnly"
       model-title="已选择人员"
       :value="selectUserId"
       :visible.sync="userPickerPopVisible"
@@ -253,6 +251,7 @@ export default {
       formContent: this.$form.createForm(this),
       formPerson: this.$form.createForm(this),
       selectUser: [], // 选中的人
+      selectUserId: [], // 选中的人的id
       formItemLayout,
       dateRangeDisable: true, // 长期策略不需要选日期范围
       isGeoFenceSelector: false,
@@ -260,13 +259,14 @@ export default {
       userPickerPopVisible: false,
       rawStrategyDetail: null, // 来自服务端的策略详情
       directivesOpt: [],
+      fencesOpt: [],
+      bannedOutFencesOpt: [],
+      bannedInFencesOpt: [],
       directiveConfigMap: null
+
     }
   },
   computed: {
-    selectUserId() {
-      return this.selectUser.map(item => item.db_id)
-    },
     // 是否选好了人，可以保存并下发
     isCanSaveAndSend() {
       return this.selectUserId.length > 0 || (this.rawStrategyDetail && this.rawStrategyDetail.isPushed === 1)
@@ -301,6 +301,7 @@ export default {
               this.formValue.condition.dateRange =
                 [moment(rawStrategyDetail.startDate), moment(rawStrategyDetail.endDate)]
             }
+            this.selectUserId = JSON.parse(rawStrategyDetail.userIds)
             this.onDirectiveTypesChange(this.formValue.content.directiveTypes)
             this.onStrategyTypeChange(this.formValue.condition.strategyType)
             this.isLoading = false
@@ -317,6 +318,7 @@ export default {
     }
   },
   async created() {
+    this.fencesOpt = await this.getFenceOpt()
     this.directivesOpt = await this.getDirectiveOpt()
     const directiveConfigRaw = await this.getDirectiveConfig(
       this.directivesOpt.map(item => item.value).join(',')
@@ -378,16 +380,21 @@ export default {
         newEditId = await this.saveEditedStrategy()
       }
       // 拿到neweditit用户
-      if (this.selectUserId.length > 0) {
-        await this.pushStrategy(newEditId)
+      await this.pushStrategy(newEditId)
+      if (this.isCanSaveAndSend) {
+        this.$message.info('策略保存并下发成功')
+      } else {
+        this.$message.info('策略暂存成功')
       }
+
+      this.$emit('update:visible', false)
       this.$emit('success')
     },
     // 新建策略
     createStrategy() {
       const formConditionValue = this.formCondition.getFieldsValue()
       const formContentValue = this.formContent.getFieldsValue()
-      // console.log(formConditionValue, formContentValue)
+      console.log(formConditionValue, formContentValue)
       const params = {
         configIds: configSerialize(formContentValue.directiveTypes),
         electronicFenceIds: configSerialize(formContentValue.geoFenceConfig),
@@ -426,11 +433,11 @@ export default {
       }
       params.id = this.editId
       console.log(params)
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/cmd-strategy/addStrategyByModify', params).then(r => {
-      //     resolve(r.data.data)
-      //   })
-      // })
+      return new Promise((resolve, reject) => {
+        this.$post('/business/cmd-strategy/addStrategyByModify', params).then(r => {
+          resolve(r.data.data)
+        })
+      })
     },
     // 策略下发
     pushStrategy(newEditId) {
@@ -438,12 +445,34 @@ export default {
         strategyId: newEditId,
         uids: configSerialize(this.selectUserId)
       }
-      console.log(params)
       return new Promise((resolve, reject) => {
         this.$post('/business/cmd-strategy/pushStrategyByManager', params)
           .then(res => {
-            console.log(res)
             resolve(res)
+          })
+      })
+    },
+    // 获取电子围栏选项
+    getFenceOpt() {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/electronic-fence/getElectronicFenceList')
+          .then(res => {
+            if (res.data.state === 1) {
+              const list = res.data.data
+              const fenceOpt = list.map(item => {
+                return {
+                  value: item.id,
+                  label: item.fenceName
+                }
+              })
+              const bannedOutFencesOpt = fenceOpt.filter(item => item.rule === 1)
+              const bannedInFencesOpt = fenceOpt.filter(item => item.rule === 0)
+              this.bannedOutFencesOpt = bannedOutFencesOpt
+              this.bannedInFencesOpt = bannedInFencesOpt
+              resolve(fenceOpt)
+            } else {
+              reject('获取数据失败')
+            }
           })
       })
     },
@@ -511,15 +540,8 @@ export default {
     // 用户选择成功
     userPickSuccess(remote_selectedUser) {
       this.selectUser = cloneDeep(remote_selectedUser)
+      this.selectUserId = this.selectUser.map(item => item.db_id)
       this.formPerson.setFieldsValue({ 'strategyBindPerson': `${this.selectUser.length}人` })
-    },
-    testClick() {
-      setTimeout(() => {
-        this.formValue.condition.strategyName = '123'
-      }, 2000)
-    },
-    setTimeWrap(callback, time = 2000) {
-      setTimeout(callback, 2000)
     }
   }
 }

@@ -17,12 +17,12 @@
             :columns="columns"
             :scroll="{x: 1100}"
             :data-source="dataSource"
-            :pagination="false"
+            :pagination="pagination"
             :loading="loading"
             @change="handleTableChange"
           >
             <template slot="strategyStatus" slot-scope="strategyStatus">
-              <span class="{'red-text': strategyStatus===6||strategyStatus===8}">{{ strategyStatus | strategyToDeviceStatusFil }}</span>
+              <span :class="{'red-text': strategyStatus===6||strategyStatus===8}">{{ strategyStatus | strategyToDeviceStatusFil }}</span>
             </template>
           </a-table>
         </a-col>
@@ -67,7 +67,16 @@ export default {
           scopedSlots: { customRender: 'strategyStatus' }
         }],
       loading: false,
-      dataSource: null
+      dataSource: null,
+      pagination: {
+        total: 0,
+        pageSizeOptions: ['10', '20', '30', '40', '100'],
+        defaultCurrent: 1,
+        defaultPageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
+      }
     }
   },
   computed: {

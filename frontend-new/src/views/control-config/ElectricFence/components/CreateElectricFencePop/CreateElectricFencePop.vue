@@ -23,7 +23,9 @@
               >
                 <a-input
                   v-decorator="[
-                    'electricFenceName'
+                    'electricFenceName', {
+                      initialValue: formValues.electricFenceName
+                    }
                   ]"
                   placeholder="请输入电子围栏名称"
                 />
@@ -33,12 +35,17 @@
               <a-form-item
                 label="性质"
               >
-                <a-input
+                <a-select
                   v-decorator="[
-                    'electricFenceType'
+                    'electricFenceType', {
+                      initialValue: formValues.electricFenceType
+                    }
                   ]"
                   placeholder="请选择电子围栏性质"
-                />
+                >
+                  <a-select-option :value="0">内</a-select-option>
+                  <a-select-option :value="1">外</a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
@@ -48,40 +55,26 @@
                 class="padding-left"
                 label="中心位置"
               >
-                <!-- <a-select
-
-                  show-search
-                  placeholder="请输入关键字进行搜索"
-                  style="width: 100%"
-                  :filter-option="false"
-                  :show-arrow="false"
-                  :not-found-content="fetching ? undefined : null"
-                  @search="fetchAddressList"
-                  @change="handleCenterAddressChange"
-                >
-
-                  <a-spin v-if="fetching" slot="notFoundContent" size="small" />
-                  <a-select-option v-for="d in addressOpts" :key="d.value">{{ d.text }}</a-select-option>
-                </a-select> -->
                 <a-input
                   v-decorator="[
-                    'centerAddress'
+                    'centerAddress', {
+                      initialValue: formValues.centerAddress
+                    }
                   ]"
                   read-only
                 ></a-input>
               </a-form-item>
 
             </a-col>
-            <!-- <a-col :span="2" :xl="2">
-              <a-button type="primary" @click="addFenceFromCenter">添加围栏</a-button>
-            </a-col> -->
             <a-col :span="4" :xl="3">
               <a-form-item
                 label="半径"
               >
                 <a-input
                   v-decorator="[
-                    'electricFenceRadius'
+                    'electricFenceRadius', {
+                      initialValue: formValues.electricFenceRadius
+                    }
                   ]"
                   placeholder="请输入半径"
                 />
@@ -93,7 +86,9 @@
               >
                 <a-input
                   v-decorator="[
-                    'electricFenceX'
+                    'electricFenceX', {
+                      initialValue: formValues.electricFenceX
+                    }
                   ]"
                   placeholder="请输入经度"
                 />
@@ -105,13 +100,14 @@
               >
                 <a-input
                   v-decorator="[
-                    'electricFenceY'
+                    'electricFenceY', {
+                      initialValue: formValues.electricFenceY
+                    }
                   ]"
                   placeholder="请输入纬度"
                 />
               </a-form-item>
             </a-col>
-
           </a-row>
           <a-row :gutter="24">
             <a-col :span="8" :xl="6">
@@ -143,8 +139,8 @@
       <electric-fence-map
         ref="electric-fence-map"
         style="margin-top:8px"
+        @map-init-success="mapInit"
         @fence-change="onFenceChange"
-        @map-init-success="isMapLoading=false"
         @add-circle-tool-off="isAddCircleToolOn=false"
         @add-circle-tool-on="isAddCircleToolOn=true"
         @circle-editor-off="isEditCircleToolOn=false"
@@ -157,6 +153,16 @@
 
 </template>
 <script>
+function formValueFormater() {
+  return {
+    electricFenceName: '',
+    electricFenceType: 0,
+    centerAddress: '',
+    electricFenceRadius: '',
+    electricFenceX: '',
+    electricFenceY: ''
+  }
+}
 import ElectricFenceMap from '@/components/utils/ElectricFenceMap'
 import _ from 'lodash/core'
 export default {
@@ -166,10 +172,19 @@ export default {
     visible: {
       default: false,
       type: Boolean
+    },
+    isEdit: {
+      default: false,
+      type: Boolean
+    },
+    editId: {
+      default: '',
+      type: [String, Number]
     }
   },
   data() {
     return {
+      formValues: formValueFormater(),
       form: null,
       isMapLoading: true,
       isAddCircleToolOn: false,
@@ -179,11 +194,25 @@ export default {
       isHaveCurrentCircle: false,
       confirmLoading: false,
       fetching: false,
-      addressOpts: []
+      addressOpts: [],
+      fenceDetail: null
     }
   },
   computed: { },
-  watch: {},
+  watch: {
+    visible: {
+      immediate: false,
+      async handler(newVal) {
+        if (newVal) {
+        // 显示
+
+        } else {
+        // 销毁
+
+        }
+      }
+    }
+  },
   created() {
 
   },
@@ -193,6 +222,37 @@ export default {
     })
   },
   methods: {
+    async mapInit() {
+      this.isMapLoading = false
+      if (this.isEdit) {
+        const fenceDetail = this.fenceDetail = await this.getFenceDetail()
+        this.formValues = {
+          electricFenceName: fenceDetail.fenceName,
+          electricFenceType: fenceDetail.rule,
+          centerAddress: fenceDetail.centerName,
+          electricFenceRadius: fenceDetail.radius,
+          electricFenceX: fenceDetail.centerLat,
+          electricFenceY: fenceDetail.centerLng
+        }
+        this.$refs['electric-fence-map'].addFenceFromParams(
+          fenceDetail.centerLng,
+          fenceDetail.centerLat,
+          fenceDetail.radius)
+      }
+    },
+    reset() {
+      this.form.resetFields()
+      this.isMapLoading = true
+      this.isAddCircleToolOn = false
+      this.isEditCircleToolOn = false
+      this.isHaveCurrentCircle = false
+      this.confirmLoading = false
+      this.addressOpts = []
+      this.$emit('update:visible', false)
+      this.$emit('update:isEdit', false)
+      this.$emit('update:editId', '')
+      this.$refs['electric-fence-map'].delCurrentCircle()
+    },
     activeAddCircleTool() {
       this.$refs['electric-fence-map'].activeAddCircleTool()
     },
@@ -207,26 +267,58 @@ export default {
       this.$refs['electric-fence-map'].delCurrentCircle()
     },
     onClose() {
-      this.$emit('update:visible', false)
-      this.$nextTick(() => {
-        this.reset()
+      this.reset()
+    },
+    async handSubmit() {
+      const formValues = this.form.getFieldsValue()
+      console.log(formValues)
+      const params = {
+        centerLat: formValues.electricFenceY,
+        centerLng: formValues.electricFenceX,
+        centerName: formValues.centerAddress,
+        fenceName: formValues.electricFenceName,
+        radius: formValues.electricFenceRadius,
+        rule: formValues.electricFenceType
+      }
+      if (this.isEdit) {
+        params.id = this.editId
+        await this.updateFence(params)
+      } else {
+        await this.createFence(params)
+      }
+      this.reset()
+      this.$emit('success')
+    },
+    // 新增电子围栏
+    createFence(params) {
+      return new Promise((resolve, reject) => {
+        this.$post('/business/electronic-fence/addElectronicFence', params).then(r => {
+          this.$message.info('新增电子围栏成功')
+          resolve(r.data.data)
+        })
       })
     },
-    handSubmit() {
-      this.confirmLoading = true
-      setTimeout(() => {
-        this.$emit('update:visible', false)
-        this.$nextTick(() => {
-          this.reset()
+    // 编辑电子围栏
+    updateFence(params) {
+      return new Promise((resolve, reject) => {
+        this.$post('/business/electronic-fence/updateElectronicFence', params).then(r => {
+          this.$message.info('编辑电子围栏成功')
+          resolve(r.data.data)
         })
-      }, 2000)
+      })
     },
-    reset() {
-      this.isMapLoading = true
-      this.isAddCircleToolOn = false
-      this.isEditCircleToolOn = false
-      this.isHaveCurrentCircle = false
-      this.confirmLoading = false
+    getFenceDetail() {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/electronic-fence/getElectronicFenceById', {
+          fenceId: this.editId
+        }).then(r => {
+          if (r.data.state === 1) {
+            resolve(r.data.data)
+          } else {
+            reject()
+          }
+        })
+      })
     },
     // 电子围栏改变
     onFenceChange({ formattedAddress, lng, lat, radius }) {

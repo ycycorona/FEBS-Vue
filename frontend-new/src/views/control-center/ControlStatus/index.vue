@@ -204,7 +204,7 @@
                   </div>
                 </div>
                 <div class="flex-item" style="text-align: right">
-                  <a-button v-if="item.dealStatus===0" type="primary" size="small" ghost style="vertical-align: -6px;" @click="handleAlarm(item.id)">处理</a-button>
+                  <a-button v-if="item.dealStatus===0" type="primary" size="small" ghost style="vertical-align: -6px;" @click="openDealAlarmPop(item.id)">处理</a-button>
                   <a-button v-else type="default" size="small" disabled style="vertical-align: -6px;">已处理</a-button>
                 </div>
               </div>
@@ -235,6 +235,11 @@
         </a-col>
       </a-row>
     </a-modal>
+    <DealAlarmModal
+      :visible.sync="dealAlarmModalVisible"
+      :alarm-id.sync="currentDealAlarmId"
+      :opt="{zIndex: 1040}"
+    ></DealAlarmModal>
   </div>
 </template>
 
@@ -244,10 +249,11 @@ import SimpleLi from '@/components/fragment/SimpleLi'
 import IconDeviceManage from '@/components/icons/IconDeviceManage'
 import DeptInputTree from '@/views/system/dept/DeptInputTree'
 import DevicesManage from './components/DevicesManage'
+import DealAlarmModal from '../../alarm-message/components/DealAlarmModal'
 export default {
   name: 'ControlStatus',
   components: { TabTitle, SimpleLi, IconDeviceManage, DeptInputTree,
-    DevicesManage },
+    DevicesManage, DealAlarmModal },
   props: {
 
   },
@@ -327,7 +333,10 @@ export default {
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
       strategyOpt: [],
-      loading: false
+      loading: false,
+      dealPopVisible: false,
+      currentDealAlarmId: '',
+      dealAlarmModalVisible: false
     }
   },
   computed: {
@@ -426,7 +435,7 @@ export default {
         return
       }
       this.alarmRecordsDetail = await this.getAlarmRecordsDetail(id)
-      console.log(this.alarmRecordsDetail)
+      // console.log(this.alarmRecordsDetail)
     },
     getStrategyDetail(id) {
       return new Promise((resolve, reject) => {
@@ -474,8 +483,9 @@ export default {
       })
     },
     // 处理报警
-    handleAlarm(id) {
-
+    openDealAlarmPop(alarmId) {
+      this.currentDealAlarmId = alarmId
+      this.dealAlarmModalVisible = true
     },
     openDevicesManageModal(userId) {
       this.deviceManageVisible = true

@@ -53,6 +53,7 @@ export default {
     },
     circleData() {
       this.geocoder.getAddress([this.circleData.lng, this.circleData.lat], (status, result) => {
+        console.log(status, result)
         if (status === 'complete' && result.regeocode) {
           console.log(status, result)
           this.$emit('fence-change', Object.assign({}, this.circleData, { formattedAddress: result.regeocode.formattedAddress }))
@@ -146,6 +147,7 @@ export default {
     },
     // 从地图移除当前圆圈，并消除变量引用
     delCurrentCircle() {
+      if (!this.currentCircle) { return }
       if (this.isEditCircleToolOn) {
         this.deActiveEditCircleTool()
       }
@@ -173,7 +175,14 @@ export default {
       const circle = new AMap.Circle({
         // eslint-disable-next-line
         center: new AMap.LngLat(lng, lat), // 圆心位置
-        radius: radius // 半径
+        radius: radius, // 半径
+        strokeColor: '#1791fc',
+        strokeOpacity: 0.8,
+        strokeDasharray: [10, 5],
+        strokeWeight: 2,
+        strokeStyle: 'solid',
+        fillColor: '#1791fc',
+        fillOpacity: 0.35
       })
       if (this.currentCircle) {
         this.delCurrentCircle()
