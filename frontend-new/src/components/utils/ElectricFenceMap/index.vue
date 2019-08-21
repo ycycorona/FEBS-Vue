@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;height:500px;position:relative">
     <div class="search-info-wrap">
-      <a-input id="map-text-search" addon-before="请输入关键字" />
+      <a-input id="map-text-search" addon-before="输入位置关键字检索" />
     </div>
     <div style="width: 100%;height:500px" />
   </div>
@@ -50,17 +50,6 @@ export default {
       } else {
         this.$emit('no-current-circle')
       }
-    },
-    circleData() {
-      this.geocoder.getAddress([this.circleData.lng, this.circleData.lat], (status, result) => {
-        console.log(status, result)
-        if (status === 'complete' && result.regeocode) {
-          console.log(status, result)
-          this.$emit('fence-change', Object.assign({}, this.circleData, { formattedAddress: result.regeocode.formattedAddress }))
-        } else {
-          console.error('根据经纬度查询地址失败')
-        }
-      })
     }
   },
   mounted() {
@@ -90,6 +79,8 @@ export default {
         this.circleChange({ lng: this.currentCircle.getCenter().getLng(),
           lat: this.currentCircle.getCenter().getLat(),
           radius: this.currentCircle.getRadius() })
+        this.getCenterAddressName()
+        this.$emit('fence-change', Object.assign({}, this.circleData))
       })
     })
   },
@@ -134,6 +125,8 @@ export default {
         this.circleChange({ lng: this.currentCircle.getCenter().getLng(),
           lat: this.currentCircle.getCenter().getLat(),
           radius: this.currentCircle.getRadius() })
+        this.getCenterAddressName()
+        this.$emit('fence-change', Object.assign({}, this.circleData))
       })
       this.circleEditor.open()
       this.isEditCircleToolOn = true
@@ -154,20 +147,39 @@ export default {
       this.currentCircle.setMap(null)
       this.currentCircle = null
     },
-    // 设置圆属性
+    // 手动设置圆属性
     manualChangeCircle({ lng, lat, radius }) {
+      if (!this.currentCircle) {
+        this.addFenceFromParams(lng, lat, radius)
+        return
+      }
       console.log(lng, lat, radius)
       this.currentCircle.setOptions({
         // eslint-disable-next-line
         radius, center: new AMap.LngLat(lng, lat)
       })
       this.circleChange({ lng, lat, radius })
+      this.getCenterAddressName()
     },
     circleChange(obj) {
       // lng, lat, radius
       const emptyObj = {}
       Object.assign(emptyObj, this.circleData, obj)
       this.circleData = emptyObj
+    },
+    // 获取中心坐标地址
+    getCenterAddressName() {
+      return new Promise((resolve, reject) => {
+        this.geocoder.getAddress([this.circleData.lng, this.circleData.lat], (status, result) => {
+          if (status === 'complete' && result.regeocode) {
+            this.$emit('center-address', result.regeocode.formattedAddress)
+            resolve(result.regeocode.formattedAddress)
+          } else {
+            reject('根据经纬度查询地址失败')
+            console.error('根据经纬度查询地址失败')
+          }
+        })
+      })
     },
     // 从参数新建圆圈
     addFenceFromParams(lng, lat, radius) {

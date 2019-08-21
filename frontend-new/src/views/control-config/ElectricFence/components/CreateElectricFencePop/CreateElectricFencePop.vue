@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :width="1400"
-    title="新建电子围栏"
+    :title="isEdit ? '编辑电子围栏' : '新建电子围栏'"
     :body-style="{height: '700px'}"
     style="top: 20px;"
     :visible="visible"
@@ -24,6 +24,9 @@
                 <a-input
                   v-decorator="[
                     'electricFenceName', {
+                      rules: [
+                        { required: true, message: '电子围栏名称不能为空'}
+                      ],
                       initialValue: formValues.electricFenceName
                     }
                   ]"
@@ -73,6 +76,9 @@
                 <a-input
                   v-decorator="[
                     'electricFenceRadius', {
+                      rules: [
+                        { required: true, message: '半径不能为空'}
+                      ],
                       initialValue: formValues.electricFenceRadius
                     }
                   ]"
@@ -87,6 +93,9 @@
                 <a-input
                   v-decorator="[
                     'electricFenceX', {
+                      rules: [
+                        { required: true, message: '经度不能为空'}
+                      ],
                       initialValue: formValues.electricFenceX
                     }
                   ]"
@@ -101,6 +110,9 @@
                 <a-input
                   v-decorator="[
                     'electricFenceY', {
+                      rules: [
+                        { required: true, message: '纬度不能为空'}
+                      ],
                       initialValue: formValues.electricFenceY
                     }
                   ]"
@@ -108,14 +120,17 @@
                 />
               </a-form-item>
             </a-col>
+            <a-col :span="4" :xl="3">
+              <a-button type="primary" @click="updateToMap">更新围栏到地图</a-button>
+            </a-col>
           </a-row>
           <a-row :gutter="24">
             <a-col :span="8" :xl="6">
-              <a-button v-if="!isHaveCurrentCircle" type="primary" class="margin-right" @click="activeAddCircleTool">围栏添加</a-button>
+              <a-button v-if="!isHaveCurrentCircle" type="primary" class="margin-right" @click="activeAddCircleTool">地图添加围栏</a-button>
               <template v-else>
                 <a-button :disabled="isEditCircleToolOn" type="danger" class="margin-right" @click="delCurrentCircle">删除已有围栏</a-button>
-                <a-button v-if="!isEditCircleToolOn" type="primary" @click="activeEditCircleTool">围栏编辑</a-button>
-                <a-button v-else type="danger" @click="deActiveEditCircleTool">停止 围栏编辑</a-button>
+                <a-button v-if="!isEditCircleToolOn" type="primary" @click="activeEditCircleTool">地图编辑围栏</a-button>
+                <a-button v-else type="danger" @click="deActiveEditCircleTool">停止地图编辑围栏</a-button>
               </template>
               <!-- <a-button type="primary">搜索</a-button> -->
             </a-col>
@@ -141,6 +156,7 @@
         style="margin-top:8px"
         @map-init-success="mapInit"
         @fence-change="onFenceChange"
+        @center-address="onCenterAddressChange"
         @add-circle-tool-off="isAddCircleToolOn=false"
         @add-circle-tool-on="isAddCircleToolOn=true"
         @circle-editor-off="isEditCircleToolOn=false"
@@ -164,7 +180,6 @@ function formValueFormater() {
   }
 }
 import ElectricFenceMap from '@/components/utils/ElectricFenceMap'
-import _ from 'lodash/core'
 export default {
   name: 'CreateElectricFencePop',
   components: { ElectricFenceMap },
@@ -231,8 +246,8 @@ export default {
           electricFenceType: fenceDetail.rule,
           centerAddress: fenceDetail.centerName,
           electricFenceRadius: fenceDetail.radius,
-          electricFenceX: fenceDetail.centerLat,
-          electricFenceY: fenceDetail.centerLng
+          electricFenceX: fenceDetail.centerLng,
+          electricFenceY: fenceDetail.centerLat
         }
         this.$refs['electric-fence-map'].addFenceFromParams(
           fenceDetail.centerLng,
@@ -269,7 +284,23 @@ export default {
     onClose() {
       this.reset()
     },
+    validateFields(arr = []) {
+      let fieldnames
+      if (arr.length !== 0) {
+        fieldnames = arr
+      }
+      let validateFlag = true
+      this.form.validateFields(fieldnames, (err, fieldsValue) => {
+        if (err) {
+          validateFlag = false
+        }
+      })
+      return validateFlag
+    },
     async handSubmit() {
+      if (!this.validateFields()) {
+        return
+      }
       const formValues = this.form.getFieldsValue()
       console.log(formValues)
       const params = {
@@ -307,6 +338,7 @@ export default {
         })
       })
     },
+    // 获取围栏
     getFenceDetail() {
       return new Promise((resolve, reject) => {
         this.$get('/business/electronic-fence/getElectronicFenceById', {
@@ -327,13 +359,19 @@ export default {
         'centerAddress': formattedAddress,
         'electricFenceX': lng,
         'electricFenceY': lat
-
       })
     },
-    onValuesChange(props, values) {
-      this.updateCircleOptions(values)
+    // 中心地址改变
+    onCenterAddressChange(address) {
+      this.form.setFieldsValue({
+        'centerAddress': address
+      })
     },
+    // 更新圆圈参数
     updateCircleOptions(values) {
+      if (!this.validateFields(['electricFenceX', 'electricFenceY', 'electricFenceRadius'])) {
+        return
+      }
       const obj_1 = Object.assign({}, {
         electricFenceX: this.form.getFieldValue('electricFenceX'),
         electricFenceY: this.form.getFieldValue('electricFenceY'),
@@ -349,17 +387,18 @@ export default {
         lng: obj_1.electricFenceX,
         lat: obj_1.electricFenceY,
         radius: obj_1.electricFenceRadius
-
       }
       // 是否是从地图触发变化
-      const isUnchange = _.isEqual(obj_2, this.$refs['electric-fence-map'].circleData)
-      if (!isUnchange && this.isHaveCurrentCircle) {
-        this.$refs['electric-fence-map'].manualChangeCircle(obj_2)
-      }
+      this.$refs['electric-fence-map'].manualChangeCircle(obj_2)
     },
+    // 删除围栏
     onCircleDelete() {
       this.onFenceChange({ formattedAddress: '', lng: '', lat: '', radius: '' })
       this.isHaveCurrentCircle = false
+    },
+    // 更新围栏到地图
+    updateToMap() {
+      this.updateCircleOptions()
     }
   }
 }

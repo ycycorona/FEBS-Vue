@@ -27,7 +27,14 @@
       </template>
       <template slot="operation" slot-scope="text, record">
         <span class="operation-btn" @click="editElectricFencePop(record.id)"><icon-edit title="修改" />编辑</span>
-        <span class="operation-btn" @click="openDelPop"><icon-delete title="删除" />删除</span>
+        <a-popconfirm
+          title="确认删除吗?"
+          ok-text="删除"
+          cancel-text="取消"
+          @confirm="dodelItem(record.id)"
+        >
+          <span class="operation-btn"><icon-delete title="删除" />删除</span>
+        </a-popconfirm>
       </template>
     </a-table>
     <create-electric-fence-pop
@@ -145,13 +152,16 @@ export default {
     handleCreateElectricFenceSuccess() {
       this.fetch({ pageSize: 10, pageNum: 1 })
     },
-    // 查看详情弹窗
-    detailPop() {
-
-    },
-
-    openDelPop() {
-
+    dodelItem(fenceId) {
+      return new Promise((resolve, reject) => {
+        this.$delete('/business/electronic-fence/deleteElectronicFence', {
+          fenceId
+        }).then(r => {
+          resolve(r.data.data)
+          this.$message.info('电子围栏删除成功')
+          this.fetch({ pageSize: 10, pageNum: 1 })
+        })
+      })
     }
   }
 }
