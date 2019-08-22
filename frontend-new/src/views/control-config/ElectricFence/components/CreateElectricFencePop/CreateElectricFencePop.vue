@@ -256,6 +256,7 @@ export default {
       }
     },
     reset() {
+      this.formValues = formValueFormater()
       this.form.resetFields()
       this.isMapLoading = true
       this.isAddCircleToolOn = false

@@ -1,14 +1,18 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="top">
-        <div class="header">
-          <img alt="logo" class="logo" src="@/assets/imgs/logo-blue.png">
-          <span class="title">{{ systemName }}</span>
+      <div class="from-wrap">
+        <div class="top">
+          <div class="header">
+            <img alt="logo" class="logo" src="@/assets/imgs/logo-blue.png">
+            <span class="title">{{ systemName }}</span>
+          </div>
+          <div class="desc" />
         </div>
-        <div class="desc" />
+        <div class="from-inner-wrap">
+          <component :is="componentName" class="main-content" @regist="handleRegist" />
+        </div>
       </div>
-      <component :is="componentName" class="main-content" @regist="handleRegist" />
     </div>
     <global-footer :copyright="copyright" />
   </div>
@@ -49,13 +53,25 @@ export default {
     flex-direction: column;
     height: 100vh;
     overflow: auto;
-    background: #f0f2f5 url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center 110px;
+    //background: #f0f2f5 url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center 110px;
+    background: #f0f2f5 url('/static/img/login-back.png')  center/cover repeat local;
     background-size: 100%;
     .content {
+      .from-wrap {
+        width: 50%;
+        float: right;
+        .from-inner-wrap {
+          background-color: white;
+          width:350px;
+          padding-top: 40px;
+          padding-bottom: 20px;
+          margin: auto;
+        }
+      }
       padding: 32px 0;
       flex: 1;
       @media (min-width: 768px){
-        padding: 116px 0 10px;
+        padding: 250px 0 10px;
       }
       .top {
         text-align: center;
@@ -88,7 +104,7 @@ export default {
         }
       }
       .main-content {
-        width: 368px;
+        width: 300px;
         margin: 0 auto;
         @media screen and (max-width: 576px) {
           width: 95%;

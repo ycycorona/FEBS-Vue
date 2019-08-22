@@ -20,8 +20,7 @@
               <a-input
                 v-decorator="['strategyName',
                               {rules: [
-                                 { required: true, message: '策略名称不能为空'},
-                                 { max: 20, message: '长度不能超过20个字符'}
+                                 { required: true, message: '策略名称不能为空'}
                                ],
                                initialValue: formValue.condition.strategyName}]"
                 :read-only="readOnly"

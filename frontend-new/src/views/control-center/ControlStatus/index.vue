@@ -38,6 +38,7 @@
               v-decorator="[
                 'strategyName'
               ]"
+              allow-clear
               :options="strategyOpt"
             />
           </a-form-item>
@@ -354,9 +355,10 @@ export default {
       const values = this.filterForm.getFieldsValue()
       const params = {
         deptId: values.dept,
-        strategyId: values.values,
+        strategyId: values.strategyName,
         userName: values.username
       }
+      console.log(params)
       // params.strategyType = values.strategyType
       // params.strategyName = values.strategyName
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))

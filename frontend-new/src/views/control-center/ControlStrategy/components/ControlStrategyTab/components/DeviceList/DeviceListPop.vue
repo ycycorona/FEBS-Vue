@@ -22,7 +22,9 @@
             @change="handleTableChange"
           >
             <template slot="strategyStatus" slot-scope="strategyStatus">
-              <span :class="{'red-text': strategyStatus===6||strategyStatus===8}">{{ strategyStatus | strategyToDeviceStatusFil }}</span>
+              <span :class="{'red-text': [0,3,6,8].findIndex(item => item===strategyStatus) !== -1}">
+                {{ strategyStatus | strategyToDeviceStatusFil }}
+              </span>
             </template>
           </a-table>
         </a-col>

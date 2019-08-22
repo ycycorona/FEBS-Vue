@@ -60,7 +60,7 @@
           登录
         </a-button>
       </a-form-item>
-      <div>
+      <div class="clear">
         <a style="float: right" @click="regist">注册账户</a>
       </div>
     </a-form>
@@ -164,6 +164,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "~@/utils/utils.less";
   .login {
     .icon {
       font-size: 24px;
@@ -177,5 +178,8 @@ export default {
         color: #1890ff;
       }
     }
+  }
+  .clear {
+    .clearfix();
   }
 </style>

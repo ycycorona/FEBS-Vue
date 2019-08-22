@@ -9,10 +9,17 @@ const DeviceStatusColorDict = {
 }
 
 const StrategyToDeviceStatusDict = {
+  '0': '待接收',
   '1': '已接收',
+  '2': '已接收',
+  '3': '待撤销',
   '4': '已撤销',
+  '5': '已撤销',
   '6': '待接收',
-  '8': '待撤销'
+  '7': '已接收',
+  '8': '待接收',
+  '9': '已撤销',
+  '10': '已过期'
 }
 
 const alarmDealStatusDict = {

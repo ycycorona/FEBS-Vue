@@ -12,13 +12,11 @@
     @close="onClose"
   >
     <a-spin size="small" :spinning="isLoading">
-      <simple-li>
-        <div>
-          <span>2019.8.9 14:59</span>
-          <span style="float:right">
-            <a-button type="default" size="small" @click="openControlStrategyPop">详情</a-button>
-          </span>
-        </div>
+      <simple-li v-for="(record, index) in recordList" :key="index">
+        <span>{{ record.updateTime }}</span>
+        <span style="float:right">
+          <a-button type="default" size="small" @click="openControlStrategyPop(record.id)">详情</a-button>
+        </span>
       </simple-li>
     </a-spin>
     <div class="drawer-bootom-button">
@@ -28,7 +26,7 @@
       :read-only="true"
       :is-edit-page="true"
       :visible.sync="controlStrategyPopVisiable"
-      :edit-id="recordId"
+      :edit-id.sync="currentRecordId"
       @close="handleControlStrategyClose"
     ></CreateControlStrategyPop>
   </a-drawer>
@@ -55,7 +53,7 @@ export default {
     return {
       isLoading: false,
       controlStrategyPopVisiable: false,
-      recordId: '',
+      currentRecordId: '',
       recordList: []
     }
   },
@@ -64,11 +62,11 @@ export default {
   },
   watch: {
     visible: {
-      immediate: true,
+      immediate: false,
       async handler(newVal) {
         if (newVal) {
         // 显示
-          this.editRecordsList = this.getModfyRecordListById() || []
+          this.recordList = await this.getModfyRecordListById() || []
         } else {
         // 销毁
 
@@ -100,8 +98,8 @@ export default {
     handleControlStrategyClose() {
 
     },
-    openControlStrategyPop() {
-      this.recordId = 2
+    openControlStrategyPop(id) {
+      this.currentRecordId = id
       this.controlStrategyPopVisiable = true
     }
   }

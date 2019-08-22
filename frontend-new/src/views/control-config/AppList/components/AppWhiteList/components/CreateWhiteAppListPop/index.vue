@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     destroy-on-close
-    class="create-black-app-list-pop"
+    class="create-white-app-list-pop"
     title="添加应用黑名单"
     :mask-closable="false"
     width="650"
@@ -11,64 +11,62 @@
     style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
     @close="onClose"
   >
-    <a-spin :spinning="loading">
-      <a-form :form="form">
-        <div v-for="(k, index) in form.getFieldValue('keys')" :key="k" class="for-item">
-          <div>{{ `${index+1}、` }}</div>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="应用名称" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`appName[${k}]`,
-                                {rules: [
-                                   { required: true, message: '应用名称不能为空'},
-                                   { max: 20, message: '长度不能超过20个字符'}
-                                 ],
-                                 initialValue: formValues.appName[k]}]"
-                  palceholder="请输入应用名称"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="应用包名" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`packageName[${k}]`,
-                                {rules: [
-                                   { required: true, message: '应用包名不能为空'}
-                                 ],
-                                 initialValue: formValues.packageName[k]}]"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="备注" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`description[${k}]`,
-                                {initialValue: formValues.description[k]}]"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-divider v-if="form.getFieldValue('keys').length-1!==index" />
-          <div v-else style="margin-top:12px;height:1px"></div>
-          <a-button
-            v-if="index!==0"
-            type="danger"
-            shape="circle"
-            icon="delete"
-            class="del-for-item"
-            @click="removeFormItem(k)"
-          ></a-button>
-        </div>
-        <a-button v-if="!isEdit" ghost type="primary" @click="addFormItem">
-          <a-icon type="plus" /><span style="margin-left: 3px;">继续添加</span>
-        </a-button>
-      </a-form>
-    </a-spin>
+    <a-form :form="form">
+      <div v-for="(k, index) in form.getFieldValue('keys')" :key="k" class="for-item">
+        <div>{{ `${index+1}、` }}</div>
+        <a-row :gutter="24">
+          <a-col :span="18">
+            <a-form-item label="应用名称" v-bind="formItemLayout">
+              <a-input
+                v-decorator="[`appName[${k}]`,
+                              {rules: [
+                                 { required: true, message: '应用名称不能为空'},
+                                 { max: 20, message: '长度不能超过20个字符'}
+                               ],
+                               initialValue: formValues.appName[k]}]"
+                palceholder="请输入应用名称"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="18">
+            <a-form-item label="应用包名" v-bind="formItemLayout">
+              <a-input
+                v-decorator="[`packageName[${k}]`,
+                              {rules: [
+                                 { required: true, message: '应用包名不能为空'}
+                               ],
+                               initialValue: formValues.packageName[k]}]"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="18">
+            <a-form-item label="备注" v-bind="formItemLayout">
+              <a-input
+                v-decorator="[`description[${k}]`,
+                              {initialValue: formValues.description[k]}]"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-divider v-if="form.getFieldValue('keys').length-1!==index" />
+        <div v-else style="margin-top:12px;height:1px"></div>
+        <a-button
+          v-if="index!==0"
+          type="danger"
+          shape="circle"
+          icon="delete"
+          class="del-for-item"
+          @click="removeFormItem(k)"
+        ></a-button>
+      </div>
+      <a-button v-if="!isEdit" ghost type="primary" @click="addFormItem">
+        <a-icon type="plus" /><span style="margin-left: 3px;">继续添加</span>
+      </a-button>
+    </a-form>
     <div class="drawer-bootom-button">
       <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button :loading="loading" style="margin-right: .8rem">取消</a-button>
@@ -92,7 +90,7 @@ const formItemLayout = {
   wrapperCol: { span: 20 }
 }
 export default {
-  name: 'CreateBlackAppListPop',
+  name: 'CreateWhiteAppListPop',
   components: { },
   props: {
     visible: {
@@ -127,6 +125,9 @@ export default {
         // 显示
           if (this.isEdit) {
             const rawDetail = this.rawDetail = await this.getDetail()
+            // this.formValues.appName[0] = rawDetail.appName
+            // this.formValues.packageName[0] = rawDetail.packageName
+            // this.formValues.description[0] = rawDetail.description
             this.$set(this.formValues.appName, 0, rawDetail.appName)
             this.$set(this.formValues.packageName, 0, rawDetail.packageName)
             this.$set(this.formValues.description, 0, rawDetail.description)
@@ -155,21 +156,16 @@ export default {
       this.$emit('update:editId', '')
     },
     getDetail() {
-      this.loading = true
       return new Promise((resolve, reject) => {
         this.$get('/business/black-white-app/getBlackWhiteAppById', {
           appId: this.editId
+        }).then(r => {
+          if (r.data.state === 1) {
+            resolve(r.data.data)
+          } else {
+            reject()
+          }
         })
-          .then(r => {
-            if (r.data.state === 1) {
-              resolve(r.data.data)
-            } else {
-              reject()
-            }
-          })
-          .finally(() => {
-            this.loading = false
-          })
       })
     },
     async handleSubmit() {
@@ -194,11 +190,10 @@ export default {
           appName: formValues.appName[key],
           description: formValues.description[key],
           packageName: formValues.packageName[key],
-          type: 0
+          type: 1
         })
       })
       console.log(paramsList)
-      this.loading = true
       return new Promise((resolve, reject) => {
         this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
           jsonString: JSON.stringify(paramsList)
@@ -206,27 +201,20 @@ export default {
           this.$message.info('新增应用黑名单成功')
           resolve(r.data.data)
         })
-          .finally(() => {
-            this.loading = false
-          })
       })
     },
     editSave(id, formValues) {
-      this.loading = true
       return new Promise((resolve, reject) => {
         this.$post('/business/black-white-app/updateBlackWhiteApp', {
           id,
           appName: formValues.appName[0],
           description: formValues.description[0],
           packageName: formValues.packageName[0],
-          type: 0
+          type: 1
         }).then(r => {
           this.$message.info('修改应用黑名单成功')
           resolve(r.data.data)
         })
-          .finally(() => {
-            this.loading = false
-          })
       })
     },
     validateFields(arr = []) {
@@ -258,6 +246,7 @@ export default {
       if (keys.length === 1) {
         return
       }
+
       // can use data-binding to set
       form.setFieldsValue({
         keys: keys.filter(k => k !== key)

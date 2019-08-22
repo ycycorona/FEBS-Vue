@@ -29,6 +29,7 @@
             <a-select
               v-decorator="['strategyType']"
               placeholder="策略类型"
+              allow-clear
             >
               <a-select-option :value="0">长期策略</a-select-option>
               <a-select-option :value="1">临时策略</a-select-option>

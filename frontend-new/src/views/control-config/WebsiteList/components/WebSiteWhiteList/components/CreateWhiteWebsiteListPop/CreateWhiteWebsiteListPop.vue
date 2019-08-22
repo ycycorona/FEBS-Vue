@@ -1,8 +1,8 @@
 <template>
   <a-drawer
     destroy-on-close
-    class="create-black-app-list-pop"
-    title="添加应用黑名单"
+    class="create-black-website-list-pop"
+    title="添加网址白名单"
     :mask-closable="false"
     width="650"
     placement="right"
@@ -17,28 +17,14 @@
           <div>{{ `${index+1}、` }}</div>
           <a-row :gutter="24">
             <a-col :span="18">
-              <a-form-item label="应用名称" v-bind="formItemLayout">
+              <a-form-item label="网址" v-bind="formItemLayout">
                 <a-input
-                  v-decorator="[`appName[${k}]`,
+                  v-decorator="[`url[${k}]`,
                                 {rules: [
-                                   { required: true, message: '应用名称不能为空'},
-                                   { max: 20, message: '长度不能超过20个字符'}
+                                   { required: true, message: '网址不能为空'}
                                  ],
-                                 initialValue: formValues.appName[k]}]"
-                  palceholder="请输入应用名称"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="应用包名" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`packageName[${k}]`,
-                                {rules: [
-                                   { required: true, message: '应用包名不能为空'}
-                                 ],
-                                 initialValue: formValues.packageName[k]}]"
+                                 initialValue: formValues.url[k]}]"
+                  palceholder="请输入网址"
                 />
               </a-form-item>
             </a-col>
@@ -47,8 +33,11 @@
             <a-col :span="18">
               <a-form-item label="备注" v-bind="formItemLayout">
                 <a-input
-                  v-decorator="[`description[${k}]`,
-                                {initialValue: formValues.description[k]}]"
+                  v-decorator="[`webName[${k}]`,
+                                {rules: [
+
+                                 ],
+                                 initialValue: formValues.webName[k]}]"
                 />
               </a-form-item>
             </a-col>
@@ -81,9 +70,8 @@
 <script>
 function formValueFormater() {
   return {
-    appName: [''],
-    packageName: [''],
-    description: ['']
+    url: [''],
+    webName: ['']
   }
 }
 let counter = 0
@@ -92,7 +80,7 @@ const formItemLayout = {
   wrapperCol: { span: 20 }
 }
 export default {
-  name: 'CreateBlackAppListPop',
+  name: 'CreateWhiteWebsiteListPop',
   components: { },
   props: {
     visible: {
@@ -127,9 +115,8 @@ export default {
         // 显示
           if (this.isEdit) {
             const rawDetail = this.rawDetail = await this.getDetail()
-            this.$set(this.formValues.appName, 0, rawDetail.appName)
-            this.$set(this.formValues.packageName, 0, rawDetail.packageName)
-            this.$set(this.formValues.description, 0, rawDetail.description)
+            this.$set(this.formValues.url, 0, rawDetail.url)
+            this.$set(this.formValues.webName, 0, rawDetail.webName)
           }
         } else {
         // 销毁
@@ -157,8 +144,8 @@ export default {
     getDetail() {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$get('/business/black-white-app/getBlackWhiteAppById', {
-          appId: this.editId
+        this.$get('/business/black-white-web/getBlackWhitewebById', {
+          webId: this.editId
         })
           .then(r => {
             if (r.data.state === 1) {
@@ -177,7 +164,7 @@ export default {
         return
       }
       const formValues = this.form.getFieldsValue()
-      console.log(formValues)
+      // console.log(formValues)
       if (this.isEdit) {
         await this.editSave(this.editId, formValues)
       } else {
@@ -191,19 +178,18 @@ export default {
       const keys = formValues.keys
       keys.forEach(key => {
         paramsList.push({
-          appName: formValues.appName[key],
-          description: formValues.description[key],
-          packageName: formValues.packageName[key],
-          type: 0
+          url: formValues.url[key],
+          webName: formValues.webName[key],
+          type: 1
         })
       })
-      console.log(paramsList)
+      // console.log(paramsList)
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
+        this.$post('/business/black-white-web/addBlackWhiteWebByBatch', {
           jsonString: JSON.stringify(paramsList)
         }).then(r => {
-          this.$message.info('新增应用黑名单成功')
+          this.$message.info('新增网站白名单成功')
           resolve(r.data.data)
         })
           .finally(() => {
@@ -214,14 +200,13 @@ export default {
     editSave(id, formValues) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/updateBlackWhiteApp', {
+        this.$post('/business/black-white-web/updateBlackWhiteWeb', {
           id,
-          appName: formValues.appName[0],
-          description: formValues.description[0],
-          packageName: formValues.packageName[0],
-          type: 0
+          url: formValues.url[0],
+          webName: formValues.webName[0],
+          type: 1
         }).then(r => {
-          this.$message.info('修改应用黑名单成功')
+          this.$message.info('修改网站白名单成功')
           resolve(r.data.data)
         })
           .finally(() => {

@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import AppBlackList from './components/AppBlackList'
-import AppWhiteList from './components/AppWhiteList'
+import AppBlackList from './components/AppBlackList/AppBlackList'
+import AppWhiteList from './components/AppWhiteList/AppWhiteList'
 export default {
   name: 'AppListWrap',
   components: { AppBlackList, AppWhiteList },
