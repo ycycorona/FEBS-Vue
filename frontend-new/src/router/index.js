@@ -91,7 +91,7 @@ function filterAsyncRouter(routes) {
           route.component = HomePageView
           break
         default:
-          route.component = view(component)
+          route.component = /* view(component) */ () => import(`@/views/${component}.vue`)
       }
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children)
@@ -101,12 +101,12 @@ function filterAsyncRouter(routes) {
   })
 }
 
-function view(path) {
+/* function view(path) {
   return function(resolve) {
     import(`@/views/${path}.vue`).then(mod => {
       resolve(mod)
     })
   }
-}
+} */
 
 export default router

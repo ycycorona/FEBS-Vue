@@ -118,7 +118,7 @@ export default {
       this.$emit('update:visible', false)
     },
     onTreeSelect(node, instanceId) {
-      console.log('node', node)
+      // console.log('node', node)
       this.getSelectUser(this.$refs['tree-select'].selectedNodes.map(item => item.raw))
       if (this.readOnly) {
         this.$nextTick(() => {
@@ -134,6 +134,7 @@ export default {
         })
       }
     },
+    // 选出是人的子节点
     getSelectUser(rawItems) {
       this.selectUser = rawItems.filter((item) => {
         return item.id.indexOf('user') > -1

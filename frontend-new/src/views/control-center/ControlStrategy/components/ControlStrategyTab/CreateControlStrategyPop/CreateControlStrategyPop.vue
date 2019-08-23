@@ -38,7 +38,7 @@
                   ],
                   initialValue: formValue.condition.strategyType
                 }]"
-                :disabled="readOnly"
+                :disabled="readOnly || isEditPage"
                 placeholder="策略属性"
                 @change="onStrategyTypeChange"
               >

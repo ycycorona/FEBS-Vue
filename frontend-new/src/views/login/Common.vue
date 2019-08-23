@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="from-wrap">
+      <div class="form-wrap">
         <div class="top">
           <div class="header">
             <img alt="logo" class="logo" src="@/assets/imgs/logo-blue.png">
@@ -9,7 +9,7 @@
           </div>
           <div class="desc" />
         </div>
-        <div class="from-inner-wrap">
+        <div class="form-inner-wrap">
           <component :is="componentName" class="main-content" @regist="handleRegist" />
         </div>
       </div>
@@ -57,10 +57,13 @@ export default {
     background: #f0f2f5 url('/static/img/login-back.png')  center/cover repeat local;
     background-size: 100%;
     .content {
-      .from-wrap {
+      .form-wrap {
+        position: absolute;
+        top: 48%;
+        left: 50%;
         width: 50%;
-        float: right;
-        .from-inner-wrap {
+        transform: translate(0, -50%);
+        .form-inner-wrap {
           background-color: white;
           width:350px;
           padding-top: 40px;
@@ -71,7 +74,7 @@ export default {
       padding: 32px 0;
       flex: 1;
       @media (min-width: 768px){
-        padding: 250px 0 10px;
+        padding: 0 0 10px;
       }
       .top {
         text-align: center;

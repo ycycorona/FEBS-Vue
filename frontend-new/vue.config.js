@@ -16,6 +16,9 @@ module.exports = {
   },
 
   chainWebpack: (config) => {
+    // 移除 prefetch 插件
+    // config.plugins.delete('prefetch')
+
     config.resolve.alias
       .set('@', resolve('src'))
       .set('vue$', 'vue/dist/vue.esm.js')
@@ -58,13 +61,13 @@ module.exports = {
     // development server port 8000
     port: 8001,
     proxy: {
-      '/': {
+      '^/api': {
         // target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro',
         // target: 'http://127.0.0.1:9527',
         target: 'http://39.106.162.152:9527',
-        // pathRewrite: {
-        //   '^/': ''
-        // },
+        pathRewrite: {
+          '^/api': ''
+        },
         ws: false,
         changeOrigin: true
       }
