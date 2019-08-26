@@ -21,6 +21,9 @@
 
       </MultiTimeRangePicker>
     </a-form>
+    <div style="width:100px;height:200px">
+      <a-spin :spinning="true"></a-spin>
+    </div>
     <!-- <input v-model="arrTest[0]" type="text"> -->
   </div>
 </template>

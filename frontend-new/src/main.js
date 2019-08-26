@@ -10,7 +10,7 @@ import VueApexCharts from 'vue-apexcharts'
 // mock
 import './mock'
 
-import 'ant-design-vue/dist/antd.css'
+import 'ant-design-vue/dist/antd.less'
 
 import 'utils/install'
 

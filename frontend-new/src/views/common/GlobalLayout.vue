@@ -5,9 +5,9 @@
     </drawer> -->
     <!-- v-else-if="layout === 'side'" -->
     <sider-menu :theme="theme" :menu-data="menuData" :collapsed="collapsed" :collapsible="true" />
-    <drawer :open-drawer="settingBar" placement="right">
+    <!-- <drawer :open-drawer="settingBar" placement="right">
       <setting />
-    </drawer>
+    </drawer> -->
     <a-layout :style="{ paddingLeft: paddingLeft }">
       <global-header :menu-data="menuData" :collapsed="collapsed" @toggleCollapse="toggleCollapse" />
       <a-layout-content :style="{minHeight: minHeight, margin: '20px 14px 0'}" :class="fixHeader ? 'fixed-header-content' : null">

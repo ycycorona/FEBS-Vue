@@ -72,20 +72,23 @@
           overlay-class-name="strategy-blue-title-popover"
           @visibleChange="longStrategyPopoverVisibleChange(record.longStrategyId, arguments[0])"
         >
-          <template v-if="longStrategyDetail" slot="content">
-            <simple-li title="策略名称:">{{ longStrategyDetail.strategyName }}</simple-li>
-            <tab-title title="策略生效条件"></tab-title>
-            <template>
-              <simple-li title="策略类型:">{{ longStrategyDetail.strategyTypeName }}</simple-li>
-              <simple-li title="日期:">{{ longStrategyDetail.startDate }} ~ {{ longStrategyDetail.endDate }}</simple-li>
-              <simple-li title="时间:">{{ longStrategyDetail.startEndTime }}</simple-li>
-              <simple-li title="管控区域:">{{ longStrategyDetail.controlZoneFence.fenceName }}</simple-li>
+          <a-spin slot="content" :spinning="popoverLoading" class="pop-center-spin">
+            <template v-if="longStrategyDetail">
+              <simple-li title="策略名称:">{{ longStrategyDetail.strategyName }}</simple-li>
+              <tab-title title="策略生效条件"></tab-title>
+              <template>
+                <simple-li title="策略类型:">{{ longStrategyDetail.strategyTypeName }}</simple-li>
+                <simple-li title="日期:">{{ longStrategyDetail.startDate }} ~ {{ longStrategyDetail.endDate }}</simple-li>
+                <simple-li title="时间:">{{ longStrategyDetail.startEndTime }}</simple-li>
+                <simple-li title="管控区域:">{{ longStrategyDetail.controlZoneFence ?
+                  longStrategyDetail.controlZoneFence.fenceName : '' }}</simple-li>
+              </template>
+              <tab-title title="指令"></tab-title>
+              <template v-for="(directive, index) in longStrategyDetail.cmdTypeAndConfig">
+                <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
+              </template>
             </template>
-            <tab-title title="指令"></tab-title>
-            <template v-for="(directive, index) in longStrategyDetail.cmdTypeAndConfig">
-              <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
-            </template>
-          </template>
+          </a-spin>
           <span slot="default" class="popover-trigger">
             <template v-if="longStrategyName">
               {{ longStrategyName }}
@@ -111,21 +114,23 @@
           overlay-class-name="strategy-blue-title-popover"
           @visibleChange="temporaryStrategyPopoverVisibleChange(record.temporaryStrategyId, arguments[0])"
         >
-          <template v-if="temporaryStrategyDetail" slot="content">
-            <simple-li title="策略名称:">{{ temporaryStrategyDetail.strategyName }}</simple-li>
-            <tab-title title="策略生效条件"></tab-title>
-            <template>
-              <simple-li title="策略类型:">{{ temporaryStrategyDetail.strategyTypeName }}</simple-li>
-              <simple-li title="日期:">{{ temporaryStrategyDetail.startDate }} ~ {{ temporaryStrategyDetail.endDate }}</simple-li>
-              <simple-li title="时间:">{{ temporaryStrategyDetail.startEndTime }}</simple-li>
-              <simple-li title="管控区域:">{{ temporaryStrategyDetail.controlZoneFence ?
-                temporaryStrategyDetail.controlZoneFence.fenceName : '' }}</simple-li>
+          <a-spin slot="content" :spinning="popoverLoading" class="pop-center-spin">
+            <template v-if="temporaryStrategyDetail">
+              <simple-li title="策略名称:">{{ temporaryStrategyDetail.strategyName }}</simple-li>
+              <tab-title title="策略生效条件"></tab-title>
+              <template>
+                <simple-li title="策略类型:">{{ temporaryStrategyDetail.strategyTypeName }}</simple-li>
+                <simple-li title="日期:">{{ temporaryStrategyDetail.startDate }} ~ {{ temporaryStrategyDetail.endDate }}</simple-li>
+                <simple-li title="时间:">{{ temporaryStrategyDetail.startEndTime }}</simple-li>
+                <simple-li title="管控区域:">{{ temporaryStrategyDetail.controlZoneFence ?
+                  temporaryStrategyDetail.controlZoneFence.fenceName : '' }}</simple-li>
+              </template>
+              <tab-title title="指令"></tab-title>
+              <template v-for="(directive, index) in temporaryStrategyDetail.cmdTypeAndConfig">
+                <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
+              </template>
             </template>
-            <tab-title title="指令"></tab-title>
-            <template v-for="(directive, index) in temporaryStrategyDetail.cmdTypeAndConfig">
-              <simple-li :key="index" :title="`指令${index+1}:`">{{ directive.typeName }}</simple-li>
-            </template>
-          </template>
+          </a-spin>
           <span slot="default" class="popover-trigger">
             <template v-if="temporaryStrategyName">
               {{ temporaryStrategyName }}
@@ -156,6 +161,7 @@
         >
           <template slot="content">
             <a-table
+              :loading="popoverLoading"
               size="small"
               :row-key="record => record.id"
               :columns="controlDevicesColumns"
@@ -191,7 +197,7 @@
           overlay-class-name="red-title-popover alarm-pop-wrap"
           @visibleChange="onAlarmRecordsPopoverVisibleChange(record.userId, arguments[0])"
         >
-          <template slot="content">
+          <a-spin slot="content" :spinning="popoverLoading" class="pop-center-spin">
             <div
               v-for="(item,index) in alarmRecordsDetail"
               :key="index"
@@ -211,7 +217,8 @@
               </div>
               <a-divider class="inline-divider" />
             </div>
-          </template>
+          </a-spin>
+
           <span slot="default" style="color:red;cursor: pointer">{{ alarmCount }}</span>
         </a-popover>
       </template>
@@ -335,6 +342,7 @@ export default {
       },
       strategyOpt: [],
       loading: false,
+      popoverLoading: false,
       dealPopVisible: false,
       currentDealAlarmId: '',
       dealAlarmModalVisible: false
@@ -411,7 +419,11 @@ export default {
         this.longStrategyDetail = null
         return
       }
+      this.popoverLoading = true
       this.longStrategyDetail = await this.getStrategyDetail(id)
+        .finally(() => {
+          this.popoverLoading = false
+        })
       // console.log(this.longStrategyDetail)
     },
     // 点击短期策略悬窗
@@ -420,7 +432,11 @@ export default {
         this.temporaryStrategyDetail = null
         return
       }
+      this.popoverLoading = true
       this.temporaryStrategyDetail = await this.getStrategyDetail(id)
+        .finally(() => {
+          this.popoverLoading = false
+        })
       // console.log(this.temporaryStrategyDetail)
     },
     async onControlDevicesPopoverVisibleChange(id, flag) {
@@ -452,9 +468,13 @@ export default {
               reject()
             }
           })
+          .finally(() => {
+            reject()
+          })
       })
     },
     getcontrolDevicesDetail(id) {
+      this.popoverLoading = true
       return new Promise((resolve, reject) => {
         this.$get('/business/controlUserStatus/getPhoneListByUserid',
           {
@@ -467,9 +487,14 @@ export default {
               reject()
             }
           })
+          .finally(() => {
+            reject()
+            this.popoverLoading = false
+          })
       })
     },
     getAlarmRecordsDetail(id) {
+      this.popoverLoading = true
       return new Promise((resolve, reject) => {
         this.$get('/business/controlUserStatus/getAlarmListByUserid',
           {
@@ -481,6 +506,10 @@ export default {
             } else {
               reject()
             }
+          })
+          .finally(() => {
+            reject()
+            this.popoverLoading = false
           })
       })
     },

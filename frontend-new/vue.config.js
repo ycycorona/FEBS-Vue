@@ -44,10 +44,11 @@ module.exports = {
     loaderOptions: {
       less: {
         modifyVars: {
+          'primary-color': 'rgb(24, 144, 255)'
           /* less 变量覆盖，用于自定义 ant design 主题 */
 
           /*
-          'primary-color': '#F5222D',
+          'primary-color': 'rgb(24, 144, 255)',
           'link-color': '#F5222D',
           'border-radius-base': '4px',
           */

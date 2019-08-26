@@ -3,6 +3,7 @@ import { message } from 'ant-design-vue/es'
 let lessNodesAppended
 
 const updateTheme = primaryColor => {
+  console.log(Error(123))
   if (!primaryColor) {
     return
   }
@@ -40,7 +41,8 @@ const updateTheme = primaryColor => {
         javascriptEnabled: true
       }
     `
-    lessScriptNode.src = 'https://cdn.bootcss.com/less.js/3.9.0/less.min.js'
+    // lessScriptNode.src = 'https://cdn.bootcss.com/less.js/3.9.0/less.min.js'
+    lessScriptNode.src = '/static/less/less.min.js'
     lessScriptNode.async = true
     lessScriptNode.onload = () => {
       buildIt()
