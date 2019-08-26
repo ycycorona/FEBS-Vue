@@ -91,7 +91,7 @@ function filterAsyncRouter(routes) {
           route.component = HomePageView
           break
         default:
-          route.component = /* view(component) */ () => import(`@/views/${component}.vue`)
+          route.component = /* view(component) */ () => import(`@/views/${component}`)
       }
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children)

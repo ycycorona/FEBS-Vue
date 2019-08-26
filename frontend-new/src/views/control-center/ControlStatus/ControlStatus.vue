@@ -445,7 +445,7 @@ export default {
         return
       }
       this.controlDevicesDetail = await this.getcontrolDevicesDetail(id)
-      console.log(this.controlDevicesDetail)
+      // console.log(this.controlDevicesDetail)
     },
     async onAlarmRecordsPopoverVisibleChange(id, flag) {
       if (!flag) {

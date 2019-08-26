@@ -8,7 +8,7 @@ import db from 'utils/localstorage'
 import VueApexCharts from 'vue-apexcharts'
 
 // mock
-import './mock'
+// import './mock'
 
 import 'ant-design-vue/dist/antd.less'
 

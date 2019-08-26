@@ -334,8 +334,13 @@ export default {
     disabledDate(current) {
       return current && current < moment().subtract(1, 'days').endOf('day')
     },
-    onClose() {
+    resetPopParams() {
       this.$emit('update:visible', false)
+      this.$emit('update:editId', '')
+      this.$emit('update:isEditPage', false)
+    },
+    onClose() {
+      this.resetPopParams()
       this.$emit('close')
     },
     getStrategyDetail() {
@@ -386,7 +391,7 @@ export default {
         this.$message.info('策略暂存成功')
       }
 
-      this.$emit('update:visible', false)
+      this.resetPopParams()
       this.$emit('success')
     },
     // 新建策略

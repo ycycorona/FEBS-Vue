@@ -23,9 +23,9 @@
 <script>
 import GlobalHeader from './GlobalHeader'
 // import GlobalFooter from './GlobalFooter'
-import Drawer from '~/tool/Drawer'
+// import Drawer from '~/tool/Drawer'
 import SiderMenu from '~/menu/SiderMenu'
-import Setting from '~/setting/Setting'
+// import Setting from '~/setting/Setting'
 import { mapState, mapMutations } from 'vuex'
 import { triggerWindowResizeEvent } from 'utils/common'
 
@@ -35,7 +35,7 @@ let menuData = []
 let keepHeight
 export default {
   name: 'GlobalLayout',
-  components: { Setting, SiderMenu, Drawer, /* GlobalFooter ,*/ GlobalHeader },
+  components: { /* Setting, */ SiderMenu, /* Drawer, */ /* GlobalFooter ,*/ GlobalHeader },
   data() {
     return {
       minHeight: 0,

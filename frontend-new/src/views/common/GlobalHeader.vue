@@ -11,6 +11,9 @@
         <i-menu style="height: 64px; line-height: 64px;" class="system-top-menu" :theme="theme" mode="horizontal" :menu-data="menuData" @select="onSelect" />
       </div>
       <div :class="['global-header-right', theme]">
+        <div>
+          <span>您好，欢迎使用敏感区域智能手机管控系统</span>
+        </div>
         <header-avatar class="header-item" />
       </div>
     </div>
@@ -113,6 +116,7 @@ export default {
         display: inline-block;
       }
       .global-header-right{
+        display: flex;
         float: right;
         &.dark{
           color: #fff;

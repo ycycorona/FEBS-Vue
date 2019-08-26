@@ -15,7 +15,7 @@
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
-          <a-form-item label="策略名称" v-bind="formItemLayout">
+          <a-form-item label="策略名称">
             <a-input
               v-decorator="[
                 'strategyName'
@@ -25,7 +25,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="8" :xl="6">
-          <a-form-item label="策略类型" v-bind="formItemLayout">
+          <a-form-item label="策略类型">
             <a-select
               v-decorator="['strategyType']"
               placeholder="策略类型"
@@ -37,7 +37,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="8" :xl="6">
-          <a-form-item label="日期" v-bind="formItemLayout">
+          <a-form-item label="日期">
             <a-range-picker
               v-decorator="['dateRange']"
             >
@@ -84,8 +84,8 @@
     </a-table>
     <CreateControlStrategyPop
       :edit-id="editId"
-      :is-edit-page="editControlStrategyPopVisiable"
-      :visible.sync="createControlStrategyPopVisible"
+      :is-edit-page.sync="isEdit"
+      :visible.sync="controlStrategyPopVisible"
       @close="handleControlStrategyClose"
       @success="handleControlStrategySuccess"
     ></CreateControlStrategyPop>
@@ -101,21 +101,17 @@
     <!-- 设备列表 -->
     <device-list-pop
       :visible.sync="deviceListPopVisible"
-      :strategy-id="editId"
+      :strategy-id.sync="editId"
     ></device-list-pop>
     <edit-records
       :visible.sync="editRecordsPopVisible"
-      :strategy-id="editId"
+      :strategy-id.sync="editId"
     >
     </edit-records>
   </div>
 </template>
 
 <script>
-const formItemLayout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 }
-}
 import { strategyTypeShortMap } from '@/utils/params'
 import IconDelete from '@/components/icons/IconDelete'
 import IconStrategyManage from '@/components/icons/IconStrategyManage'
@@ -180,10 +176,9 @@ export default {
       },
       loading: false,
       dataSource: null,
-      createControlStrategyPopVisiable: false,
-      editControlStrategyPopVisiable: false,
+      controlStrategyPopVisible: false,
+      isEdit: false,
       editId: '',
-      formItemLayout,
       strategyTypeShortMap,
       readUserSelectedPopVisible: false,
       deviceListPopVisible: false,
@@ -192,15 +187,7 @@ export default {
     }
   },
   computed: {
-    createControlStrategyPopVisible: {
-      set(val) {
-        this.createControlStrategyPopVisiable = val
-        this.editControlStrategyPopVisiable = val
-      },
-      get() {
-        return this.createControlStrategyPopVisiable || this.editControlStrategyPopVisiable
-      }
-    }
+
   },
   watch: {},
   created() {
@@ -242,29 +229,23 @@ export default {
           this.loading = false
         })
     },
-    // 打开新建控制策略弹窗
+    // 打开新建策略弹窗
     createControlStrategyPop() {
-      this.createControlStrategyPopVisiable = true
-    },
-    // 策略弹窗关闭
-    handleControlStrategyClose() {
-      this.resetControlStrategyParams()
-    },
-    // 策略新建/编辑成功
-    handleControlStrategySuccess() {
-      this.resetControlStrategyParams()
-      this.fetch({ pageSize: 10, pageNum: 1 })
-    },
-    // 重置策略管理弹窗的交互参数
-    resetControlStrategyParams() {
-      // this.createControlStrategyPopVisiable = false
-      // this.editControlStrategyPopVisiable = false
-      this.editId = ''
+      this.controlStrategyPopVisible = true
     },
     // 打开编辑策略弹窗
     openEditPop(id) {
       this.editId = id
-      this.editControlStrategyPopVisiable = true
+      this.isEdit = true
+      this.controlStrategyPopVisible = true
+    },
+    // 策略弹窗关闭
+    handleControlStrategyClose() {
+
+    },
+    // 策略新建/编辑成功
+    handleControlStrategySuccess() {
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 删除策略
     deleteStrategy(strategyId) {
@@ -310,10 +291,6 @@ export default {
     showEditRecordsPop(id) {
       this.editId = id
       this.editRecordsPopVisible = true
-    },
-    //
-    changeEditId(id) {
-      this.editId = id
     }
   }
 }
