@@ -297,14 +297,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.float-add-btn-wrap {
-  height: 45px;
-  position: relative;
-  .float-add-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-}
 
 </style>
