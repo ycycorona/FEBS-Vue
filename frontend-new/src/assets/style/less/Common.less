@@ -1,3 +1,4 @@
+@import "~@/utils/utils.less";
 .sider .theme {
   background-color: @primary-color
 }
@@ -193,18 +194,29 @@ span.normal-click {
   margin: -10px;
 }
 
-.float-add-btn-wrap {
-  height: 45px;
-  position: relative;
+.header-add-btn-row() {
   .float-add-btn {
     position: absolute;
     top: 0;
     right: 0;
   }
+  .left-text{
+    float: left;
+    color: #4E4E4E;
+    font-size: 18px;
+    font-weight: 700;
+    position: absolute;
+    bottom: 0;
+  }
+}
+.header-add-btn-row();
+
+// .header-add-btn()
+.float-add-btn-wrap {
+  margin-bottom: 5px;
+  height: 35px;
+  position: relative;
+  .clearfix();
+  .header-add-btn-row();
 }
 
-.float-add-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}

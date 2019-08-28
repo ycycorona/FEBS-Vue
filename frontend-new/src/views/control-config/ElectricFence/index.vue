@@ -1,15 +1,18 @@
 <template>
-  <div class="electric-fence-list full-width">
-    <div class="add-btn-wrap">
-      <span class="left-text">电子围栏配置</span>
-      <a-button
-        class="right-btn"
-        type="primary"
-        style="border-radius:45px!important;"
-        @click="createElectricFencePop"
-      >
-        <a-icon type="plus" @click="createElectricFencePopVisiable=true" /><span style="margin-left: 3px;">新建电子围栏</span>
-      </a-button>
+  <div class="electric-fence-list full-width table-page-search-wrapper">
+    <div class="float-add-btn-wrap">
+      <div class="left-text">
+        <span>电子围栏配置</span>
+      </div>
+      <div class="float-add-btn">
+        <a-button
+          type="primary"
+          style="border-radius:45px!important;"
+          @click="createElectricFencePop"
+        >
+          <a-icon type="plus" @click="createElectricFencePopVisiable=true" /><span style="margin-left: 3px;">新建电子围栏</span>
+        </a-button>
+      </div>
     </div>
     <!-- 表格区域 -->
     <a-table
@@ -168,18 +171,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "~@/utils/utils.less";
-.add-btn-wrap {
-  .clearfix();
-  .left-text{
-    float: left;
-    color: #4E4E4E;
-    font-size: 18px;
-    font-weight: 700
-  }
-  .right-btn{
-    float: right;
-  }
-  margin-bottom: 5px
-}
+
 </style>

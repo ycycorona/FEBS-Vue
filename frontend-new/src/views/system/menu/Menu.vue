@@ -61,7 +61,7 @@
         :pagination="pagination"
         :loading="loading"
         :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        :scroll="{ x: 1500 }"
+        :scroll="{ x: 2500 }"
         @change="handleTableChange"
       >
         <template slot="icon" slot-scope="text, record">
