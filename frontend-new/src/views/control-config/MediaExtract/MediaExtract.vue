@@ -238,9 +238,15 @@ export default {
           configId: id
         })
           .then(r => {
-            resolve(r.data.data)
-            this.$message.info('删除成功')
-            this.fetch({ pageSize: 10, pageNum: 1 })
+            const data = r.data
+            if (data.state === 1) {
+              this.$message.info('删除成功')
+              this.fetch({ pageSize: 10, pageNum: 1 })
+              resolve(data.data)
+            } else {
+              this.$message.error('删除失败' + data.message)
+              reject(data.message)
+            }
           })
           .finally(() => {
             this.loading = false
