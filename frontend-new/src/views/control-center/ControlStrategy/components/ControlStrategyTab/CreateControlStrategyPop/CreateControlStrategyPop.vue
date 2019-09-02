@@ -118,38 +118,23 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row :gutter="24">
+        <template v-if="directiveConfigList"></template>
+        <a-row v-for="(configKey, index) in showCommonDirConfigSelector" :key="configKey" :gutter="24">
           <a-col :span="22">
-            <a-form-item v-if="isGeoFenceSelector" label="电子围栏" v-bind="formItemLayout">
+            <a-form-item :label="`${directiveConfigList[configKey].title}配置`" v-bind="bigLabelFormItemLayout">
               <a-select
-                v-decorator="['geoFenceConfig',{
+                v-decorator="[`config[${configKey}]`,{
                   rules: [
-                    { required: true, type: 'array', message: '电子围栏不能为空'}
+                    { required: true, message: '不能为空'}
                   ],
-                  initialValue: formValue.content.geoFenceConfig}]"
-                :disabled="readOnly"
-                placeholder="点击选择电子围栏"
-                mode="multiple"
-                :options="fencesOpt"
+                  initialValue: formValue.content.commonConfig[configKey] ||
+                    [directiveConfigList[configKey].opts[0].value] ||
+                    []}]"
+                :disabled="readOnly || directiveConfigList[configKey].configIsFixed===1"
+                placeholder="请选择"
+                :mode=" directiveConfigList[configKey].isMulti ? 'multiple' : 'default'"
+                :options="directiveConfigList[configKey].opts"
               >
-              </a-select>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="24">
-          <a-col :span="22">
-            <a-form-item v-if="isExtractImgs" label="图片提取配置" v-bind="formItemLayout">
-              <a-select
-                v-decorator="['extractImgsConfig', {rules: [
-                  { required: true, type: 'array', message: '不能为空'}
-                ]}]"
-                :disabled="readOnly"
-                placeholder="点击选择图片提取配置"
-              >
-                <a-select-option :value="1">配置1</a-select-option>
-                <a-select-option :value="2">配置2</a-select-option>
-                <a-select-option :value="3">配置3</a-select-option>
-                <a-select-option :value="4">配置4</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -178,6 +163,7 @@
         </a-popconfirm>
         <a-button :disabled="!isCanSaveAndSend" type="primary" style="margin-right: .8rem" @click="doSubmit">下发</a-button>
         <a-button :disabled="isCanSaveAndSend" type="primary" class="green-btn" @click="doSubmit">暂存</a-button>
+        <!-- <a-button @click="testForm">表单值</a-button> -->
       </div>
     </template>
     <user-picker-pop
@@ -192,7 +178,7 @@
 </template>
 
 <script>
-
+const multiConfigDirs = [12]
 import cloneDeep from 'lodash/cloneDeep'
 import { configDeserialize, configSerialize, timeRangeSerialize, timeRangeDeserialize } from '@/utils/common'
 import moment from 'moment'
@@ -202,6 +188,10 @@ import UserPickerPop from '@/components/UserPickerPop'
 const formItemLayout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 }
+}
+const bigLabelFormItemLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 }
 }
 function formValueFormater() {
   return {
@@ -215,7 +205,8 @@ function formValueFormater() {
     },
     content: {
       directiveTypes: [],
-      geoFenceConfig: []
+      geoFenceConfig: [],
+      commonConfig: []
     },
     personNum: '0人'
   }
@@ -243,6 +234,7 @@ export default {
   },
   data() {
     return {
+      console,
       formValue: formValueFormater(),
       moment,
       isLoading: false,
@@ -252,6 +244,7 @@ export default {
       selectUser: [], // 选中的人
       selectUserId: [], // 选中的人的id
       formItemLayout,
+      bigLabelFormItemLayout,
       dateRangeDisable: true, // 长期策略不需要选日期范围
       isGeoFenceSelector: false,
       isExtractImgs: false,
@@ -261,7 +254,8 @@ export default {
       fencesOpt: [],
       bannedOutFencesOpt: [],
       bannedInFencesOpt: [],
-      directiveConfigMap: null
+      directiveConfigList: [],
+      showCommonDirConfigSelector: [] // 当前正在选择的 单选的指令选项
 
     }
   },
@@ -291,11 +285,21 @@ export default {
                 timeRange: timeRangeDeserialize(rawStrategyDetail.startEndTime)
               },
               content: {
-                directiveTypes: configDeserialize(rawStrategyDetail.configIds),
+                directiveTypes: rawStrategyDetail.cmdTypeAndConfig.map(item => item.id),
+                commonConfig: [],
                 geoFenceConfig: configDeserialize(rawStrategyDetail.electronicFenceIds)
               },
               personNum: rawStrategyDetail.userCount
             }
+            rawStrategyDetail.cmdTypeAndConfig.forEach(item => {
+              this.formValue.content.commonConfig[item.id] = item.configList[0].id
+            })
+            // 有电子围栏的时候
+            if (rawStrategyDetail.electronicFence.length > 0) {
+              this.formValue.content.directiveTypes.push(12)
+              this.formValue.content.commonConfig[12] = rawStrategyDetail.electronicFence.map(item => item.id)
+            }
+            // 临时策略时
             if (rawStrategyDetail.strategyType === 1) {
               this.formValue.condition.dateRange =
                 [moment(rawStrategyDetail.startDate), moment(rawStrategyDetail.endDate)]
@@ -320,15 +324,25 @@ export default {
     this.fencesOpt = await this.getFenceOpt()
     this.directivesOpt = await this.getDirectiveOpt()
     const directiveConfigRaw = await this.getDirectiveConfig(
-      this.directivesOpt.map(item => item.value).join(',')
+      this.directivesOpt.filter(item => multiConfigDirs.indexOf(item.value) === -1).map(item => item.value).join(',')
     )
-    const directiveConfigMap = {}
+    const directiveConfigList = []
     directiveConfigRaw.forEach(item => {
-      directiveConfigMap[item.id] = item.configList.map(item => {
-        return { value: item.id, label: item.configName }
-      })
+      directiveConfigList[item.id] = {
+        opts: item.configList.map(item => {
+          return { value: item.id, label: item.configName }
+        }),
+        configIsFixed: item.configIsFixed,
+        isMulti: false,
+        title: item.typeName }
     })
-    this.directiveConfigMap = directiveConfigMap
+    directiveConfigList[12] = {
+      opts: this.fencesOpt,
+      configIsFixed: 0,
+      isMulti: true,
+      title: '电子围栏'
+    }
+    this.directiveConfigList = directiveConfigList
   },
   methods: {
     disabledDate(current) {
@@ -398,10 +412,16 @@ export default {
     createStrategy() {
       const formConditionValue = this.formCondition.getFieldsValue()
       const formContentValue = this.formContent.getFieldsValue()
-      console.log(formConditionValue, formContentValue)
+      // console.log(formConditionValue, formContentValue)
       const params = {
-        configIds: configSerialize(formContentValue.directiveTypes),
-        electronicFenceIds: configSerialize(formContentValue.geoFenceConfig),
+        configIds: configSerialize(formContentValue.config.reduce((res, value, index) => {
+          if (index === 12) {
+            return res
+          } else {
+            return res + ',' + value
+          }
+        })),
+        electronicFenceIds: configSerialize(formContentValue.config[12]),
         strategyType: formConditionValue.strategyType,
         strategyName: formConditionValue.strategyName,
         controlZone: formConditionValue.controlArea,
@@ -423,8 +443,14 @@ export default {
       const formConditionValue = this.formCondition.getFieldsValue()
       const formContentValue = this.formContent.getFieldsValue()
       const params = {
-        configIds: configSerialize(formContentValue.directiveTypes),
-        electronicFenceIds: configSerialize(formContentValue.geoFenceConfig),
+        configIds: formContentValue.config.reduce((res, value, index) => {
+          if (index === 12) {
+            return res
+          } else {
+            return res + ',' + value
+          }
+        }),
+        electronicFenceIds: configSerialize(formContentValue.config[12]),
         strategyType: formConditionValue.strategyType,
         strategyName: formConditionValue.strategyName,
         controlZone: formConditionValue.controlArea,
@@ -436,7 +462,8 @@ export default {
         params.endDate = formConditionValue.dateRange[1].format('YYYY-MM-DD')
       }
       params.id = this.editId
-      console.log(params)
+      // console.log(params)
+      // return Promise.reject()
       return new Promise((resolve, reject) => {
         this.$post('/business/cmd-strategy/addStrategyByModify', params).then(r => {
           resolve(r.data.data)
@@ -508,7 +535,8 @@ export default {
         })
           .then(res => {
             if (res.data.state === 1) {
-              resolve(res.data.rows)
+              // 提出固定配置的指令配置选项
+              resolve(res.data.rows/* .filter(item => item.configIsFixed === 0) */)
             } else {
               reject('获取数据失败')
             }
@@ -517,6 +545,20 @@ export default {
     },
     // 指令选择变动时
     onDirectiveTypesChange(val) {
+      // 正常需要选项的指令
+      const commonDir = val.filter(item => {
+        // console.log(Object.keys(this.directiveConfigList))
+        // console.log(item)
+        return true
+        /* return multiConfigDirs.indexOf(item) === -1  &&
+        Object.keys(this.directiveConfigList).findIndex(key => Number(key) === item) !== -1 */
+      })
+      this.showCommonDirConfigSelector = commonDir
+      // console.log(commonDir)
+      commonDir.forEach(item => {
+
+      })
+
       if (val.find(item => item === 12)) {
         // 电子围栏配置
         this.isGeoFenceSelector = true
@@ -546,6 +588,17 @@ export default {
       this.selectUser = cloneDeep(remote_selectedUser)
       this.selectUserId = this.selectUser.map(item => item.db_id)
       this.formPerson.setFieldsValue({ 'strategyBindPerson': `${this.selectUser.length}人` })
+    },
+    testForm() {
+      const val = this.formContent.getFieldsValue()
+      console.log(val)
+      console.log(val.config.reduce((res, value, index) => {
+        if (index === 12) {
+          return res
+        } else {
+          return res + ',' + value
+        }
+      }))
     }
   }
 }

@@ -22,6 +22,15 @@
       :loading="false"
       @change="handleTableChange"
     >
+      <template v-slot:params="record">
+        <!-- {{ record.id }} -->
+        <a-select v-if="selectedRowKeys.findIndex(key => key===record.id)!==-1" default-value="lucy" style="width: 120px">
+          <a-select-option value="jack">Jack</a-select-option>
+          <a-select-option value="lucy">Lucy</a-select-option>
+          <a-select-option value="disabled" disabled>Disabled</a-select-option>
+          <a-select-option value="Yiminghe">yiminghe</a-select-option>
+        </a-select>
+      </template>
     </a-table>
     <user-picker-pop :visible.sync="userPickerPopVisible"></user-picker-pop>
   </div>
@@ -59,6 +68,11 @@ export default {
         {
           title: '指令名称',
           dataIndex: 'strategyName'
+        },
+        {
+          title: '指令参数',
+          // dataIndex: 'params'
+          scopedSlots: { customRender: 'params' }
         }
       ],
       userPickerPopVisible: false

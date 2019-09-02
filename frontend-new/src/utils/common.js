@@ -40,3 +40,10 @@ export function timeRangeDeserialize(str) {
   if (!str) { return [['00:01', '23:59']] }
   return str.split(',').map(item => item.split('-'))
 }
+
+export function optToArrayMap(arr) {
+  return arr.reduce((accumulator, item) => {
+    accumulator[item.value] = item.label
+    return accumulator
+  }, [])
+}
