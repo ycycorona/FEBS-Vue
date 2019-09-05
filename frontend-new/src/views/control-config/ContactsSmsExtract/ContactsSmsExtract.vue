@@ -2,6 +2,9 @@
   <a-spin :spinning="loading" class="full-width">
     <div class="standard-search-table-wrap table-page-search-wrapper">
       <div class="float-add-btn-wrap">
+        <div class="left-text">
+          通讯录信息提取配置
+        </div>
         <div class="float-add-btn">
           <a-button
             type="primary"
@@ -15,18 +18,10 @@
       <!-- 表单区域 -->
       <!-- 表格区域 -->
       <div style="margin-bottom:10px">
-        <!--         <a-popconfirm
-          title="确认删除吗?"
-          ok-text="删除"
-          cancel-text="取消"
-          @confirm="doDelItems"
-        >
-          <a-button :disabled="selectedRowKeys.length===0" type="danger">删除</a-button>
-        </a-popconfirm> -->
       </div>
       <a-table
         ref="filter-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :row-selection="null"
         :row-key="record => record.id"
         :columns="columns"
         :scroll="{x: 1200}"
@@ -45,8 +40,19 @@
             <span class="operation-btn"><icon-delete title="删除" />删除</span>
           </a-popconfirm>
         </template>
+        <template slot="fileExtractScope" slot-scope="fileExtractScope">
+          {{ FileExtractScopeMap.get(Number(fileExtractScope)) || Number(fileExtractScope) }}
+        </template>
+        <template slot="unitedDisplay" slot-scope="record">
+          {{ record | unitedDisplayFil }}
+        </template>
+        contentValue
+        <template slot="contentValue" slot-scope="contentValue">
+          {{ contentValue | contentValueFil(contentValueMap) }}
+        </template>
       </a-table>
       <CreateEditPop
+        :content-value-opt="contentValueOpt"
         :visible.sync="createEditPopVisible"
         :is-edit.sync="isEdit"
         :edit-id.sync="editId"
@@ -62,34 +68,59 @@
 import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import CreateEditPop from './components/ContactsSmsExtractCreateEditPop'
-import { configSerialize } from '@/utils/common'
+import { configDeserialize, optToArrayMap } from '@/utils/common'
+import { FileExtractScopeMap, WeekOpt, MonthOpt } from '@/utils/params'
+
+// 周月value to text
+const WeekArrayMap = optToArrayMap(WeekOpt)
+const MonthArrayMap = optToArrayMap(MonthOpt)
+
 export default {
   name: 'ContactsSmsExtract',
   components: { IconEdit, IconDelete, CreateEditPop },
+  filters: {
+    unitedDisplayFil(record) {
+      const executeTimeTypeText = record.executeTimeType === 1 ? '周' : '月'
+      const dayText = record.executeTimeType === 1 ? WeekArrayMap[record.executeDaytime]
+        : MonthArrayMap[record.executeDaytime]
+      return `${executeTimeTypeText}/${record.intervalPeriod + 1}${executeTimeTypeText}/${dayText}`
+    },
+    contentValueFil(contentValue, contentValueMap) {
+      return configDeserialize(contentValue).map(item => contentValueMap[Number(item)]).join(',')
+    }
+  },
   props: {},
   data() {
     return {
+      FileExtractScopeMap, WeekArrayMap, MonthArrayMap,
       // filterForm: this.$form.createForm(this),
+      configDeserialize,
       columns: [
         {
-          title: '应用名称',
-          dataIndex: 'appName'
+          title: '名称',
+          dataIndex: 'configName'
         },
         {
-          title: '包名',
-          dataIndex: 'packageName'
+          title: '提取周期',
+          scopedSlots: { customRender: 'unitedDisplay' }
+        },
+        // {
+        //   title: '文件日期范围',
+        //   dataIndex: 'fileExtractScope',
+        //   scopedSlots: { customRender: 'fileExtractScope' }
+        // },
+        {
+          title: '提取内容',
+          dataIndex: 'contentValue',
+          scopedSlots: { customRender: 'contentValue' }
         },
         {
           title: '创建人',
           dataIndex: 'createUserName'
         },
         {
-          title: '添加时间',
+          title: '创建时间',
           dataIndex: 'createTime'
-        },
-        {
-          title: '备注',
-          dataIndex: 'description'
         },
         {
           title: '操作',
@@ -110,12 +141,21 @@ export default {
       createEditPopVisible: false,
       isEdit: false,
       editId: '',
-      selectedRowKeys: []
+      selectedRowKeys: [],
+      contentValueOpt: []
     }
   },
-  computed: {},
+  computed: {
+    contentValueMap() {
+      return optToArrayMap(this.contentValueOpt)
+    }
+  },
   watch: {},
-  created() {
+  async created() {
+    this.contentValueOpt = (await this.getContentValueOpt()).map(item => ({
+      value: item.id,
+      label: item.contentName
+    }))
     this.fetch({ pageSize: 10, pageNum: 1 })
   },
   methods: {
@@ -142,7 +182,7 @@ export default {
     fetch(params = {}) {
       // 显示loading
       this.loading = true
-      this.$get('/business/black-white-app/getAppListByPage', {
+      this.$get('/business/address-book-config/getListByPage', {
         ...params, type: 0
       }).then((r) => {
         const data = r.data
@@ -152,6 +192,24 @@ export default {
         this.pagination = pagination
       }).finally(() => {
         this.loading = false
+      })
+    },
+    getContentValueOpt() {
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        this.$get('/business/address-book-config/getContentceList', {
+          appId: this.editId
+        })
+          .then(r => {
+            if (r.data.state === 1) {
+              resolve(r.data.data)
+            } else {
+              reject()
+            }
+          })
+          .finally(() => {
+            this.loading = false
+          })
       })
     },
     // 打开新建弹窗
@@ -176,13 +234,19 @@ export default {
     dodelItem(id) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$delete('/business/black-white-app/deleteBlackWhiteAppById', {
-          appId: id
+        this.$delete('/business/address-book-config/deleteById', {
+          addressBookConfigId: id
         })
           .then(r => {
-            resolve(r.data.data)
-            this.$message.info('删除成功')
-            this.fetch({ pageSize: 10, pageNum: 1 })
+            const data = r.data
+            if (data.state === 1) {
+              this.$message.info('删除成功')
+              this.fetch({ pageSize: 10, pageNum: 1 })
+              resolve(data.data)
+            } else {
+              this.$message.error('删除失败' + data.message)
+              reject(data.message)
+            }
           })
           .finally(() => {
             this.loading = false
@@ -190,20 +254,20 @@ export default {
       })
     },
     doDelItems() {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$delete('/business/black-white-app/deleteBlackWhiteAppByBatch', {
-          appIds: configSerialize(this.selectedRowKeys)
-        })
-          .then(r => {
-            resolve(r.data.data)
-            this.$message.info('删除成功')
-            this.fetch({ pageSize: 10, pageNum: 1 })
-          })
-          .finally(() => {
-            this.loading = false
-          })
-      })
+      // this.loading = true
+      // return new Promise((resolve, reject) => {
+      //   this.$delete('/business/black-white-app/deleteBlackWhiteAppByBatch', {
+      //     appIds: configSerialize(this.selectedRowKeys)
+      //   })
+      //     .then(r => {
+      //       resolve(r.data.data)
+      //       this.$message.info('删除成功')
+      //       this.fetch({ pageSize: 10, pageNum: 1 })
+      //     })
+      //     .finally(() => {
+      //       this.loading = false
+      //     })
+      // })
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys

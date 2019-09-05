@@ -62,7 +62,8 @@ export default {
       type: Boolean
     },
     modelTitle: {
-      type: String
+      type: String,
+      default: '人员选择'
     },
     opt: {
       type: Object

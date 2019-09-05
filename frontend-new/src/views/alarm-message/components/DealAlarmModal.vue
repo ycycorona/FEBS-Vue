@@ -25,7 +25,7 @@
 <script>
 
 export default {
-  name: 'DeviceListPop',
+  name: 'DealAlarmModal',
   components: { },
   props: {
     visible: {

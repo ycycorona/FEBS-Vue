@@ -235,7 +235,7 @@ export default {
       this.loading = true
       return new Promise((resolve, reject) => {
         this.$delete('/business/media-file-config/deleteById', {
-          configId: id
+          mediaConfigId: id
         })
           .then(r => {
             const data = r.data

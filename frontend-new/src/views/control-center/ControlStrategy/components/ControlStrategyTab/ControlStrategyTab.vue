@@ -117,7 +117,7 @@ import IconDelete from '@/components/icons/IconDelete'
 import IconStrategyManage from '@/components/icons/IconStrategyManage'
 import CreateControlStrategyPop from './CreateControlStrategyPop'
 import UserPickerPop from '@/components/UserPickerPop'
-import DeviceListPop from './components/DeviceList/DeviceListPop'
+import DeviceListPop from '@/components/DeviceList/DeviceListPop'
 import EditRecords from './components/EditRecords/EditRecords'
 
 export default {

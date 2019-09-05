@@ -2,7 +2,7 @@
   <a-drawer
     destroy-on-close
     class="create-edit-pop"
-    title="添加/编辑"
+    :title="isEdit ? '编辑' : '新建'"
     :mask-closable="false"
     width="650"
     placement="right"
@@ -13,60 +13,118 @@
   >
     <a-spin :spinning="loading">
       <a-form :form="form">
-        <div v-for="(k, index) in form.getFieldValue('keys')" :key="k" class="for-item">
-          <div>{{ `${index+1}、` }}</div>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="应用名称" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`appName[${k}]`,
-                                {rules: [
-                                   { required: true, message: '应用名称不能为空'},
-                                   { max: 20, message: '长度不能超过20个字符'}
-                                 ],
-                                 initialValue: formValues.appName[k]}]"
-                  palceholder="请输入应用名称"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="应用包名" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`packageName[${k}]`,
-                                {rules: [
-                                   { required: true, message: '应用包名不能为空'}
-                                 ],
-                                 initialValue: formValues.packageName[k]}]"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="24">
-            <a-col :span="18">
-              <a-form-item label="备注" v-bind="formItemLayout">
-                <a-input
-                  v-decorator="[`description[${k}]`,
-                                {initialValue: formValues.description[k]}]"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-divider v-if="form.getFieldValue('keys').length-1!==index" />
-          <div v-else style="margin-top:12px;height:1px"></div>
-          <a-button
-            v-if="index!==0"
-            type="danger"
-            shape="circle"
-            icon="delete"
-            class="del-for-item"
-            @click="removeFormItem(k)"
-          ></a-button>
-        </div>
-        <a-button v-if="!isEdit" ghost type="primary" @click="addFormItem">
-          <a-icon type="plus" /><span style="margin-left: 3px;">继续添加</span>
-        </a-button>
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="名称" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['configName',
+                              {rules: [
+                                 { required: true, message: '名称不能为空'}
+                               ],
+                               initialValue: formValues.configName}]"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="提取周期" v-bind="formItemLayout" style="margin-bottom:0!important;font-weight:700">
+
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="提取单位" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['executeTimeType', {
+                  rules: [
+                    { required: true, message: '提取单位不能为空'}
+                  ],
+                  initialValue: formValues.executeTimeType
+                }]"
+                placeholder=""
+                @change="executeTimeTypeChange"
+              >
+                <a-select-option :value="1">周</a-select-option>
+                <a-select-option :value="2">月</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="间隔" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['intervalPeriod', {
+                  rules: [
+                    { required: true, message: '间隔不能为空'}
+                  ],
+                  initialValue: formValues.intervalPeriod
+                }]"
+                placeholder=""
+              >
+                <span slot="suffixIcon" class="color-unit">{{ currentTimeType===1 ? '个周' : '个月' }}</span>
+                <a-select-option v-for="n in 12" :key="n" :value="n-1">{{ n }}</a-select-option>
+              </a-select>
+            </a-form-item>
+
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="日期" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['executeDaytime', {
+                  rules: [
+                    { required: true, message: '日期不能为空'}
+                  ],
+                  initialValue: formValues.executeDaytime
+                }]"
+                :options="currentDayTimeOpt"
+                placeholder=""
+              >
+
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <!--         <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="文件日期范围" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['fileExtractScope', {
+                  rules: [
+                    { required: true, message: '文件日期范围不能为空'}
+                  ],
+                  initialValue: formValues.fileExtractScope
+                }]"
+                :options="fileExtractScopeOpt"
+                placeholder=""
+              >
+
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row> -->
+        <a-row :gutter="24">
+          <a-col :span="22">
+            <a-form-item label="提取内容" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['contentValue', {
+                  rules: [
+                    { required: true, message: '提取内容不能为空'}
+                  ],
+                  initialValue: formValues.contentValue
+                }]"
+                mode="multiple"
+                :options="contentValueOpt"
+                placeholder=""
+              >
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-spin>
     <div class="drawer-bootom-button">
@@ -79,21 +137,30 @@
 </template>
 
 <script>
+import { WeekOpt, MonthOpt, fileExtractScopeOpt } from '@/utils/params'
+import { configSerialize, configDeserialize } from '@/utils/common'
 // 对应item的字段
 function formValueFormater() {
   return {
-    appName: [''],
-    packageName: [''],
-    description: ['']
+    configName: '',
+    executeTimeType: 1, // 月还是周
+    executeDaytime: 1, // 哪一天执行
+    intervalPeriod: 0, // 间隔 0表示每周/月
+    contentValue: []
+    // fileExtractScope: 7
   }
 }
-let counter = 0
+
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 20 }
+  labelCol: { span: 5 },
+  wrapperCol: { span: 19 }
 }
+const formItemLayouWithoutLabel = {
+  wrapperCol: { span: 20, offset: 4 }
+}
+
 export default {
-  name: 'CreateEditPop',
+  name: 'ContactsSmsExtractCreateEditPop',
   components: { },
   props: {
     visible: {
@@ -107,13 +174,21 @@ export default {
     editId: {
       default: '',
       type: [String, Number]
+    },
+    contentValueOpt: {
+      type: Array
+
     }
   },
   data() {
     return {
+      WeekOpt, MonthOpt, fileExtractScopeOpt,
+      currentDayTimeOpt: WeekOpt,
+      currentTimeType: 1,
       formValues: formValueFormater(),
       loading: false,
       formItemLayout,
+      formItemLayouWithoutLabel,
       rawDetail: null
     }
   },
@@ -125,12 +200,20 @@ export default {
       immediate: false,
       async handler(newVal) {
         if (newVal) {
-        // 显示
+          // 显示
           if (this.isEdit) {
             const rawDetail = this.rawDetail = await this.getDetail()
-            this.$set(this.formValues.appName, 0, rawDetail.appName)
-            this.$set(this.formValues.packageName, 0, rawDetail.packageName)
-            this.$set(this.formValues.description, 0, rawDetail.description)
+            if (rawDetail.executeTimeType === 1) {
+              this.currentDayTimeOpt = WeekOpt
+            } else {
+              this.currentDayTimeOpt = MonthOpt
+            }
+            this.formValues.configName = rawDetail.configName
+            this.formValues.contentValue = configDeserialize(rawDetail.contentValue)
+            this.formValues.executeDaytime = Number(rawDetail.executeDaytime)
+            this.formValues.executeTimeType = rawDetail.executeTimeType
+            // this.formValues.fileExtractScope = Number(rawDetail.fileExtractScope)
+            this.formValues.intervalPeriod = rawDetail.intervalPeriod
           }
         } else {
         // 销毁
@@ -141,7 +224,9 @@ export default {
   },
   beforeCreate() {
     this.form = this.$form.createForm(this)
-    this.form.getFieldDecorator('keys', { initialValue: [0], preserve: true })
+  },
+  async created() {
+
   },
   methods: {
     onClose() {
@@ -149,6 +234,9 @@ export default {
       this.$emit('close')
     },
     reset() {
+      this.currentDayTimeOpt = WeekOpt
+      this.currentTimeType = 1
+      this.rawDetail = null
       this.formValues = formValueFormater()
       this.form.resetFields()
       this.$emit('update:visible', false)
@@ -158,8 +246,8 @@ export default {
     getDetail() {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$get('/business/black-white-app/getBlackWhiteAppById', {
-          appId: this.editId
+        this.$get('/business/address-book-config/getDetailById', {
+          configId: this.editId
         })
           .then(r => {
             if (r.data.state === 1) {
@@ -188,23 +276,19 @@ export default {
       this.$emit('success')
     },
     createSave(formValues) {
-      const paramsList = []
-      const keys = formValues.keys
-      keys.forEach(key => {
-        paramsList.push({
-          appName: formValues.appName[key],
-          description: formValues.description[key],
-          packageName: formValues.packageName[key],
-          type: 0
-        })
-      })
-      console.log(paramsList)
+      const params = {
+        configName: formValues.configName,
+        contentValue: configSerialize(formValues.contentValue),
+        executeDaytime: formValues.executeDaytime,
+        executeTimeType: formValues.executeTimeType,
+        // fileExtractScope: formValues.fileExtractScope,
+        intervalPeriod: formValues.intervalPeriod
+      }
+      console.log(params)
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-          jsonString: JSON.stringify(paramsList)
-        }).then(r => {
-          this.$message.info('新增应用黑名单成功')
+        this.$post('/business/address-book-config/add', params).then(r => {
+          this.$message.info('新增通讯录信息提取配置成功')
           resolve(r.data.data)
         })
           .finally(() => {
@@ -215,14 +299,16 @@ export default {
     editSave(id, formValues) {
       this.loading = true
       return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/updateBlackWhiteApp', {
+        this.$post('/business/address-book-config/updateById', {
           id,
-          appName: formValues.appName[0],
-          description: formValues.description[0],
-          packageName: formValues.packageName[0],
-          type: 0
+          configName: formValues.configName,
+          contentValue: configSerialize(formValues.contentValue),
+          executeDaytime: formValues.executeDaytime,
+          executeTimeType: formValues.executeTimeType,
+          // fileExtractScope: formValues.fileExtractScope,
+          intervalPeriod: formValues.intervalPeriod
         }).then(r => {
-          this.$message.info('修改应用黑名单成功')
+          this.$message.info('修改通讯录信息提取配置成功')
           resolve(r.data.data)
         })
           .finally(() => {
@@ -243,25 +329,16 @@ export default {
       })
       return validateFlag
     },
-    addFormItem() {
-      const { form } = this
-      const keys = form.getFieldValue('keys')
-      form.setFieldsValue({
-        keys: keys.concat(++counter)
-      })
-    },
-    removeFormItem(key) {
-      console.log(key)
-      const { form } = this
-      // can use data-binding to get
-      const keys = form.getFieldValue('keys')
-      // We need at least one passenger
-      if (keys.length === 1) {
-        return
+    executeTimeTypeChange(val) {
+      this.currentTimeType = val
+      if (val === 1) {
+        this.currentDayTimeOpt = WeekOpt
+      } else {
+        this.currentDayTimeOpt = MonthOpt
       }
-      // can use data-binding to set
-      form.setFieldsValue({
-        keys: keys.filter(k => k !== key)
+      this.form.setFieldsValue({
+        executeDaytime: 1,
+        intervalPeriod: 0
       })
     }
   }
@@ -283,5 +360,9 @@ export default {
 }
 .ant-divider-horizontal {
   margin: 12px 0;
+}
+.color-unit {
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 700
 }
 </style>

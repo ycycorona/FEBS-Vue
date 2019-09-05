@@ -40,7 +40,7 @@ Vue.filter('deviceStatusColorFil', (val) => {
   return DeviceStatusColorDict[String(val)]
 })
 
-Vue.filter('strategyToDeviceStatusFil', (val) => {
+Vue.filter('strategyToDeviceStatusFil', (val, type) => {
   return StrategyToDeviceStatusDict[String(val)] || '其他'
 })
 

@@ -72,6 +72,8 @@ export default {
     keepHeight = () => {
       const height = window.innerHeight - 76
       this.minHeight = `${height}px`
+      this.setWindowInnerHeight(window.innerHeight)
+      this.setWindowInnerWidth(window.innerWidth)
     }
     keepHeight()
     window.addEventListener('resize', keepHeight)
@@ -80,7 +82,11 @@ export default {
     window.removeEventListener('resize', keepHeight)
   },
   methods: {
-    ...mapMutations({ setSidebar: 'setting/setSidebar' }),
+    ...mapMutations({
+      setSidebar: 'setting/setSidebar',
+      setWindowInnerHeight: 'globalState/setWindowInnerHeight',
+      setWindowInnerWidth: 'globalState/setWindowInnerWidth'
+    }),
     toggleCollapse() {
       this.collapsed = !this.collapsed
       this.setSidebar(!this.collapsed)

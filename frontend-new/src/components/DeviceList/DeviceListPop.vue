@@ -2,7 +2,7 @@
   <div class="device-list-pop">
     <a-modal
       :width="1200"
-      title="未接收设备/全部设备"
+      title="设备查看"
       :body-style="{height: '500px'}"
       :visible="visible"
       destroy-on-close
@@ -23,7 +23,7 @@
           >
             <template slot="strategyStatus" slot-scope="strategyStatus">
               <span :class="{'red-text': [0,3,6,8].findIndex(item => item===strategyStatus) !== -1}">
-                {{ strategyStatus | strategyToDeviceStatusFil }}
+                {{ strategyStatus | strategyToDeviceStatusFil(type) }}
               </span>
             </template>
           </a-table>
@@ -34,7 +34,11 @@
 </template>
 
 <script>
-
+const URLList = [
+  '',
+  '/business/cmd-strategy/getPickPhones',
+  '/business/cmd-strategy/getPickPhones'
+]
 export default {
   name: 'DeviceListPop',
   components: { },
@@ -45,10 +49,15 @@ export default {
     },
     strategyId: {
       type: [String, Number]
+    },
+    type: {
+      type: Number,
+      default: 1
     }
   },
   data() {
     return {
+      reqURL: '',
       columns: [
         {
           title: '设备名称',
@@ -90,10 +99,12 @@ export default {
       handler(newVal) {
         if (newVal) {
         // 显示
+          this.reqURL = URLList[this.type]
           this.fetch({ pageSize: 10, pageNum: 1 })
         } else {
         // 销毁
           this.dataSource = null
+          this.reqURL = ''
         }
       }
     }
@@ -112,7 +123,7 @@ export default {
       params.strategyId = this.strategyId
       // 显示loading
       this.loading = true
-      this.$get('/business/cmd-strategy/getPickPhones', {
+      this.$get(this.reqURL, {
         ...params
       }).then((r) => {
         const data = r.data

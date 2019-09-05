@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import DirectInstructionTab from './components/DirectInstructionTab'
-import DirectInstructionSendHistory from './components/DirectInstructionSendHistory'
+import DirectInstructionTab from './components/DirectInstructionTab/DirectInstructionTab'
+import DirectInstructionSendHistory from './components/DirectInstructionSendHistory/DirectInstructionSendHistory'
 export default {
   name: 'DirectInstructionTabWrap',
   components: { DirectInstructionTab, DirectInstructionSendHistory },

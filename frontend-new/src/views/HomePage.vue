@@ -14,7 +14,11 @@
           </div>
           <div class="home-card-wrap home-map-wrap">
             <div class="map-render-area">
-              <HomeMap></HomeMap>
+              <HomeMap
+                v-if="showMap"
+                :fence-list="fenceList"
+                :phone-list="phoneList"
+              ></HomeMap>
             </div>
           </div>
         </a-col>
@@ -99,10 +103,8 @@ const headInfo = [
 ]
 const headInfoNameList = ['userCount', 'allPhoneCount', 'onlinePhoneCount', 'offlinePhoneCount', 'undealAlarmCount']
 import { mapState } from 'vuex'
-import moment from 'moment'
 import DealAlarmModal from '@/views/alarm-message/components/DealAlarmModal'
 import HomeMap from '@/views/home-components/HomeMap'
-moment.locale('zh-cn')
 
 export default {
   name: 'HomePage',
@@ -117,7 +119,10 @@ export default {
       popoverLoading: false,
       alarmRecordsDetail: [],
       dealAlarmModalVisible: false,
-      currentDealAlarmId: ''
+      currentDealAlarmId: '',
+      showMap: false,
+      fenceList: [],
+      phoneList: []
     }
   },
   computed: {
@@ -129,21 +134,47 @@ export default {
       return `/static/avatar/${this.user.avatar}`
     }
   },
-  async created() {
-    const info = await this.getInfo()
-    headInfo.forEach((item, index) => {
-      item.count = info[headInfoNameList[index]]
-    })
-    this.alarmRecordsDetail = info.alarmList.slice(0, 6)
+  created() {
+    this.handleInfo_1()
+    this.handleInfo_2()
   },
   mounted() {
 
   },
   methods: {
-    getInfo() {
+    async handleInfo_1() {
+      const info = await this.getInfo_1()
+      headInfo.forEach((item, index) => {
+        item.count = info[headInfoNameList[index]]
+      })
+      this.alarmRecordsDetail = info.alarmList.slice(0, 6) // 显示前6个
+    },
+    async handleInfo_2() {
+      const info_2 = await this.getInfo_2()
+      this.fenceList = info_2.fenceList
+      this.phoneList = info_2.phoneListForMap
+      this.showMap = true
+    },
+    getInfo_1() {
       this.loading = true
       return new Promise((resolve, reject) => {
         this.$get('/business/index/getIndexData1')
+          .then(res => {
+            if (res.data.state === 1) {
+              resolve(res.data.data)
+            } else {
+              reject(res.data.message)
+            }
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      })
+    },
+    getInfo_2() {
+      this.loading = true
+      return new Promise((resolve, reject) => {
+        this.$get('/business/index/getIndexData2')
           .then(res => {
             if (res.data.state === 1) {
               resolve(res.data.data)
