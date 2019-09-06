@@ -140,7 +140,7 @@ export default {
       // 显示loading
       this.loading = true
       this.$get('/business/instant-send-record/getInstantRecordListByPage', {
-        ...params, type: 1
+        ...params
       }).then((r) => {
         const data = r.data
         const pagination = { ...this.pagination }

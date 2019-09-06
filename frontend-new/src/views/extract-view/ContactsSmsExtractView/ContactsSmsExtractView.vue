@@ -81,8 +81,8 @@
       v-bind="{footer: null}"
       :mask-closable="false"
     >
-      <a-row :gutter="16" style="height:100%">
-        <a-col :span="24">
+      <a-row :gutter="16" class="full-height">
+        <a-col :span="24" class="full-height">
           <data-viewer
             :user-id="currentUserId"
             :default-tab="defaultTab"
