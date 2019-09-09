@@ -70,7 +70,10 @@
               class="grey-back-menu"
               @select="onSmsSelect"
             >
-              <a-menu-item v-for="(item, index) in currentSmsList" :key="`${item.number}-${item.id}`">{{ item.number }}{{ item.fileTime }}</a-menu-item>
+              <a-menu-item v-for="(item, index) in currentSmsList" :key="`${item.number}-${item.id}`">
+                <span>{{ item.linkman || item.number }}</span>
+                <span style="float: right">{{ item.fileTime | callLogDateFil }}</span>
+              </a-menu-item>
             </a-menu>
           </a-spin>
           <div class="posi-bottom">
@@ -79,8 +82,16 @@
           <div v-if="currentSmsList.length===0" class="ant-list-empty-text">暂无数据</div>
         </a-col>
         <a-col :span="16" class="full-height padding-normal">
-          <template v-if="currentDisplaySms">
 
+          <template v-if="currentDisplaySms">
+            <div v-for="item in currentDisplaySms.messagelist" :key="item.id">
+              <div class="sms-text-wrap">
+                {{ item.messageContent }}
+              </div>
+              <div class="sms-date-wrap">
+                {{ item.fileTime }}
+              </div>
+            </div>
           </template>
           <div v-else class="ant-list-empty-text">暂无数据</div>
         </a-col>
@@ -310,7 +321,7 @@ export default {
       console.log(key)
       const number = Number(key.split('-')[0])
       const smsDetail = await this.getSmsDetail(number)
-      console.log(smsDetail)
+      this.currentDisplaySms = smsDetail
     },
     onCallLogPageChange(page, pageSize) {
       this.getCallLog({ pageSize: pageSize, pageNum: page })
@@ -381,5 +392,9 @@ export default {
 }
 .pale-text {
   color: rgba(0, 0, 0, 0.45)
+}
+.sms-text-wrap {
+  background-color: #F7F7F7;
+  border-radius: 20px
 }
 </style>
