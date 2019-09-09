@@ -33,35 +33,100 @@
           <a-menu-item v-for="(item, index) in TabList" :key="item">{{ TabTextList[index] }}</a-menu-item>
         </a-menu>
       </a-col>
-      <template v-if="selectedTabKeys[0]!=='callLog'">
+
+      <template v-if="selectedTabKeys[0]==='contacts'">
         <a-col :span="4" class="full-height grey-back border-right">
           <a-menu
-            v-model="selectedItemKeys"
             class="grey-back-menu"
+            @select="onContactSelect"
           >
-            <template v-if="selectedTabKeys[0]==='contacts'">
-              <a-menu-item v-for="(item, index) in currentContactsList" :key="item.id">{{ item.extractLinkman }}</a-menu-item>
-            </template>
-            <template v-if="selectedTabKeys[0]==='sms'">
-              <a-menu-item v-for="(item, index) in currentSmsList" :key="item.id">{{ item.number }}{{ item.fileTime }}</a-menu-item>
-            </template>
+            <a-menu-item v-for="(item, index) in currentContactsList" :key="`${index}-${item.id}`">{{ item.extractLinkman }}</a-menu-item>
           </a-menu>
-          <div class="posi-bottom">
-            <a-pagination v-bind="smsPagination" simple style="text-align: center;" />
-          </div>
+          <div v-if="currentContactsList.length===0" class="ant-list-empty-text">暂无数据</div>
         </a-col>
         <a-col :span="16" class="full-height">
-          <div>手机 15689951093</div>
-          <div class="posi-bottom">
-            <a-pagination v-bind="callLogPagination" simple style="text-align: center;" />
-          </div>
+          <template v-if="currentDisplayContact">
+            <div class="flex-wrap padding-normal">
+              <div class="flex-item-no-grow">
+                <img src="@/assets/imgs/phone_avatar_l.png" width="80">
+              </div>
+              <div class="flex-item-no-grow contact-person-wrap">
+                <div class="contact-person-name">{{ currentDisplayContact.extractLinkman }}</div>
+                <div class="contact-person-tel">
+                  <a-icon type="phone" theme="filled" />
+                  <span>{{ currentDisplayContact.extractNumber }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+          <div v-else class="ant-list-empty-text">暂无数据</div>
         </a-col>
       </template>
-      <template v-else>
-        <a-col :span="20" class="full-height">
-          <template v-if="selectedTabKeys[0]==='callLog'">
-            <a-menu-item v-for="(item, index) in currentCallLogList" :key="item.id">{{ item.callDuration }}</a-menu-item>
+      <!-- 短信 -->
+      <template v-if="selectedTabKeys[0]==='sms'">
+        <a-col :span="4" class="full-height grey-back border-right">
+          <a-spin :spinning="smsDetailLoading">
+            <a-menu
+              class="grey-back-menu"
+              @select="onSmsSelect"
+            >
+              <a-menu-item v-for="(item, index) in currentSmsList" :key="`${item.number}-${item.id}`">{{ item.number }}{{ item.fileTime }}</a-menu-item>
+            </a-menu>
+          </a-spin>
+          <div class="posi-bottom">
+            <a-pagination v-if="currentSmsList.length!==0" v-bind="smsPagination" simple style="text-align: center;" @change="onSmsPageChange" />
+          </div>
+          <div v-if="currentSmsList.length===0" class="ant-list-empty-text">暂无数据</div>
+        </a-col>
+        <a-col :span="16" class="full-height padding-normal">
+          <template v-if="currentDisplaySms">
+
           </template>
+          <div v-else class="ant-list-empty-text">暂无数据</div>
+        </a-col>
+      </template>
+      <!-- 通话记录 -->
+      <template v-if="selectedTabKeys[0]==='callLog'">
+        <a-col :span="20" class="full-height padding-normal">
+          <a-spin :spinning="callLogDetailLoading">
+            <a-list
+              item-layout="horizontal"
+              :data-source="currentCallLogList"
+            >
+              <a-list-item slot="renderItem" slot-scope="item, index" class="call-log-item">
+                <div class="flex-item third-width flex-wrap">
+                  <div class="padding-top-5">
+                    <img src="@/assets/imgs/phone_avatar_s.png" alt="">
+                  </div>
+                  <div class="margin-left-10">
+                    <template v-if="item.callWay===1">
+                      <div>{{ item.linkman || item.number }}</div>
+                      <div class="pale-text">
+                        {{ item.linkman ? item.number : '陌生号码' }}
+                        <img src="@/assets/imgs/in-call.png" alt="">
+                      </div>
+                    </template>
+                    <template v-else-if="item.callWay===2">
+                      <div>{{ item.linkman || item.number }}</div>
+                      <div class="pale-text">
+                        {{ item.linkman ? item.number : '陌生号码' }}
+                        <img src="@/assets/imgs/out-call.png" alt="">
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="missed-call">{{ item.linkman || item.number }}</div>
+                      <div class="pale-text">{{ item.linkman ? item.number : '陌生号码' }}</div>
+                    </template>
+                  </div>
+                </div>
+                <div class="flex-item third-width">{{ item.extractTime | callLogDateFil }}</div>
+                <div class="flex-item third-width">{{ item.callDuration }} 秒</div>
+              </a-list-item>
+            </a-list>
+          </a-spin>
+          <div class="posi-bottom">
+            <a-pagination v-if="currentCallLogList.length!==0" v-bind="callLogPagination" simple style="text-align: center;" @change="onCallLogPageChange" />
+          </div>
         </a-col>
       </template>
     </a-row>
@@ -69,12 +134,18 @@
 </template>
 
 <script>
-const PageSize = 10
+import moment from 'moment'
+const PageSize = 1
 const TabList = ['contacts', 'sms', 'callLog']
 const TabTextList = ['通讯录', '短信', '通话记录']
 export default {
   name: 'DataViewer',
   components: { },
+  filters: {
+    callLogDateFil(val) {
+      return moment(val).format('YYYY年MM月DD日 HH:mm')
+    }
+  },
   props: {
     userId: {
       default: '',
@@ -97,17 +168,21 @@ export default {
       currentContactsList: [],
       currentSmsList: [],
       currentCallLogList: [],
+      currentDisplayContact: null,
+      currentDisplaySms: null,
+      currentDisplayCallLog: null,
       smsPagination: {
         total: 0,
         defaultCurrent: 1,
-        defaultPageSize: 10
+        defaultPageSize: PageSize
       },
       callLogPagination: {
         total: 0,
         defaultCurrent: 1,
-        defaultPageSize: 10
-      }
-
+        defaultPageSize: PageSize
+      },
+      callLogDetailLoading: false,
+      smsDetailLoading: false
     }
   },
   computed: {
@@ -173,6 +248,7 @@ export default {
     },
     // 获取短信
     getSms(params) {
+      this.smsDetailLoading = true
       return new Promise((resolve, reject) => {
         this.$get('/business/address-book-content/getShortMessageListByQuery', {
           ...params, phoneId: this.currentDevice
@@ -185,6 +261,8 @@ export default {
           resolve()
         }).catch((err) => {
           reject(err)
+        }).finally(() => {
+          this.smsDetailLoading = false
         })
       })
     },
@@ -205,8 +283,40 @@ export default {
         })
       })
     },
+    getSmsDetail(number) {
+      return new Promise((resolve, reject) => {
+        this.$get('/business/address-book-content/getShortMessageContentByNumber', {
+          number, phoneId: this.currentDevice
+        })
+          .then(res => {
+            if (res.data.state === 1) {
+              resolve(res.data.data)
+            } else {
+              reject('获取数据失败')
+            }
+          }).finally(() => {
+            this.smsDetailLoading = false
+          })
+      })
+    },
     doExport() {
 
+    },
+    onContactSelect({ key }) {
+      const arrayIndex = Number(key.split('-')[0])
+      this.currentDisplayContact = this.currentContactsList[arrayIndex]
+    },
+    async onSmsSelect({ key }) {
+      console.log(key)
+      const number = Number(key.split('-')[0])
+      const smsDetail = await this.getSmsDetail(number)
+      console.log(smsDetail)
+    },
+    onCallLogPageChange(page, pageSize) {
+      this.getCallLog({ pageSize: pageSize, pageNum: page })
+    },
+    onSmsPageChange(page, pageSize) {
+      this.getSms({ pageSize: pageSize, pageNum: page })
     }
   }
 }
@@ -238,5 +348,38 @@ export default {
   width: 100%;
   padding: 5px 0;
   background: white;
+}
+.contact-person-wrap  {
+  margin-left: 20px;
+  & > div {
+    height: 40px;
+  }
+  .contact-person-name {
+    font-size: 25px;
+  }
+  .contact-person-tel {
+    font-size: 18px;
+  }
+}
+.padding-normal {
+  padding: 10px;
+}
+.third-width {
+  width: 33.33333%;
+}
+.margin-left-10 {
+  margin-left: 10px;
+}
+.padding-top-5 {
+  padding-top: 5px;
+}
+.call-log-item /deep/ .ant-list-item-content {
+  align-items:center;
+}
+.missed-call {
+  color: red
+}
+.pale-text {
+  color: rgba(0, 0, 0, 0.45)
 }
 </style>

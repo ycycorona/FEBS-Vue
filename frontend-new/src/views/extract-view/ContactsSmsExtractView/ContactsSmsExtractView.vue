@@ -76,7 +76,7 @@
       :style="{}"
       centered
       title="资料查看"
-      :body-style="{height: `${windowInnerHeight*0.9}px`}"
+      :body-style="{height: `${windowInnerHeight*0.9}px`,minHeight:'700px'}"
       destroy-on-close
       v-bind="{footer: null}"
       :mask-closable="false"
