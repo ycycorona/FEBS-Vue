@@ -20,6 +20,7 @@
             <a-form-item label="日期">
               <a-range-picker
                 v-decorator="['dateRange']"
+                @change="datePickerChange"
               >
               </a-range-picker>
             </a-form-item>
@@ -46,7 +47,7 @@
       <template v-if="selectedTabKeys[0]==='image'">
         <a-col :span="20" class="full-height padding-normal" style="overflow: auto">
           <a-spin :spinning="listLoading">
-            <div>123</div>
+            <div>{{}}</div>
           </a-spin>
           <div class="posi-bottom">
             <a-pagination v-if="imageList.length!==0" v-bind="imagePagination" simple style="text-align: center;" @change="onImagePaginationChange" />
@@ -176,6 +177,17 @@ export default {
       this.currentDevice = val
       this.resetList()
       this.getDataList(this.selectedTabKeys[0], 1)
+    },
+    async datePickerChange(val) {
+      if (val.length === 0) {
+        this.startDate = null
+        this.endDate = null
+      } else {
+        this.startDate = val[0].format('YYYY-MM-DD')
+        this.endDate = val[1].format('YYYY-MM-DD')
+      }
+      this.getDataList(this.selectedTabKeys[0], 1)
+      console.log(this.startDate, this.endDate)
     },
     // 获取列表
     async getDataList(tabKeys, pageNum) {
