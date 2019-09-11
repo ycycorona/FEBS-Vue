@@ -49,14 +49,17 @@
       :pagination="pagination"
       @change="handleTableChange"
     >
-      <template slot="addressBookCount" slot-scope="addressBookCount, record">
-        <span class="blue-click" @click="showDetailView(record.userId, 'contacts')">{{ addressBookCount }}</span>
+      <template slot="imageCount" slot-scope="imageCount, record">
+        <span class="blue-click" @click="showDetailView(record.userId, 'image')">{{ imageCount }}</span>
       </template>
-      <template slot="shortMessageCount" slot-scope="shortMessageCount, record">
-        <span class="blue-click" @click="showDetailView(record.userId, 'sms')">{{ shortMessageCount }}</span>
+      <template slot="videoCount" slot-scope="videoCount, record">
+        <span class="blue-click" @click="showDetailView(record.userId, 'video')">{{ videoCount }}</span>
       </template>
-      <template slot="callLogCount" slot-scope="callLogCount, record">
-        <span class="blue-click" @click="showDetailView(record.userId, 'callLog')">{{ callLogCount }}</span>
+      <template slot="audioCount" slot-scope="audioCount, record">
+        <span class="blue-click" @click="showDetailView(record.userId, 'audio')">{{ audioCount }}</span>
+      </template>
+      <template slot="documentCount" slot-scope="documentCount, record">
+        <span class="blue-click" @click="showDetailView(record.userId, 'document')">{{ documentCount }}</span>
       </template>
       <template slot="operation" slot-scope="record">
         <span class="operation-btn" @click="doExport(record.userId)"><icon-export title="导出" />导出</span>
@@ -102,7 +105,7 @@ import { } from '@/utils/params'
 import DataViewer from './components/DataViewer'
 import { mapState } from 'vuex'
 export default {
-  name: 'ContactsSmsExtractView',
+  name: 'MediaExtractView',
   components: { IconExport, /* IconDelete, */ DeptInputTree, DataViewer },
   filters: {
 
@@ -122,20 +125,25 @@ export default {
           dataIndex: 'deptName'
         },
         {
-          title: '联系人',
-          dataIndex: 'addressBookCount',
-          scopedSlots: { customRender: 'addressBookCount' }
+          title: '图片',
+          dataIndex: 'imageCount',
+          scopedSlots: { customRender: 'imageCount' }
 
         },
         {
-          title: '短信',
-          dataIndex: 'shortMessageCount',
-          scopedSlots: { customRender: 'shortMessageCount' }
+          title: '视频',
+          dataIndex: 'videoCount',
+          scopedSlots: { customRender: 'videoCount' }
         },
         {
-          title: '通话记录',
-          dataIndex: 'callLogCount',
-          scopedSlots: { customRender: 'callLogCount' }
+          title: '音频',
+          dataIndex: 'audioCount',
+          scopedSlots: { customRender: 'audioCount' }
+        },
+        {
+          title: '文档',
+          dataIndex: 'documentCount',
+          scopedSlots: { customRender: 'documentCount' }
         },
         {
           title: '操作',
@@ -191,7 +199,7 @@ export default {
     fetch(params = {}) {
       // 显示loading
       this.loading = true
-      this.$get('/business/address-book-content/getAddressBookIndexByPage', {
+      this.$get('/business/media-file-content/getMediaFileIndexByPage', {
         ...params
       }).then((r) => {
         const data = r.data

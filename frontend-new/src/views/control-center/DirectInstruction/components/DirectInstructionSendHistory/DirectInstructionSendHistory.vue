@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { configSerialize } from '@/utils/common'
+// import { configSerialize } from '@/utils/common'
 import UserPickerPop from '@/components/UserPickerPop'
 import DeviceListPop from '@/components/DeviceList/DeviceListPop'
 export default {
