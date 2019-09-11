@@ -18,7 +18,7 @@
           </a-col>
           <a-col :span="20" :xl="21" style="text-align:right">
             <span>
-              <a-button style="margin-left: 15px" type="primary" @click="doExport">导出</a-button>
+              <a-button style="margin-left: 15px" type="primary" @click="doExport(selectedTabKeys[0])">导出当前 {{ TabTextList[TabList.indexOf(selectedTabKeys[0])] }}</a-button>
             </span>
           </a-col>
         </a-row>
@@ -33,7 +33,7 @@
           <a-menu-item v-for="(item, index) in TabList" :key="item">{{ TabTextList[index] }}</a-menu-item>
         </a-menu>
       </a-col>
-
+      <!-- 通讯录 -->
       <template v-if="selectedTabKeys[0]==='contacts'">
         <a-col :span="4" class="full-height grey-back border-right">
           <a-menu
@@ -44,7 +44,7 @@
           </a-menu>
           <div v-if="currentContactsList.length===0" class="ant-list-empty-text">暂无数据</div>
         </a-col>
-        <a-col :span="16" class="full-height">
+        <a-col :span="16" class="full-height" style="overflow: auto">
           <template v-if="currentDisplayContact">
             <div class="flex-wrap padding-normal">
               <div class="flex-item-no-grow">
@@ -53,7 +53,8 @@
               <div class="flex-item-no-grow contact-person-wrap">
                 <div class="contact-person-name">{{ currentDisplayContact.extractLinkman }}</div>
                 <div class="contact-person-tel">
-                  <a-icon type="phone" theme="filled" />
+                  <!-- <a-icon type="phone" theme="filled" /> -->
+                  <img src="@/assets/imgs/phone.png" alt="">
                   <span>{{ currentDisplayContact.extractNumber }}</span>
                 </div>
               </div>
@@ -81,8 +82,7 @@
           </div>
           <div v-if="currentSmsList.length===0" class="ant-list-empty-text">暂无数据</div>
         </a-col>
-        <a-col :span="16" class="full-height padding-normal">
-
+        <a-col :span="16" class="full-height padding-normal" style="overflow:auto">
           <template v-if="currentDisplaySms">
             <div v-for="item in currentDisplaySms.messagelist" :key="item.id">
               <div class="sms-text-wrap">
@@ -98,7 +98,7 @@
       </template>
       <!-- 通话记录 -->
       <template v-if="selectedTabKeys[0]==='callLog'">
-        <a-col :span="20" class="full-height padding-normal">
+        <a-col :span="20" class="full-height padding-normal" style="overflow: auto">
           <a-spin :spinning="callLogDetailLoading">
             <a-list
               item-layout="horizontal"
@@ -146,7 +146,7 @@
 
 <script>
 import moment from 'moment'
-const PageSize = 1
+const PageSize = 10
 const TabList = ['contacts', 'sms', 'callLog']
 const TabTextList = ['通讯录', '短信', '通话记录']
 export default {
@@ -173,7 +173,6 @@ export default {
       filterForm: this.$form.createForm(this),
       deviceListOpt: [],
       currentDevice: '',
-      currentTab: '',
       selectedTabKeys: [this.defaultTab], // 当前选中的显示项目
       selectedItemKeys: [],
       currentContactsList: [],
@@ -203,7 +202,6 @@ export default {
 
   },
   async created() {
-    this.currentTab = this.defaultTab
     this.deviceListOpt = await this.getDeviceListOpt()
     this.currentDevice = this.deviceListOpt[0].value
     this.getMultiDataList(PageSize, 1)
@@ -213,6 +211,7 @@ export default {
     async deviceChange(val) {
       this.currentDevice = val
       this.getMultiDataList(PageSize, 1)
+      this.resetDetailDisplay()
     },
     // 同时获取通讯录、短信、通话记录列表的第一页
     async getMultiDataList(pageSize, pageNum) {
@@ -310,8 +309,20 @@ export default {
           })
       })
     },
-    doExport() {
-
+    doExport(exportType) {
+      this.doExportRequest(exportType)
+    },
+    doExportRequest(exportType) {
+      const UrlMap = {
+        'contacts': 'export_AddressBookByPhoneId',
+        'sms': 'export_ShortMessageByQuery',
+        'callLog': 'export_CallLogByQuery'
+      }
+      return new Promise((resolve, reject) => {
+        this.$export(`/business/address-book-content/${UrlMap[exportType]}`, {
+          phoneId: this.currentDevice
+        })
+      })
     },
     onContactSelect({ key }) {
       const arrayIndex = Number(key.split('-')[0])
@@ -325,9 +336,15 @@ export default {
     },
     onCallLogPageChange(page, pageSize) {
       this.getCallLog({ pageSize: pageSize, pageNum: page })
+      this.resetDetailDisplay()
     },
     onSmsPageChange(page, pageSize) {
       this.getSms({ pageSize: pageSize, pageNum: page })
+      this.resetDetailDisplay()
+    },
+    resetDetailDisplay() {
+      this.currentDisplayCallLog = null
+      this.currentDisplaySms = null
     }
   }
 }
@@ -359,6 +376,7 @@ export default {
   width: 100%;
   padding: 5px 0;
   background: white;
+  margin-left: -10px
 }
 .contact-person-wrap  {
   margin-left: 20px;
@@ -395,6 +413,13 @@ export default {
 }
 .sms-text-wrap {
   background-color: #F7F7F7;
-  border-radius: 20px
+  border-radius: 20px;
+  margin: 20px 40px 0;
+  padding: 10px 20px
+}
+.sms-date-wrap {
+  text-align: right;
+  padding-right: 50px;
+  margin-bottom: 20px
 }
 </style>

@@ -113,9 +113,13 @@ const request = {
       }],
       responseType: 'blob'
     }).then((r) => {
+      const rawContentDisposition = r.headers['content-disposition'].split('; ')
+      const contentDisposition = qs.parse(rawContentDisposition[1])
+
       const content = r.data
       const blob = new Blob([content])
-      const fileName = `${new Date().getTime()}_导出结果.xlsx`
+      // ${new Date().getTime()}_导出结果.xlsx
+      const fileName = `${contentDisposition.filename}`
       if ('download' in document.createElement('a')) {
         const elink = document.createElement('a')
         elink.download = fileName
@@ -141,6 +145,7 @@ const request = {
       }],
       responseType: 'blob'
     }).then((r) => {
+      console.log(r)
       const content = r.data
       const blob = new Blob([content])
       if ('download' in document.createElement('a')) {

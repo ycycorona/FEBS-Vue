@@ -59,15 +59,15 @@
         <span class="blue-click" @click="showDetailView(record.userId, 'callLog')">{{ callLogCount }}</span>
       </template>
       <template slot="operation" slot-scope="record">
-        <span class="operation-btn" @click="doExport(record.id)"><icon-export title="导出" />导出</span>
-        <a-popconfirm
+        <span class="operation-btn" @click="doExport(record.userId)"><icon-export title="导出" />导出</span>
+        <!-- <a-popconfirm
           title="确认删除吗?"
           ok-text="删除"
           cancel-text="取消"
-          @confirm="dodelItem(record.id)"
+          @confirm="dodelItem(record.userId)"
         >
           <span class="operation-btn"><icon-delete title="删除" />删除</span>
-        </a-popconfirm>
+        </a-popconfirm> -->
       </template>
     </a-table>
     <a-modal
@@ -178,7 +178,7 @@ export default {
         params.startDate = values.dateRange[0].format('YYYY-MM-DD')
         params.endDate = values.dateRange[1].format('YYYY-MM-DD')
       }
-      params.username = values.username
+      params.userName = values.username
       params.deptId = values.dept
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
@@ -192,7 +192,7 @@ export default {
       // 显示loading
       this.loading = true
       this.$get('/business/address-book-content/getAddressBookIndexByPage', {
-        ...params, type: 0
+        ...params
       }).then((r) => {
         const data = r.data
         const pagination = { ...this.pagination }
@@ -238,7 +238,12 @@ export default {
       // })
     },
     doExport(id) {
-
+      console.log(id)
+      return new Promise((resolve, reject) => {
+        this.$export(`/business/address-book-content/export_AllDataByUserId`, {
+          userId: id
+        })
+      })
     },
     showDetailView(userId, flag) {
       this.currentUserId = userId
