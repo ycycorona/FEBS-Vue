@@ -145,12 +145,13 @@ const request = {
       }],
       responseType: 'blob'
     }).then((r) => {
-      console.log(r)
+      const rawContentDisposition = r.headers['content-disposition'].split('; ')
+      const contentDisposition = qs.parse(rawContentDisposition[1])
       const content = r.data
       const blob = new Blob([content])
       if ('download' in document.createElement('a')) {
         const elink = document.createElement('a')
-        elink.download = filename
+        elink.download = filename || contentDisposition.filename
         elink.style.display = 'none'
         elink.href = URL.createObjectURL(blob)
         document.body.appendChild(elink)
@@ -158,7 +159,7 @@ const request = {
         URL.revokeObjectURL(elink.href)
         document.body.removeChild(elink)
       } else {
-        navigator.msSaveBlob(blob, filename)
+        navigator.msSaveBlob(blob, filename || contentDisposition.filename)
       }
     }).catch((r) => {
       console.error(r)

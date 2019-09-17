@@ -60,15 +60,15 @@
         @success="handleCreateEditPopSuccess"
       ></CreateEditPop>
     </div>
-  </a-spin>
 
+  </a-spin>
 </template>
 
 <script>
 import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import CreateEditPop from './components/MediaExtractCreateEditPop'
-import { configSerialize, configDeserialize, optToArrayMap } from '@/utils/common'
+import { configDeserialize, optToArrayMap } from '@/utils/common'
 import { FileExtractScopeMap, WeekOpt, MonthOpt } from '@/utils/params'
 
 // 周月value to text

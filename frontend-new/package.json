@@ -17,10 +17,11 @@
     "lodash": "^4.17.15",
     "qs": "^6.7.0",
     "urijs": "^1.19.1",
+    "v-viewer": "^1.4.2",
     "vue": "^2.6.10",
     "vue-amap": "^0.5.10",
     "vue-apexcharts": "^1.4.0",
-    "vue-router": "^3.0.3",
+    "vue-router": "3.0.7",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

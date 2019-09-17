@@ -45,36 +45,107 @@
       </a-col>
       <!-- 图片 -->
       <template v-if="selectedTabKeys[0]==='image'">
-        <a-col :span="20" class="full-height padding-normal" style="overflow: auto">
-          <a-spin :spinning="listLoading">
-            <div>{{}}</div>
-          </a-spin>
+        <a-col :span="20" class="full-height padding-normal">
+          <div class="detail-content-wrap">
+            <a-spin :spinning="listLoading">
+              <template v-for="item in imageListByDay">
+                <div :key="item.day + new Date().valueOf() + 'day'" style="margin:10px auto">{{ item.day }}</div>
+                <div :key="item.day + new Date().valueOf() + 'list'" v-viewer="vViewerOpt" class="flex-wrap flex-auto-line">
+                  <div
+                    v-for="(subItem,index) in item.imageList"
+                    :key="subItem.id"
+                    class="flex-item-no-grow img-list-item normal-click"
+                  >
+                    <img :src="subItem.thumbPath" :data-src="subItem.filePath" alt="" class="img-list-img thumb-img">
+                    <div>{{ subItem.fileName }}</div>
+                  </div>
+                </div>
+              </template>
+              <div style="height:40px">bottom</div>
+            </a-spin>
+          </div>
           <div class="posi-bottom">
-            <a-pagination v-if="imageList.length!==0" v-bind="imagePagination" simple style="text-align: center;" @change="onImagePaginationChange" />
+            <a-pagination v-if="imageListByDay.length!==0" v-bind="imagePagination" simple style="text-align: center;" @change="onImagePaginationChange" />
+          </div>
+        </a-col>
+      </template>
+      <!-- 视频 -->
+      <template v-if="selectedTabKeys[0]==='video'">
+        <a-col :span="20" class="full-height padding-normal">
+          <div class="detail-content-wrap">
+            <a-spin :spinning="listLoading">
+              <template v-for="item in videoList">
+                <div :key="item.day + new Date().valueOf() + 'day'" style="margin:10px auto">{{ item.day }}</div>
+                <div :key="item.day + new Date().valueOf() + 'list'" class="flex-wrap flex-auto-line">
+                  <div
+                    v-for="(subItem, index) in item.videoList"
+                    :key="subItem.id"
+                    class="flex-item-no-grow img-list-item normal-click"
+                    @click="viewDetailVideo(subItem.filePath)"
+                  >
+                    <img :src="subItem.thumbPath" alt="" class="img-list-img thumb-img">
+                    <div>{{ subItem.fileName }}</div>
+                  </div>
+                </div>
+              </template>
+            </a-spin>
+          </div>
+          <div class="posi-bottom">
+            <a-pagination v-if="videoList.length!==0" v-bind="videoPagination" simple style="text-align: center;" @change="onVideoPaginationChange" />
+          </div>
+        </a-col>
+      </template>
+      <!-- 音频 -->
+      <template v-if="selectedTabKeys[0]==='audio'">
+        <a-col :span="20" class="full-height padding-normal">
+          <div class="detail-content-wrap">
+            <a-spin :spinning="listLoading">
+              <a-list
+                item-layout="horizontal"
+                :data-source="audioList"
+              >
+                <a-list-item slot="renderItem" slot-scope="item, index" class="call-log-item">
+                  <div class="flex-item  flex-wrap">
+                    <span class="down-link" @click="downloadDocument(item.filePath)">
+                      <a-icon type="play-circle" style="margin-right:5px" />
+                      <span>{{ item.fileName + '.' + item.fileSuffix }}</span>
+                    </span>
+                  </div>
+                  <div class="flex-item third-width" style="width: 50%">
+                    {{ item.fileTime | callLogDateFil }}
+                  </div>
+                </a-list-item>
+              </a-list>
+            </a-spin>
+          </div>
+          <div class="posi-bottom">
+            <a-pagination v-if="audioList.length!==0" v-bind="audioPagination" simple style="text-align: center;" @change="onAudioPaginationChange" />
           </div>
         </a-col>
       </template>
       <!-- 文档 -->
       <template v-if="selectedTabKeys[0]==='document'">
-        <a-col :span="20" class="full-height padding-normal" style="overflow: auto">
-          <a-spin :spinning="listLoading">
-            <a-list
-              item-layout="horizontal"
-              :data-source="documentList"
-            >
-              <a-list-item slot="renderItem" slot-scope="item, index" class="call-log-item">
-                <div class="flex-item third-width flex-wrap">
-                  {{ item.fileName + item.fileSuffix }}
-                </div>
-                <div class="flex-item third-width">
-                  {{ item.fileSize }}KB
-                </div>
-                <div class="flex-item third-width">
-                  {{ fileTime | callLogDateFil }}
-                </div>
-              </a-list-item>
-            </a-list>
-          </a-spin>
+        <a-col :span="20" class="full-height padding-normal">
+          <div class="detail-content-wrap">
+            <a-spin :spinning="listLoading">
+              <a-list
+                item-layout="horizontal"
+                :data-source="documentList"
+              >
+                <a-list-item slot="renderItem" slot-scope="item, index" class="call-log-item">
+                  <div class="flex-item third-width flex-wrap">
+                    <span class="down-link" @click="downloadDocument(item.filePath)">{{ item.fileName + '.' + item.fileSuffix }}</span>
+                  </div>
+                  <div class="flex-item third-width">
+                    {{ item.fileSize }}KB
+                  </div>
+                  <div class="flex-item third-width">
+                    {{ item.fileTime | callLogDateFil }}
+                  </div>
+                </a-list-item>
+              </a-list>
+            </a-spin>
+          </div>
           <div class="posi-bottom">
             <a-pagination v-if="documentList.length!==0" v-bind="documentPagination" simple style="text-align: center;" @change="onDocumentPaginationChange" />
           </div>
@@ -85,6 +156,23 @@
 </template>
 
 <script>
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer'
+import Vue from 'vue'
+Vue.use(Viewer)
+// build items array
+const items = [
+  {
+    src: 'https://placekitten.com/600/400',
+    w: 600,
+    h: 400
+  },
+  {
+    src: 'https://placekitten.com/1200/900',
+    w: 1200,
+    h: 900
+  }
+]
 import moment from 'moment'
 const PageSize = 10
 const TabList = ['image', 'video', 'audio', 'document']
@@ -102,7 +190,7 @@ const paginationMap = {
   'document': 'documentPagination'
 }
 const currentListMap = {
-  'image': 'imageList',
+  'image': 'imageListByDay',
   'video': 'videoList',
   'audio': 'audioList',
   'document': 'documentList'
@@ -128,12 +216,18 @@ export default {
   },
   data() {
     return {
-      TabList, TabTextList,
+      TabList, TabTextList, items,
+      vViewerOpt: {
+        // 获取原图
+        url(image) {
+          return image.dataset.src
+        }
+      },
       filterForm: this.$form.createForm(this),
       deviceListOpt: [],
       currentDevice: '',
       selectedTabKeys: [this.defaultTab], // 当前选中的显示项目
-      imageList: [],
+      imageListByDay: [],
       videoList: [],
       audioList: [],
       documentList: [],
@@ -157,7 +251,8 @@ export default {
         defaultCurrent: 1,
         defaultPageSize: PageSize
       },
-      listLoading: false
+      listLoading: false,
+      showImgsViewer: false
     }
   },
   computed: {
@@ -239,7 +334,10 @@ export default {
           })
       })
     },
-
+    // 下载文件
+    downloadDocument(path) {
+      this.$download(path)
+    },
     getDetail(number) {
       return new Promise((resolve, reject) => {
         this.$get('/business/address-book-content/getShortMessageContentByNumber', {
@@ -280,6 +378,17 @@ export default {
     },
     onTabSelect({ key }) {
       this.getDataList(key, 1)
+    },
+    viewDetailVideo(filePath) {
+      console.log(filePath)
+      window.open(filePath, '_blank')
+    },
+    onThumbnailClick(index, imageList) {
+      this.viewDetailImg(index, imageList)
+    },
+    viewDetailImg(index, imageList) {
+      this.showImgsViewer = true
+      this.$refs['imgsViewer'].open(imageList, index)
     }
   }
 }
@@ -304,6 +413,11 @@ export default {
 }
 .out-border {
   border: 2px solid @greyBorderColor
+}
+.detail-content-wrap {
+  padding-bottom: 35px;
+  overflow: auto;
+  height: 100%;
 }
 .posi-bottom {
   position: absolute;
@@ -331,6 +445,7 @@ export default {
 .third-width {
   width: 33.33333%;
 }
+
 .margin-left-10 {
   margin-left: 10px;
 }
@@ -356,5 +471,24 @@ export default {
   text-align: right;
   padding-right: 50px;
   margin-bottom: 20px
+}
+.down-link {
+  cursor: pointer;
+}
+.down-link:hover {
+  color: blue
+}
+.img-list-img {
+
+}
+.img-list-item{
+  margin-right: 10px
+}
+.img-list-item:last-of-type {
+  margin-right: 0
+}
+.thumb-img {
+  width: 110px;
+  height: 150px
 }
 </style>

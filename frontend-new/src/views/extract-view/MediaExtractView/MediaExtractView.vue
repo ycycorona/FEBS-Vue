@@ -93,6 +93,7 @@
         </a-col>
       </a-row>
     </a-modal>
+
   </div>
 </template>
 
@@ -104,6 +105,7 @@ import { configDeserialize } from '@/utils/common'
 import { } from '@/utils/params'
 import DataViewer from './components/DataViewer'
 import { mapState } from 'vuex'
+
 export default {
   name: 'MediaExtractView',
   components: { IconExport, /* IconDelete, */ DeptInputTree, DataViewer },
