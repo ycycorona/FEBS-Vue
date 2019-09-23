@@ -24,11 +24,13 @@
         {{ record.login.uuid }}
       </template>
     </a-table>
+    <LeafFletTest></LeafFletTest>
   </div>
 </template>
 
 <script>
 import FormTest from './FormTest'
+import LeafFletTest from '@/components/Leaflet'
 const columns = [{
   title: 'Name',
   dataIndex: 'name',
@@ -55,7 +57,7 @@ const columns = [{
 
 export default {
   name: 'TableTest',
-  components: { FormTest },
+  components: { FormTest, LeafFletTest },
   props: {},
   data() {
     const selectedRowKeys = []

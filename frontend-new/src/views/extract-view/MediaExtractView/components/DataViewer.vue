@@ -83,8 +83,9 @@
                     class="flex-item-no-grow img-list-item normal-click"
                     @click="viewDetailVideo(subItem.filePath)"
                   >
-                    <img :src="subItem.thumbPath" alt="" class="img-list-img thumb-img">
+                    <img :src="subItem.filePicPath" alt="" class="img-list-img thumb-img">
                     <div>{{ subItem.fileName }}</div>
+                    <div>{{ subItem.fileSize }}<a-icon class="blue-normal-click normal-click" type="download" @click.stop="downloadVideo(subItem.filePath)" /></div>
                   </div>
                 </div>
               </template>
@@ -152,14 +153,38 @@
         </a-col>
       </template>
     </a-row>
+    <a-modal
+      v-model="videoModalVisibile"
+      :width="windowInnerWidth*0.8"
+      :style="{}"
+      centered
+      title="播放视频"
+      :body-style="{height: `${windowInnerHeight*0.8}px`,minHeight:'700px'}"
+      destroy-on-close
+      v-bind="{footer: null}"
+      :mask-closable="false"
+    >
+      <a-row :gutter="16" class="full-height">
+        <a-col :span="24" class="full-height">
+          <video-player :options="playerOptions"></video-player>
+        </a-col>
+      </a-row>
+    </a-modal>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
+import VueVideoPlayer from 'vue-video-player'
+import 'video.js/dist/video-js.css'
 import Vue from 'vue'
 Vue.use(Viewer)
+Vue.use(VueVideoPlayer, /* {
+  options: global default options,
+  events: global videojs events
+} */)
 // build items array
 const items = [
   {
@@ -216,6 +241,16 @@ export default {
   },
   data() {
     return {
+      playerOptions: {
+        muted: true,
+        language: 'en',
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+          // type: 'video/mp4',
+          src: ''
+        }],
+        poster: '/static/images/author.jpg'
+      },
       TabList, TabTextList, items,
       vViewerOpt: {
         // 获取原图
@@ -252,11 +287,15 @@ export default {
         defaultPageSize: PageSize
       },
       listLoading: false,
-      showImgsViewer: false
+      showImgsViewer: false,
+      videoModalVisibile: false
     }
   },
   computed: {
-
+    ...mapState({
+      windowInnerHeight: state => state.globalState.windowInnerHeight,
+      windowInnerWidth: state => state.globalState.windowInnerWidth
+    })
   },
   watch: {
 
@@ -338,6 +377,9 @@ export default {
     downloadDocument(path) {
       this.$download(path)
     },
+    downloadVideo(path) {
+      this.$download(path)
+    },
     getDetail(number) {
       return new Promise((resolve, reject) => {
         this.$get('/business/address-book-content/getShortMessageContentByNumber', {
@@ -381,7 +423,9 @@ export default {
     },
     viewDetailVideo(filePath) {
       console.log(filePath)
-      window.open(filePath, '_blank')
+      this.playerOptions.sources[0].src = filePath
+      this.videoModalVisibile = true
+      // window.open(filePath, '_blank')
     },
     onThumbnailClick(index, imageList) {
       this.viewDetailImg(index, imageList)
@@ -490,5 +534,11 @@ export default {
 .thumb-img {
   width: 110px;
   height: 150px
+}
+.video-player {
+  height: 100%;
+}
+.video-player /deep/  div.video-js {
+  margin: auto
 }
 </style>

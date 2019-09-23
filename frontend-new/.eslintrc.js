@@ -10,7 +10,8 @@ module.exports = {
     es6: true,
   },
   globals: {
-    "AMap": true
+    "AMap": true,
+    "L": true
   },
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
 
