@@ -46,14 +46,7 @@
         </a-row>
       </a-form>
       <!-- 表格区域 -->
-      <a-row :gutter="24">
-        <a-col :span="12" :xl="8">1</a-col>
-        <a-col :span="12" :xl="8">2</a-col>
-        <a-col :span="12" :xl="8">3</a-col>
-        <a-col :span="12" :xl="8">4</a-col>
-        <a-col :span="12" :xl="8">5</a-col>
-        <a-col :span="12" :xl="8">6</a-col>
-      </a-row>
+      <AnalysisGraphArea></AnalysisGraphArea>
     </div>
   </SingleMenuWrap>
 </template>
@@ -62,9 +55,10 @@
 
 import DeptInputTree from '@/views/system/dept/DeptInputTree'
 import SingleMenuWrap from '@/views/common/SingleMenuWrap'
+import AnalysisGraphArea from './AnalysisGraphArea'
 export default {
   name: 'AnalysisIndex',
-  components: { DeptInputTree, SingleMenuWrap },
+  components: { DeptInputTree, SingleMenuWrap, AnalysisGraphArea },
   props: {
 
   },

@@ -16,6 +16,7 @@
             <div class="map-render-area">
               <HomeMap
                 v-if="showMap"
+                style="z-index:1"
                 :fence-list="fenceList"
                 :phone-list="phoneList"
               ></HomeMap>
@@ -55,7 +56,7 @@
         <a-col :span="24">
           <a-card title="审计分析" :bordered="false" style="width: 100%">
             <a slot="extra" href="#">更多>></a>
-            <p>Card content</p>
+            <AnalysisGraphArea></AnalysisGraphArea>
           </a-card>
         </a-col>
       </a-row>
@@ -73,6 +74,7 @@ import ImgDeviceNum from '@/assets/imgs/device-num.png'
 import ImgOfflineDevice from '@/assets/imgs/offline-device.png'
 import ImgOnlineDevice from '@/assets/imgs/online-device.png'
 import ImgUnhandledAlarm from '@/assets/imgs/unhandled-alarm.png'
+import AnalysisGraphArea from '@/views/analysis/AnalysisGraphArea.vue'
 
 const headInfo = [
   {
@@ -110,7 +112,7 @@ export default {
   name: 'HomePage',
   components: {
     DealAlarmModal,
-    HomeMap
+    HomeMap, AnalysisGraphArea
   },
   data() {
     return {
