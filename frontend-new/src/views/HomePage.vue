@@ -25,7 +25,9 @@
         </a-col>
         <a-col :span="5">
           <a-card title="报警消息" :bordered="false" style="width: 100%;height: 534px;">
-            <a slot="extra" href="#">更多>></a>
+            <!-- <a slot="extra" href="#"></a> -->
+            <router-link slot="extra" :to="'/alarm-message/list'">更多>></router-link>
+
             <div class="alarm-list-wrap">
               <a-spin :spinning="popoverLoading" class="pop-center-spin">
                 <div
@@ -55,7 +57,7 @@
       <a-row :gutter="24" style="margin-top: 24px">
         <a-col :span="24">
           <a-card title="审计分析" :bordered="false" style="width: 100%">
-            <a slot="extra" href="#">更多>></a>
+            <router-link slot="extra" :to="'/analysis/index'">更多>></router-link>
             <AnalysisGraphArea></AnalysisGraphArea>
           </a-card>
         </a-col>
