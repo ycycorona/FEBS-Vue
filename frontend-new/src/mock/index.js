@@ -4,9 +4,10 @@ import Mock from 'mockjs2'
 if (process.env.NODE_ENV !== 'production' || process.env.VUE_APP_PREVIEW === 'true') {
   // 使用同步加载依赖
   console.log('mock mounting')
-  require('./services/test')
-  require('./services/controlStrategy')
-  require('./services/controlConfig')
+  // require('./services/test')
+  // require('./services/controlStrategy')
+  // require('./services/controlConfig')
+  require('./services/LightControlCenter')
 
   Mock.setup({
     timeout: 800 // setter delay time

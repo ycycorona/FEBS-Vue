@@ -44,7 +44,7 @@ export default {
       crs: L.CRS.Simple,
       maxBounds: bounds
     })
-    const image = L.imageOverlay('http://d.5857.com/tc_170411/001.jpg', bounds).addTo(mymap)
+    // const image = L.imageOverlay('http://d.5857.com/tc_170411/001.jpg', bounds).addTo(mymap)
     // mymap.fitBounds(bounds)
     const marker = L.marker([0, 0], {
       zIndexOffset: 1000,

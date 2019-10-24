@@ -93,7 +93,7 @@ export default {
       checkedKeys: [],
       defaultCheckedKeys: [],
       expandedKeys: [],
-      checkStrictly: true
+      checkStrictly: false
     }
   },
   watch: {

@@ -47,3 +47,15 @@ export function optToArrayMap(arr) {
     return accumulator
   }, [])
 }
+
+/**
+ * @desc 根据数据创造数组
+ */
+export function createArrayFromNum(number, init = '') {
+  const array = []
+  const value = typeof init === 'function' ? init() : init
+  for (let i = 0; i < number; i++) {
+    array.push(value)
+  }
+  return array
+}
