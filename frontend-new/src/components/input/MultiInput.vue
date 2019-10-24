@@ -3,7 +3,7 @@
     <a-input
       v-for="n in inputNum"
       :key="n"
-      :default-value="localValue[n-1]"
+      :value="localValue[n-1]"
       class="input-width"
       on-change="inputValueChange"
     />
@@ -43,7 +43,10 @@ export default {
     } else {
       this.localValue = createArrayFromNum(this.inputNum)
     }
-    this.localValue[0] = 2
+    setTimeout(() => {
+      this.$set(this.localValue, 0, 2)
+    }, 2000)
+    // this.localValue[0] = 2
   },
   methods: {
     inputValueChange() {

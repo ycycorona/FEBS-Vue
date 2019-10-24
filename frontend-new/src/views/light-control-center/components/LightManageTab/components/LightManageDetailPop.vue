@@ -211,9 +211,9 @@ export default {
     this.form.getFieldDecorator('keys', { initialValue: [0], preserve: true })
   },
   mounted() {
-    setTimeout(() => {
-      this.formValues.project = 1
-    })
+    // setTimeout(() => {
+    //   this.$set(this.formValues, 'project', 1)
+    // }, 3000)
   },
   methods: {
     onClose() {
