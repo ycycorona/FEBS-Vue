@@ -118,6 +118,48 @@
             </a-form-item>
           </a-col>
         </a-row>
+        <a-row :gutter="12">
+          <a-col :span="24">
+            <a-form-item label="校表码" v-bind="formItemLayout_1">
+              <multi-input
+                v-decorator="['jiaobiaoCode',
+                              {rules: [
+                                 { required: true, message: '校表码不能为空'}
+                               ],
+                               initialValue: formValues.jioabiaoCode}]"
+                :input-num="8"
+              ></multi-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="24">
+            <a-form-item label="扩展PANID" v-bind="formItemLayout_1">
+              <multi-input
+                v-decorator="['panId',
+                              {rules: [
+                                 { required: true, message: 'panId不能为空'}
+                               ],
+                               initialValue: formValues.panId}]"
+                :input-num="8"
+              ></multi-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="频道(11-26)" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['channel',
+                              {rules: [
+                                 { required: true, message: '频道不能为空'}
+                               ],
+                               initialValue: formValues.channel}]"
+                palceholder=""
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-spin>
     <div class="drawer-bootom-button">
@@ -125,13 +167,14 @@
         <a-button :loading="loading" style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
       <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="test">测试</a-button>
     </div>
   </a-drawer>
 </template>
 
 <script>
 import { LightName } from '@/config/LightConstant'
-import MultiInput from '@/components/input/MultiInput'
+import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
 const titleOpt = [
   '添加' + LightName,
@@ -146,7 +189,10 @@ function formValueFormater() {
     lightShellId: '',
     lightType: '',
     installType: '',
-    macAddress: createArrayFromNum(8, 0)
+    macAddress: createArrayFromNum(8, 0),
+    jioabiaoCode: createArrayFromNum(12, 0),
+    panId: createArrayFromNum(8, 0),
+    channel: ''
   }
 }
 let counter = 0
@@ -177,6 +223,7 @@ export default {
   },
   data() {
     return {
+      form: this.$form.createForm(this),
       titleOpt,
       formValues: formValueFormater(),
       loading: false,
@@ -207,15 +254,17 @@ export default {
     }
   },
   beforeCreate() {
-    this.form = this.$form.createForm(this)
-    this.form.getFieldDecorator('keys', { initialValue: [0], preserve: true })
+
   },
   mounted() {
-    // setTimeout(() => {
-    //   this.$set(this.formValues, 'project', 1)
-    // }, 3000)
+    setTimeout(() => {
+      this.$set(this.formValues.macAddress, 0, 10)
+    }, 6000)
   },
   methods: {
+    test() {
+      console.log(this.form.getFieldsValue())
+    },
     onClose() {
       this.reset()
       this.$emit('close')
