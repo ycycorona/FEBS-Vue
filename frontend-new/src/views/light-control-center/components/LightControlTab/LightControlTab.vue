@@ -1,17 +1,7 @@
 <template>
   <a-spin :spinning="loading">
-    <div class="light-manage-list-tab">
-      <!-- 添加按钮 -->
-      <div class="float-add-btn">
-        <a-button
-          type="primary"
-          style="border-radius:45px!important;"
-          @click="openCreate"
-        >
-          <a-icon type="plus" /><span style="margin-left: 3px;">添加{{ Cons.LightName }}</span>
-        </a-button>
-      </div>
-      <!-- 表格区域 -->
+    <div class="light-control-list-tab">
+      <!-- 操作按钮 -->
       <div style="margin-bottom:10px" class="">
         <a-popconfirm
           title="确认删除吗?"
@@ -29,6 +19,22 @@
         >
           <a-button :disabled="selectedRowKeys.length===0" type="primary">审核{{ Cons.LightName }}</a-button>
         </a-popconfirm>
+        <a-dropdown>
+          <a-menu slot="overlay" @click="handleActionClick">
+            <a-menu-item key="1">开关灯模式</a-menu-item>
+            <a-menu-item key="2">手动模式开关灯功率</a-menu-item>
+            <a-menu-item key="3">调光策略</a-menu-item>
+            <a-menu-item key="4">时间校准</a-menu-item>
+            <a-menu-item key="5">单灯校表</a-menu-item>
+            <a-menu-item key="6">经纬度修改</a-menu-item>
+            <a-menu-item key="7">PANID修改</a-menu-item>
+            <a-menu-item key="8">频道修改</a-menu-item>
+            <a-menu-item key="9">报警阈修改</a-menu-item>
+            <a-menu-item key="10">红外触发参数设置</a-menu-item>
+            <a-menu-item key="11">强制删除</a-menu-item>
+          </a-menu>
+          <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
+        </a-dropdown>
         <a v-if="!showSearchForm" style="margin-left: 8px" @click="toggleSearchForm">
           {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
           <a-icon :type="showSearchForm ? 'up' : 'down'" />
@@ -38,10 +44,10 @@
       <a-form v-if="showSearchForm" layout="inline" :form="filterForm">
         <a-row :gutter="24">
           <a-col :span="8" :xl="6">
-            <a-form-item label="编组">
+            <a-form-item label="智能灯编号">
               <a-input
                 v-decorator="[
-                  'group'
+                  'lightId'
                 ]"
               />
             </a-form-item>
@@ -58,8 +64,9 @@
           </a-col>
         </a-row>
       </a-form>
+      <!-- 表格 -->
       <a-table
-        ref="light-manage-list-tab-table"
+        ref="light-control-list-tab-table"
         :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         :row-key="record => record.id"
         :columns="columns"
@@ -71,69 +78,85 @@
         <template slot="operation" slot-scope="record">
           <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
           <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
-
         </template>
       </a-table>
-      <LightManageDetailPop
-        :visible.sync="lightManageDetailPopVisible"
+      <LightControlDetailPop
+        :visible.sync="lightControlDetailPopVisible"
         :is-edit.sync="isEdit"
         :edit-id.sync="editId"
         :pop-readonly.sync="popReadonly"
         @close="handleEditPopClose"
         @success="handleEditPopSuccess"
-      ></LightManageDetailPop>
+      ></LightControlDetailPop>
     </div>
   </a-spin>
-
 </template>
 
 <script>
 import IconEdit from '@/components/icons/IconEdit'
-import LightManageDetailPop from './components/LightManageDetailPop'
+import LightControlDetailPop from './components/LightControlDetailPop'
+
 // import { configSerialize } from '@/utils/common'
 import { LightName } from '@/config/LightConstant'
-const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 18 }
-}
 export default {
-  name: 'LightManageTab',
-  components: { IconEdit, LightManageDetailPop },
+  name: 'LightControlTab',
+  components: { IconEdit, LightControlDetailPop },
   props: {},
   data() {
     return {
       filterForm: this.$form.createForm(this),
+      showSearchForm: false,
       Cons: {
         LightName
       },
       columns: [
         {
-          title: '项目名称',
-          dataIndex: 'projectName'
-        },
-        {
-          title: '网关名称',
-          dataIndex: 'gatewayName'
-        },
-        {
-          title: '编组名称',
-          dataIndex: 'groupName'
-        },
-        {
           title: '智能灯编号',
           dataIndex: 'lightId'
         },
         {
-          title: '审核状态',
-          dataIndex: 'approveStatus'
+          title: 'I路状态',
+          dataIndex: 'statusI'
         },
         {
-          title: '创建人',
-          dataIndex: 'createdBy'
+          title: 'II路状态',
+          dataIndex: 'statusII'
         },
         {
-          title: '创建时间',
-          dataIndex: 'createTime'
+          title: '网关状态',
+          dataIndex: 'gatewayStatus'
+        },
+        {
+          title: 'I路调光',
+          dataIndex: 'brightnessI'
+        },
+        {
+          title: 'II路调光',
+          dataIndex: 'brightnessII'
+        },
+        {
+          title: '电压/V',
+          dataIndex: 'voltage'
+        },
+        {
+          title: '电流/A',
+          dataIndex: 'eCurrent'
+        },
+        {
+          title: '频率',
+          dataIndex: 'frequency'
+        },
+        {
+          title: '功率因数',
+          dataIndex: 'powerFactor'
+        },
+        {
+          title: '日能耗/kWh',
+          dataIndex: 'dailyConsumption'
+        },
+        {
+          title: '更新时间',
+          dataIndex: 'updateTime'
         },
         {
           title: '操作',
@@ -151,13 +174,11 @@ export default {
       },
       loading: false,
       dataSource: null,
-      lightManageDetailPopVisible: false,
+      lightControlDetailPopVisible: false,
       isEdit: false,
       popReadonly: false,
       editId: '',
-      selectedRowKeys: [],
-      formItemLayout,
-      showSearchForm: false
+      selectedRowKeys: []
     }
   },
   computed: {},
@@ -176,7 +197,7 @@ export default {
     fetch(params = {}) {
       // 显示loading
       this.loading = true
-      this.$get('/light-control-center/light-manage/list', {
+      this.$get('/light-control-center/light-control/list', {
         ...params, type: 0
       }).then((r) => {
         const data = r.data
@@ -190,20 +211,20 @@ export default {
     },
     // 打开新建弹窗
     openCreate() {
-      this.lightManageDetailPopVisible = true
+      this.lightControlDetailPopVisible = true
     },
     // 打开编辑弹窗
     openEditPop(id) {
       this.editId = id
       this.isEdit = true
-      this.lightManageDetailPopVisible = true
+      this.lightControlDetailPopVisible = true
     },
     // 打开只读弹窗
     openReadonlyPop(id) {
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
-      this.lightManageDetailPopVisible = true
+      this.lightControlDetailPopVisible = true
     },
     // 编辑弹窗关闭
     handleEditPopClose() {
@@ -241,6 +262,9 @@ export default {
 
     },
     resetFilterForm() {
+
+    },
+    handleActionClick() {
 
     }
   }

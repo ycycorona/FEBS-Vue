@@ -22,6 +22,7 @@
                                  { required: true, message: '应用名称不能为空'}
                                ],
                                initialValue: formValues.project}]"
+                :open="!readonly"
                 palceholder="请输入应用名称"
               >
                 <a-select-option :value="0">项目1</a-select-option>
@@ -37,6 +38,7 @@
                                  { required: true, message: '编组名称不能为空'}
                                ],
                                initialValue: formValues.group}]"
+                :open="!readonly"
                 palceholder="请选择编组"
               >
                 <a-select-option :value="0">编组1</a-select-option>
@@ -54,6 +56,7 @@
                                  { required: true, message: '智能灯编号不能为空'}
                                ],
                                initialValue: formValues.lightId}]"
+                :read-only="readonly"
                 palceholder="请输入智能灯编号"
               />
 
@@ -68,6 +71,7 @@
                                ],
                                initialValue: formValues.lightShellId}]"
                 palceholder="请输入外壳编号"
+                :read-only="readonly"
               />
             </a-form-item>
           </a-col>
@@ -82,6 +86,7 @@
                                ],
                                initialValue: formValues.lightType}]"
                 palceholder="请选择智能灯类型"
+                :open="!readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
                 <a-select-option :value="1">2</a-select-option>
@@ -97,10 +102,40 @@
                                ],
                                initialValue: formValues.installType}]"
                 palceholder="请选择安装状态"
+                :open="!readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
                 <a-select-option :value="1">2</a-select-option>
               </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="I额定功率" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['powerI',
+                              {rules: [
+                                 { required: true, message: 'I额定功率不能为空'}
+                               ],
+                               initialValue: formValues.powerI}]"
+                palceholder="请输入I额定功率"
+                :read-only="readonly"
+              />
+
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="II额定功率" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['powerII',
+                              {rules: [
+                                 { required: true, message: 'II额定功率不能为空'}
+                               ],
+                               initialValue: formValues.powerI}]"
+                palceholder="请输入II额定功率"
+                :read-only="readonly"
+              />
             </a-form-item>
           </a-col>
         </a-row>
@@ -114,6 +149,7 @@
                                ],
                                initialValue: formValues.macAddress}]"
                 :input-num="8"
+                :readonly="readonly"
               ></multi-input>
             </a-form-item>
           </a-col>
@@ -128,6 +164,7 @@
                                ],
                                initialValue: formValues.jioabiaoCode}]"
                 :input-num="8"
+                :readonly="readonly"
               ></multi-input>
             </a-form-item>
           </a-col>
@@ -142,6 +179,7 @@
                                ],
                                initialValue: formValues.panId}]"
                 :input-num="8"
+                :readonly="readonly"
               ></multi-input>
             </a-form-item>
           </a-col>
@@ -156,10 +194,51 @@
                                ],
                                initialValue: formValues.channel}]"
                 palceholder=""
+                :read-only="readonly"
               />
             </a-form-item>
           </a-col>
         </a-row>
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="安装方向" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['installDirection',
+                              {rules: [
+                                 { required: true, message: '安装方向不能为空'}
+                               ],
+                               initialValue: formValues.installType}]"
+                palceholder="请选择安装方向"
+                :open="!readonly"
+              >
+                <a-select-option :value="0">左侧主路</a-select-option>
+                <a-select-option :value="1">右侧主路</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="24">
+            <a-form-item label="智能灯位置" v-bind="formItemLayout_1">
+              <position-input
+                v-decorator="['lightPosition',
+                              {rules: [
+                                 { required: true, message: '智能灯位置不能为空'}
+                               ],
+                               initialValue: formValues.lightPosition}]"
+                palceholder="请选择智能灯位置"
+                :readonly="readonly"
+                @change="positionChangeFromText"
+              ></position-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <PointerSelect
+          ref="positonSelect"
+          style="z-index:1"
+          :current-pointer="pointerSelectValue"
+          @change="positionChangeFromMap"
+        ></PointerSelect>
       </a-form>
     </a-spin>
     <div class="drawer-bootom-button">
@@ -167,15 +246,17 @@
         <a-button :loading="loading" style="margin-right: .8rem">取消</a-button>
       </a-popconfirm>
       <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
-      <a-button type="primary" :loading="loading" @click="test">测试</a-button>
+      <!-- <a-button type="primary" :loading="loading" @click="test">测试</a-button> -->
     </div>
   </a-drawer>
 </template>
 
 <script>
-import { LightName } from '@/config/LightConstant'
+import { LightName, BasePosition } from '@/config/LightConstant'
 import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
+import PointerSelect from '@/components/diyMap/PointerSelect'
+import PositionInput from './PositionInput'
 const titleOpt = [
   '添加' + LightName,
   '编辑' + LightName,
@@ -184,7 +265,7 @@ const titleOpt = [
 function formValueFormater() {
   return {
     project: 0,
-    group: 0,
+    group: '',
     lightId: '',
     lightShellId: '',
     lightType: '',
@@ -192,7 +273,11 @@ function formValueFormater() {
     macAddress: createArrayFromNum(8, 0),
     jioabiaoCode: createArrayFromNum(12, 0),
     panId: createArrayFromNum(8, 0),
-    channel: ''
+    channel: '',
+    powerI: '',
+    powerII: '',
+    installDirection: '',
+    lightPosition: BasePosition
   }
 }
 let counter = 0
@@ -206,7 +291,7 @@ const formItemLayout_1 = {
 }
 export default {
   name: 'LightManageDetailPop',
-  components: { MultiInput },
+  components: { MultiInput, PointerSelect, PositionInput },
   props: {
     visible: {
       default: false,
@@ -219,16 +304,22 @@ export default {
     editId: {
       default: '',
       type: [String, Number]
+    },
+    readonly: {
+      default: false,
+      type: Boolean
     }
   },
   data() {
+    const formValues = formValueFormater()
     return {
       form: this.$form.createForm(this),
       titleOpt,
-      formValues: formValueFormater(),
+      formValues,
       loading: false,
       formItemLayout, formItemLayout_1,
-      rawDetail: null
+      rawDetail: null,
+      pointerSelectValue: formValues.lightPosition
     }
   },
   computed: {
@@ -241,10 +332,8 @@ export default {
         if (newVal) {
         // 显示
           if (this.isEdit) {
-            const rawDetail = this.rawDetail = await this.getDetail()
-            this.$set(this.formValues.appName, 0, rawDetail.appName)
-            this.$set(this.formValues.packageName, 0, rawDetail.packageName)
-            this.$set(this.formValues.description, 0, rawDetail.description)
+            // const rawDetail = this.rawDetail = await this.getDetail()
+            this.$set(this.formValues, 'macAddress', [2, 2, 2, 2, 2, 2, 2, 2])
           }
         } else {
         // 销毁
@@ -265,6 +354,30 @@ export default {
     test() {
       console.log(this.form.getFieldsValue())
     },
+    // 智能灯经纬度改变 从地图
+    positionChangeFromMap([lng, lat]) {
+      this.form.setFieldsValue({ lightPosition: [lng, lat] })
+    },
+    // 智能灯经纬度改变 从input
+    positionChangeFromText([lng, lat]) {
+      console.log(lng, lat)
+      if (!this.validateX(lng)) { return }
+      if (!this.validateY(lat)) { return }
+
+      this.pointerSelectValue = [lng, lat]
+    },
+    validateX(x) {
+      if (isNaN(x) || x === '') { return false }
+      // if (Math.abs(Number(x)) === 0) { return false }
+      if (Math.abs(Number(x)) >= 180) { return false }
+      return true
+    },
+    validateY(y) {
+      if (isNaN(y) || y === '') { return false }
+      // if (Math.abs(Number(y)) === 0) { return false }
+      if (Math.abs(Number(y)) >= 90) { return false }
+      return true
+    },
     onClose() {
       this.reset()
       this.$emit('close')
@@ -275,6 +388,7 @@ export default {
       this.$emit('update:visible', false)
       this.$emit('update:isEdit', false)
       this.$emit('update:editId', '')
+      this.$emit('update:popReadonly', false)
     },
     getDetail() {
       this.loading = true
@@ -309,47 +423,38 @@ export default {
       this.$emit('success')
     },
     createSave(formValues) {
-      const paramsList = []
-      const keys = formValues.keys
-      keys.forEach(key => {
-        paramsList.push({
-          appName: formValues.appName[key],
-          description: formValues.description[key],
-          packageName: formValues.packageName[key],
-          type: 0
-        })
-      })
-      console.log(paramsList)
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-          jsonString: JSON.stringify(paramsList)
-        }).then(r => {
-          this.$message.info('新增应用黑名单成功')
-          resolve(r.data.data)
-        })
-          .finally(() => {
-            this.loading = false
-          })
-      })
+      const params = []
+
+      // this.loading = true
+      // return new Promise((resolve, reject) => {
+      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
+      //     jsonString: JSON.stringify(params)
+      //   }).then(r => {
+      //     this.$message.info('新增应用黑名单成功')
+      //     resolve(r.data.data)
+      //   })
+      //     .finally(() => {
+      //       this.loading = false
+      //     })
+      // })
     },
     editSave(id, formValues) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$post('/business/black-white-app/updateBlackWhiteApp', {
-          id,
-          appName: formValues.appName[0],
-          description: formValues.description[0],
-          packageName: formValues.packageName[0],
-          type: 0
-        }).then(r => {
-          this.$message.info('修改应用黑名单成功')
-          resolve(r.data.data)
-        })
-          .finally(() => {
-            this.loading = false
-          })
-      })
+      // this.loading = true
+      // return new Promise((resolve, reject) => {
+      //   this.$post('/business/black-white-app/updateBlackWhiteApp', {
+      //     id,
+      //     appName: formValues.appName[0],
+      //     description: formValues.description[0],
+      //     packageName: formValues.packageName[0],
+      //     type: 0
+      //   }).then(r => {
+      //     this.$message.info('修改应用黑名单成功')
+      //     resolve(r.data.data)
+      //   })
+      //     .finally(() => {
+      //       this.loading = false
+      //     })
+      // })
     },
     validateFields(arr = []) {
       let fieldnames
@@ -404,5 +509,8 @@ export default {
 }
 .ant-divider-horizontal {
   margin: 12px 0;
+}
+.drawer-bootom-button {
+  z-index: 10;
 }
 </style>

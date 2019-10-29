@@ -5,6 +5,7 @@
       :key="n"
       :value="localValue[n-1]"
       class="input-width"
+      :read-only="readonly"
       @change="inputValueChange(arguments[0], n)"
     />
   </span>
@@ -22,6 +23,10 @@ export default {
     },
     value: {
       type: Array
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

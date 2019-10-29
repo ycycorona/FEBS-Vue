@@ -39,7 +39,7 @@
       </a-form>
       <a-tabs default-active-key="controlTab" class="full-width-tab" @change="onTabChange">
         <a-tab-pane key="controlTab" :tab="currentControlDeviceName + '控制'">
-          kongzhi
+          <LightControlTab></LightControlTab>
         </a-tab-pane>
         <a-tab-pane key="manageTab" :tab="currentControlDeviceName + '管理'">
           <LightManageTab></LightManageTab>
@@ -53,10 +53,11 @@
 
 import SingleMenuWrap from '@/views/common/SingleMenuWrap'
 import LightManageTab from './components/LightManageTab/LightManageTab'
+import LightControlTab from './components/LightControlTab/LightControlTab'
 import { LightName, GatewayName } from '@/config/LightConstant'
 export default {
   name: 'LightControlCenterIndex',
-  components: { SingleMenuWrap, LightManageTab },
+  components: { SingleMenuWrap, LightManageTab, LightControlTab },
   props: {
 
   },
@@ -100,7 +101,7 @@ export default {
       // 显示loading
       this.loading = true
       this.loading = false
-      console.log(params)
+      // console.log(params)
       // this.$get('/business/alarm/getAlarmListByPage', {
       //   ...params
       // })
