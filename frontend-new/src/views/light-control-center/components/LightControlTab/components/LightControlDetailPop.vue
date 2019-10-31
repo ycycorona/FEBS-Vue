@@ -281,9 +281,9 @@ export default {
   right: 103px;
   transform: translateY(-33px);
 }
-.ant-divider-horizontal {
-  margin: 12px 0;
-}
+// .ant-divider-horizontal {
+//   margin: 12px 0;
+// }
 .drawer-bootom-button {
   z-index: 10;
 }

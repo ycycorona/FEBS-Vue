@@ -20,10 +20,10 @@
           <a-button :disabled="selectedRowKeys.length===0" type="primary">审核{{ Cons.LightName }}</a-button>
         </a-popconfirm>
         <a-dropdown>
-          <a-menu slot="overlay" @click="handleActionClick">
-            <a-menu-item key="1">开关灯模式</a-menu-item>
-            <a-menu-item key="2">手动模式开关灯功率</a-menu-item>
-            <a-menu-item key="3">调光策略</a-menu-item>
+          <a-menu slot="overlay" @click="handleCommandClick">
+            <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
+            <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
+            <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
             <a-menu-item key="4">时间校准</a-menu-item>
             <a-menu-item key="5">单灯校表</a-menu-item>
             <a-menu-item key="6">经纬度修改</a-menu-item>
@@ -88,6 +88,17 @@
         @close="handleEditPopClose"
         @success="handleEditPopSuccess"
       ></LightControlDetailPop>
+      <CommonDrawerWrap
+        :draw-width="800"
+        :visible.sync="lightCommandPopVisible"
+        :draw-title="currentCommandTitle"
+        @close="handleCommandPopClose"
+        @success="handleCommandPopSuccess"
+      >
+        <template v-slot:default>
+          <component :is="currentCommandPop"></component>
+        </template>
+      </CommonDrawerWrap>
     </div>
   </a-spin>
 </template>
@@ -95,12 +106,27 @@
 <script>
 import IconEdit from '@/components/icons/IconEdit'
 import LightControlDetailPop from './components/LightControlDetailPop'
+import CommonDrawerWrap from './components/CommonDrawerWrap'
+import LightControlType from './components/commandPopContent/LightControlType'
+import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
+import LightControlStrategy from './components/commandPopContent/LightControlStrategy'
+
+const commandPopMap = {
+  'LightControlType': LightControlType,
+  'LightControlManualPower': LightControlManualPower,
+  'LightControlStrategy': LightControlStrategy
+}
+const commandPopTitleMap = {
+  'LightControlType': '开关灯模式',
+  'LightControlManualPower': '手动开关灯功率',
+  'LightControlStrategy': '调光策略设置'
+}
 
 // import { configSerialize } from '@/utils/common'
 import { LightName } from '@/config/LightConstant'
 export default {
   name: 'LightControlTab',
-  components: { IconEdit, LightControlDetailPop },
+  components: { IconEdit, LightControlDetailPop, CommonDrawerWrap },
   props: {},
   data() {
     return {
@@ -175,10 +201,13 @@ export default {
       loading: false,
       dataSource: null,
       lightControlDetailPopVisible: false,
+      lightCommandPopVisible: false,
       isEdit: false,
       popReadonly: false,
       editId: '',
-      selectedRowKeys: []
+      selectedRowKeys: [],
+      currentCommandPop: null,
+      currentCommandTitle: ''
     }
   },
   computed: {},
@@ -252,6 +281,7 @@ export default {
         //   })
       })
     },
+    // 通过审核
     doApprove() {
 
     },
@@ -264,8 +294,19 @@ export default {
     resetFilterForm() {
 
     },
-    handleActionClick() {
+    // 选择命令 打开弹窗
+    handleCommandClick({ key }) {
+      this.currentCommandPop = commandPopMap[key]
+      this.currentCommandTitle = commandPopTitleMap[key]
+      this.lightCommandPopVisible = true
+    },
+    // 命令弹窗关闭
+    handleCommandPopClose() {
 
+    },
+    // 命令执行成功
+    handleCommandPopSuccess() {
+      this.fetch({ pageSize: 10, pageNum: 1 })
     }
   }
 }

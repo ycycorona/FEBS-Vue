@@ -1,26 +1,28 @@
 <template>
   <div class="select-range-time">
-    <a-row :gutter="24">
+    <a-row :gutter="0">
       <a-col :span="11" style="text-align:center">
         <a-time-picker
           :disabled="disabled"
           style="width:100%"
           :disabled-hours="getDisabledStartHours"
           :disabled-minutes="getDisabledStartMinutes"
-          :default-value="moment(startTime, 'HH:mm')"
-          format="HH:mm"
+          :disabled-seconds="getDisabledStartSeconds"
+          :default-value="moment(startTime, format)"
+          :format="format"
           @change="(val,dateStrings)=>changeTime(val,dateStrings,'startTime')"
         />
       </a-col>
-      <a-col :span="2" style="text-align:center;">至</a-col>
+      <a-col :span="2" style="text-align:center;">{{ divide }}</a-col>
       <a-col :span="11" style="text-align:center">
         <a-time-picker
           :disabled="disabled"
           style="width:100%"
           :disabled-hours="getDisabledEndHours"
           :disabled-minutes="getDisabledEndMinutes"
-          :default-value="moment(endTime, 'HH:mm')"
-          format="HH:mm"
+          :disabled-seconds="getDisabledEndSeconds"
+          :default-value="moment(endTime, format)"
+          :format="format"
           @change="(val,dateStrings)=>changeTime(val,dateStrings,'endTime')"
         />
       </a-col>
@@ -37,9 +39,17 @@ export default {
     event: 'change'
   },
   props: {
+    format: {
+      type: String,
+      default: 'HH:mm'
+    },
+    divide: {
+      type: String,
+      default: '至'
+    },
     startTimeLimit: {
       type: String,
-      default: '00:01'
+      default: '00:00:01'
     },
     value: {
       type: Array
@@ -92,6 +102,17 @@ export default {
       }
       return minutes
     },
+    getDisabledEndSeconds(selectedHour, selectedMinute) {
+      const time = this.startTime
+      const timeArr = time.split(':')
+      const seconds = []
+      if (selectedHour === parseInt(timeArr[0]) && selectedMinute === parseInt(timeArr[1])) {
+        for (let i = 0; i < parseInt(timeArr[2]); i++) {
+          seconds.push(i)
+        }
+      }
+      return seconds
+    },
     getDisabledStartHours() {
       const hours = []
       const time = this.startTimeLimit
@@ -111,6 +132,17 @@ export default {
         }
       }
       return minutes
+    },
+    getDisabledStartSeconds(selectedHour, selectedMinute) {
+      const time = this.startTimeLimit
+      const timeArr = time.split(':')
+      const seconds = []
+      if (selectedHour === parseInt(timeArr[0]) && selectedMinute === parseInt(timeArr[1])) {
+        for (let i = 0; i < parseInt(timeArr[2]); i++) {
+          seconds.push(i)
+        }
+      }
+      return seconds
     }
   }
 }
