@@ -24,8 +24,8 @@
             <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
             <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
             <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
-            <a-menu-item key="4">时间校准</a-menu-item>
-            <a-menu-item key="5">单灯校表</a-menu-item>
+            <a-menu-item key="LightTimeSync">时间校准</a-menu-item>
+            <a-menu-item key="singleLightJiaoBiao">单灯校表</a-menu-item>
             <a-menu-item key="6">经纬度修改</a-menu-item>
             <a-menu-item key="7">PANID修改</a-menu-item>
             <a-menu-item key="8">频道修改</a-menu-item>
@@ -99,6 +99,14 @@
           <component :is="currentCommandPop"></component>
         </template>
       </CommonDrawerWrap>
+      <a-modal
+        title="单灯校表"
+        :visible="lightJiaoBiaoModalVisible"
+        @ok="commitLightJiaoBiao"
+        @cancel="lightJiaoBiaoModalVisible=false"
+      >
+        <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
+      </a-modal>
     </div>
   </a-spin>
 </template>
@@ -110,16 +118,19 @@ import CommonDrawerWrap from './components/CommonDrawerWrap'
 import LightControlType from './components/commandPopContent/LightControlType'
 import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
 import LightControlStrategy from './components/commandPopContent/LightControlStrategy'
+import LightTimeSync from './components/commandPopContent/LightTimeSync'
 
 const commandPopMap = {
   'LightControlType': LightControlType,
   'LightControlManualPower': LightControlManualPower,
-  'LightControlStrategy': LightControlStrategy
+  'LightControlStrategy': LightControlStrategy,
+  'LightTimeSync': LightTimeSync
 }
 const commandPopTitleMap = {
   'LightControlType': '开关灯模式',
   'LightControlManualPower': '手动开关灯功率',
-  'LightControlStrategy': '调光策略设置'
+  'LightControlStrategy': '调光策略设置',
+  'LightTimeSync': '时间校准'
 }
 
 // import { configSerialize } from '@/utils/common'
@@ -132,6 +143,7 @@ export default {
     return {
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
+      lightJiaoBiaoModalVisible: false,
       Cons: {
         LightName
       },
@@ -296,6 +308,11 @@ export default {
     },
     // 选择命令 打开弹窗
     handleCommandClick({ key }) {
+      // 单灯校表
+      if (key === 'singleLightJiaoBiao') {
+        this.lightJiaoBiaoModalVisible = true
+        return
+      }
       this.currentCommandPop = commandPopMap[key]
       this.currentCommandTitle = commandPopTitleMap[key]
       this.lightCommandPopVisible = true
@@ -307,6 +324,10 @@ export default {
     // 命令执行成功
     handleCommandPopSuccess() {
       this.fetch({ pageSize: 10, pageNum: 1 })
+    },
+    commitLightJiaoBiao() {
+      // todo 提交jiaobiao
+      this.lightJiaoBiaoModalVisible = false
     }
   }
 }

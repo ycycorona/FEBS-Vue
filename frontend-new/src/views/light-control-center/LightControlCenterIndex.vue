@@ -9,29 +9,38 @@
               label="项目"
             >
               <a-select
-                v-decorator="['project']"
-
+                v-model="currentProject"
                 placeholder="请选择项目"
-                allow-clear
               >
                 <a-select-option :value="0">项目1</a-select-option>
                 <a-select-option :value="1">项目2</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :span="8" :xl="6">
+          <a-col :span="4" :xl="3">
             <a-form-item
               label="设备"
             >
               <a-select
-                v-decorator="['deviceType', {
-                  initialValue: 0
-                }]"
+                v-model="currentDeviceType"
                 placeholder="请选择设备类型"
-                allow-clear
               >
                 <a-select-option :value="0">智能灯</a-select-option>
                 <a-select-option :value="1">网关</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col v-if="currentDeviceType===0" :span="8" :xl="6">
+            <a-form-item
+              label="编组"
+            >
+              <a-select
+                v-model="currentGroup"
+                placeholder="请选择编组"
+              >
+                <a-select-option :value="0">全部</a-select-option>
+                <a-select-option :value="1">编组1</a-select-option>
+                <a-select-option :value="2">编组2</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -66,6 +75,9 @@ export default {
       Cons: {
         LightName, GatewayName
       },
+      currentProject: 0,
+      currentDeviceType: 0,
+      currentGroup: 0,
       functionSelectForm: this.$form.createForm(this),
       loading: false,
       strategyOpt: [],
@@ -76,7 +88,12 @@ export default {
 
   },
   watch: {
+    currentProject(newVal, oldVal) {
+      console.log(newVal, oldVal)
+    },
+    currentDeviceType(newVal, oldVal) {
 
+    }
   },
   async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })

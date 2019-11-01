@@ -78,7 +78,7 @@
         :visible.sync="lightManageDetailPopVisible"
         :is-edit.sync="isEdit"
         :edit-id.sync="editId"
-        :pop-readonly.sync="popReadonly"
+        :readonly.sync="popReadonly"
         @close="handleEditPopClose"
         @success="handleEditPopSuccess"
       ></LightManageDetailPop>

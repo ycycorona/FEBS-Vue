@@ -2,40 +2,22 @@
   <a-spin :spinning="loading">
     <a-form :form="form">
       <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="I路" v-bind="formItemLayout">
-            <a-radio-group
-              v-decorator="['typeI',
+        <a-col :span="24">
+          <a-form-item label="校准系统时间" v-bind="formItemLayout">
+            <a-date-picker
+              v-decorator="['sysDateTime',
                             {rules: [
-
+                               { required: true, message: '时间不能为空'}
                              ],
-                             initialValue: formValues.typeI}]"
-            >
-              <a-radio :style="radioStyle" :value="1">开灯</a-radio>
-              <a-radio :style="radioStyle" :value="2">关灯</a-radio>
-              <a-radio :style="radioStyle" :value="3">启用</a-radio>
-              <a-radio :style="radioStyle" :value="4">禁用</a-radio>
-              <a-radio :style="radioStyle" :value="5">定时</a-radio>
-              <a-radio :style="radioStyle" :value="6">经纬度</a-radio>
-            </a-radio-group>
+                             initialValue: formValues.sysDateTime}]"
+              format="YYYY-MM-DD HH:mm:ss"
+              :show-time="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
+            />
           </a-form-item>
         </a-col>
-        <a-col :span="12">
-          <a-form-item label="II路" v-bind="formItemLayout">
-            <a-radio-group
-              v-decorator="['typeII',
-                            {rules: [
-
-                             ],
-                             initialValue: formValues.typeII}]"
-            >
-              <a-radio :style="radioStyle" :value="1">开灯</a-radio>
-              <a-radio :style="radioStyle" :value="2">关灯</a-radio>
-              <a-radio :style="radioStyle" :value="3">启用</a-radio>
-              <a-radio :style="radioStyle" :value="4">禁用</a-radio>
-              <a-radio :style="radioStyle" :value="5">定时</a-radio>
-              <a-radio :style="radioStyle" :value="6">经纬度</a-radio>
-            </a-radio-group>
+        <a-col :span="24">
+          <a-form-item label="" v-bind="formItemLayout_1">
+            <a-button @click="getLocalDate">同步本地时间</a-button>
           </a-form-item>
         </a-col>
       </a-row>
@@ -43,18 +25,24 @@
   </a-spin>
 </template>
 <script>
+import moment from 'moment'
+import PointerSelect from '@/components/diyMap/PointerSelect'
+import PositionInput from './PositionInput'
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 18 }
+  labelCol: { span: 5 },
+  wrapperCol: { span: 19 }
+}
+const formItemLayout_1 = {
+  labelCol: { span: 0 },
+  wrapperCol: { offset: 5, span: 19 }
 }
 function formValueFormater() {
   return {
-    typeI: 1,
-    typeII: 1
+    sysDateTime: null
   }
 }
 export default {
-  name: 'LightControlType',
+  name: 'LightPosition',
   components: { },
   props: {
 
@@ -62,15 +50,11 @@ export default {
   data() {
     const formValues = formValueFormater()
     return {
+      moment,
       loading: false,
-      formItemLayout,
+      formItemLayout, formItemLayout_1,
       formValues,
-      form: this.$form.createForm(this),
-      radioStyle: {
-        display: 'block',
-        height: '39px',
-        lineHeight: '39px'
-      }
+      form: this.$form.createForm(this)
     }
   },
   computed: {
@@ -121,6 +105,9 @@ export default {
         }
       })
       return validateFlag
+    },
+    getLocalDate() {
+      this.form.setFieldsValue({ 'sysDateTime': moment(new Date()) })
     }
   }
 }

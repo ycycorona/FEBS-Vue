@@ -22,8 +22,8 @@
                                  { required: true, message: '应用名称不能为空'}
                                ],
                                initialValue: formValues.project}]"
-                :open="!readonly"
                 palceholder="请输入应用名称"
+                @dropdownVisibleChange="test"
               >
                 <a-select-option :value="0">项目1</a-select-option>
                 <a-select-option :value="1">项目2</a-select-option>
@@ -38,7 +38,7 @@
                                  { required: true, message: '编组名称不能为空'}
                                ],
                                initialValue: formValues.group}]"
-                :open="!readonly"
+                :disabled="readonly"
                 palceholder="请选择编组"
               >
                 <a-select-option :value="0">编组1</a-select-option>
@@ -86,7 +86,7 @@
                                ],
                                initialValue: formValues.lightType}]"
                 palceholder="请选择智能灯类型"
-                :open="!readonly"
+                :disabled="readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
                 <a-select-option :value="1">2</a-select-option>
@@ -102,7 +102,7 @@
                                ],
                                initialValue: formValues.installType}]"
                 palceholder="请选择安装状态"
-                :open="!readonly"
+                :disabled="readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
                 <a-select-option :value="1">2</a-select-option>
@@ -209,7 +209,7 @@
                                ],
                                initialValue: formValues.installType}]"
                 palceholder="请选择安装方向"
-                :open="!readonly"
+                :disabled="readonly"
               >
                 <a-select-option :value="0">左侧主路</a-select-option>
                 <a-select-option :value="1">右侧主路</a-select-option>
@@ -351,8 +351,8 @@ export default {
     }, 6000)
   },
   methods: {
-    test() {
-      console.log(this.form.getFieldsValue())
+    test(x) {
+      console.log(x)
     },
     // 智能灯经纬度改变 从地图
     positionChangeFromMap([lng, lat]) {
@@ -423,7 +423,7 @@ export default {
       this.$emit('success')
     },
     createSave(formValues) {
-      const params = []
+      // const params = []
 
       // this.loading = true
       // return new Promise((resolve, reject) => {
