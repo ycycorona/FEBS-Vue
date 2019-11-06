@@ -256,7 +256,7 @@ import { LightName, BasePosition } from '@/config/LightConstant'
 import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
 import PointerSelect from '@/components/diyMap/PointerSelect'
-import PositionInput from './PositionInput'
+import PositionInput from '@/components/diyMap/PositionInput'
 const titleOpt = [
   '添加' + LightName,
   '编辑' + LightName,

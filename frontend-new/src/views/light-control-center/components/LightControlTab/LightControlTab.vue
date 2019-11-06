@@ -25,13 +25,13 @@
             <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
             <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
             <a-menu-item key="LightTimeSync">时间校准</a-menu-item>
-            <a-menu-item key="singleLightJiaoBiao">单灯校表</a-menu-item>
-            <a-menu-item key="6">经纬度修改</a-menu-item>
-            <a-menu-item key="7">PANID修改</a-menu-item>
-            <a-menu-item key="8">频道修改</a-menu-item>
-            <a-menu-item key="9">报警阈修改</a-menu-item>
-            <a-menu-item key="10">红外触发参数设置</a-menu-item>
-            <a-menu-item key="11">强制删除</a-menu-item>
+            <a-menu-item key="SingleLightJiaoBiao">单灯校表</a-menu-item>
+            <a-menu-item key="LightPosition">经纬度修改</a-menu-item>
+            <a-menu-item key="LightPanId">PANID修改</a-menu-item>
+            <a-menu-item key="LightChannel">频道修改</a-menu-item>
+            <a-menu-item key="AlarmThreshold">报警阈修改</a-menu-item>
+            <a-menu-item key="InfraredParams">红外触发参数设置</a-menu-item>
+            <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item>
           </a-menu>
           <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
         </a-dropdown>
@@ -107,6 +107,14 @@
       >
         <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
       </a-modal>
+      <a-modal
+        title="强制删除"
+        :visible="forceDeleteModalVisible"
+        @ok="commitForceDelete"
+        @cancel="forceDeleteModalVisible=false"
+      >
+        <p>确定要删除所选智能灯?</p>
+      </a-modal>
     </div>
   </a-spin>
 </template>
@@ -119,18 +127,33 @@ import LightControlType from './components/commandPopContent/LightControlType'
 import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
 import LightControlStrategy from './components/commandPopContent/LightControlStrategy'
 import LightTimeSync from './components/commandPopContent/LightTimeSync'
+import LightPosition from './components/commandPopContent/LightPosition'
+import LightPanId from './components/commandPopContent/LightPanId'
+import LightChannel from './components/commandPopContent/LightChannel'
+import AlarmThreshold from './components/commandPopContent/AlarmThreshold'
+import InfraredParams from './components/commandPopContent/InfraredParams'
 
 const commandPopMap = {
   'LightControlType': LightControlType,
   'LightControlManualPower': LightControlManualPower,
   'LightControlStrategy': LightControlStrategy,
-  'LightTimeSync': LightTimeSync
+  'LightTimeSync': LightTimeSync,
+  'LightPosition': LightPosition,
+  'LightPanId': LightPanId,
+  'LightChannel': LightChannel,
+  'AlarmThreshold': AlarmThreshold,
+  'InfraredParams': InfraredParams
 }
 const commandPopTitleMap = {
   'LightControlType': '开关灯模式',
   'LightControlManualPower': '手动开关灯功率',
   'LightControlStrategy': '调光策略设置',
-  'LightTimeSync': '时间校准'
+  'LightTimeSync': '时间校准',
+  'LightPosition': '经纬度修改',
+  'LightPanId': 'PANID修改',
+  'LightChannel': '频道修改',
+  'AlarmThreshold': '报警阈修改',
+  'InfraredParams': '红外触发参数设置'
 }
 
 // import { configSerialize } from '@/utils/common'
@@ -144,6 +167,7 @@ export default {
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
       lightJiaoBiaoModalVisible: false,
+      forceDeleteModalVisible: false,
       Cons: {
         LightName
       },
@@ -309,8 +333,12 @@ export default {
     // 选择命令 打开弹窗
     handleCommandClick({ key }) {
       // 单灯校表
-      if (key === 'singleLightJiaoBiao') {
+      if (key === 'SingleLightJiaoBiao') {
         this.lightJiaoBiaoModalVisible = true
+        return
+      }
+      if (key === 'ForceDelete') {
+        this.forceDeleteModalVisible = true
         return
       }
       this.currentCommandPop = commandPopMap[key]
@@ -328,6 +356,10 @@ export default {
     commitLightJiaoBiao() {
       // todo 提交jiaobiao
       this.lightJiaoBiaoModalVisible = false
+    },
+    // 强制删除智能灯
+    commitForceDelete() {
+      this.forceDeleteModalVisible = false
     }
   }
 }

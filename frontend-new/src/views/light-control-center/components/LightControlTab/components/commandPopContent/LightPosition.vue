@@ -3,31 +3,33 @@
     <a-form :form="form">
       <a-row :gutter="12">
         <a-col :span="24">
-          <a-form-item label="校准系统时间" v-bind="formItemLayout">
-            <a-date-picker
-              v-decorator="['sysDateTime',
+          <a-form-item label="智能灯位置" v-bind="formItemLayout">
+            <position-input
+              v-decorator="['lightPosition',
                             {rules: [
-                               { required: true, message: '时间不能为空'}
+                               { required: true, message: '智能灯位置不能为空'}
                              ],
-                             initialValue: formValues.sysDateTime}]"
-              format="YYYY-MM-DD HH:mm:ss"
-              :show-time="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label="" v-bind="formItemLayout_1">
-            <a-button @click="getLocalDate">同步本地时间</a-button>
+                             initialValue: formValues.lightPosition}]"
+              palceholder="请选择智能灯位置"
+              @change="positionChangeFromText"
+            ></position-input>
           </a-form-item>
         </a-col>
       </a-row>
+      <PointerSelect
+        ref="positonSelect"
+        style="z-index:1"
+        :current-pointer="pointerSelectValue"
+        @change="positionChangeFromMap"
+      ></PointerSelect>
     </a-form>
   </a-spin>
 </template>
 <script>
+import { BasePosition } from '@/config/LightConstant'
 import moment from 'moment'
 import PointerSelect from '@/components/diyMap/PointerSelect'
-import PositionInput from './PositionInput'
+import PositionInput from '@/components/diyMap/PositionInput'
 const formItemLayout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 }
@@ -38,23 +40,25 @@ const formItemLayout_1 = {
 }
 function formValueFormater() {
   return {
-    sysDateTime: null
+    lightPosition: BasePosition
   }
 }
 export default {
   name: 'LightPosition',
-  components: { },
+  components: { PointerSelect, PositionInput },
   props: {
 
   },
   data() {
     const formValues = formValueFormater()
     return {
+      BasePosition,
       moment,
       loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      pointerSelectValue: formValues.lightPosition
     }
   },
   computed: {
@@ -67,6 +71,30 @@ export default {
     this.$store.commit('contact/setCurrentPopContent', this)
   },
   methods: {
+    // 智能灯经纬度改变 从地图
+    positionChangeFromMap([lng, lat]) {
+      this.form.setFieldsValue({ lightPosition: [lng, lat] })
+    },
+    // 智能灯经纬度改变 从input
+    positionChangeFromText([lng, lat]) {
+      console.log(lng, lat)
+      if (!this.validateX(lng)) { return }
+      if (!this.validateY(lat)) { return }
+
+      this.pointerSelectValue = [lng, lat]
+    },
+    validateX(x) {
+      if (isNaN(x) || x === '') { return false }
+      // if (Math.abs(Number(x)) === 0) { return false }
+      if (Math.abs(Number(x)) >= 180) { return false }
+      return true
+    },
+    validateY(y) {
+      if (isNaN(y) || y === '') { return false }
+      // if (Math.abs(Number(y)) === 0) { return false }
+      if (Math.abs(Number(y)) >= 90) { return false }
+      return true
+    },
     async handleSubmit() {
       if (!this.validateFields()) {
         return false

@@ -32,7 +32,7 @@ import { LightName, BasePosition } from '@/config/LightConstant'
 import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
 import PointerSelect from '@/components/diyMap/PointerSelect'
-import PositionInput from '@/views/light-control-center/components/LightManageTab/components/PositionInput'
+import PositionInput from '@/components/diyMap/PositionInput'
 const titleOpt = [
   LightName + '状态'
 ]

@@ -71,7 +71,6 @@
         <template slot="operation" slot-scope="record">
           <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
           <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
-
         </template>
       </a-table>
       <LightManageDetailPop
