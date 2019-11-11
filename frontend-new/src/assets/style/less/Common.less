@@ -35,6 +35,9 @@ span {
   &.padding-right {
     padding-right: 5px
   }
+  &.padding-left {
+    padding-left: 5px
+  }
 }
 
 
@@ -259,3 +262,18 @@ span.normal-click, .normal-click {
   padding-right: 2px;
 }
 
+// readonly
+.ant-select-disabled.readonly .ant-select-selection {
+  background: #fff;
+  cursor: pointer;
+}
+.ant-select-disabled.readonly {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+span.readonly .ant-time-picker-input[disabled] {
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
+}

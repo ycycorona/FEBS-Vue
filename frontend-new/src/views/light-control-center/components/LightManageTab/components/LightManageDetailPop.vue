@@ -22,8 +22,8 @@
                                  { required: true, message: '应用名称不能为空'}
                                ],
                                initialValue: formValues.project}]"
-                palceholder="请输入应用名称"
-                @dropdownVisibleChange="test"
+                :class="{'readonly': readonly}"
+                :disabled="readonly"
               >
                 <a-select-option :value="0">项目1</a-select-option>
                 <a-select-option :value="1">项目2</a-select-option>
@@ -38,6 +38,7 @@
                                  { required: true, message: '编组名称不能为空'}
                                ],
                                initialValue: formValues.group}]"
+                :class="{'readonly': readonly}"
                 :disabled="readonly"
                 palceholder="请选择编组"
               >
@@ -57,7 +58,6 @@
                                ],
                                initialValue: formValues.lightId}]"
                 :read-only="readonly"
-                palceholder="请输入智能灯编号"
               />
 
             </a-form-item>
@@ -70,7 +70,6 @@
                                  { required: true, message: '外壳编号不能为空'}
                                ],
                                initialValue: formValues.lightShellId}]"
-                palceholder="请输入外壳编号"
                 :read-only="readonly"
               />
             </a-form-item>
@@ -85,7 +84,7 @@
                                  { required: true, message: '智能灯类型不能为空'}
                                ],
                                initialValue: formValues.lightType}]"
-                palceholder="请选择智能灯类型"
+                :class="{'readonly': readonly}"
                 :disabled="readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
@@ -101,7 +100,7 @@
                                  { required: true, message: '安装状态不能为空'}
                                ],
                                initialValue: formValues.installType}]"
-                palceholder="请选择安装状态"
+                :class="{'readonly': readonly}"
                 :disabled="readonly"
               >
                 <a-select-option :value="0">1</a-select-option>
@@ -119,7 +118,6 @@
                                  { required: true, message: 'I额定功率不能为空'}
                                ],
                                initialValue: formValues.powerI}]"
-                palceholder="请输入I额定功率"
                 :read-only="readonly"
               />
 
@@ -133,7 +131,6 @@
                                  { required: true, message: 'II额定功率不能为空'}
                                ],
                                initialValue: formValues.powerI}]"
-                palceholder="请输入II额定功率"
                 :read-only="readonly"
               />
             </a-form-item>
@@ -193,7 +190,6 @@
                                  { required: true, message: '频道不能为空'}
                                ],
                                initialValue: formValues.channel}]"
-                palceholder=""
                 :read-only="readonly"
               />
             </a-form-item>
@@ -208,7 +204,7 @@
                                  { required: true, message: '安装方向不能为空'}
                                ],
                                initialValue: formValues.installType}]"
-                palceholder="请选择安装方向"
+                :class="{'readonly': readonly}"
                 :disabled="readonly"
               >
                 <a-select-option :value="0">左侧主路</a-select-option>
@@ -346,14 +342,11 @@ export default {
 
   },
   mounted() {
-    setTimeout(() => {
-      this.$set(this.formValues.macAddress, 0, 10)
-    }, 6000)
+    // setTimeout(() => {
+    //   this.$set(this.formValues.macAddress, 0, 10)
+    // }, 6000)
   },
   methods: {
-    test(x) {
-      console.log(x)
-    },
     // 智能灯经纬度改变 从地图
     positionChangeFromMap([lng, lat]) {
       this.form.setFieldsValue({ lightPosition: [lng, lat] })
@@ -388,7 +381,7 @@ export default {
       this.$emit('update:visible', false)
       this.$emit('update:isEdit', false)
       this.$emit('update:editId', '')
-      this.$emit('update:popReadonly', false)
+      this.$emit('update:readonly', false)
     },
     getDetail() {
       this.loading = true

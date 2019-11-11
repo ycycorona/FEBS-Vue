@@ -1,25 +1,29 @@
 <template>
   <a-spin :spinning="loading">
-    <div class="light-control-list-tab">
+    <div class="gateway-list-tab">
+      <!-- 添加按钮 -->
+      <div class="float-add-btn">
+        <a-button
+          type="primary"
+          style="border-radius:45px!important;"
+          @click="openCreate"
+        >
+          <a-icon type="plus" /><span style="margin-left: 3px;">添加{{ Cons.GatewayName }}</span>
+        </a-button>
+      </div>
       <!-- 操作按钮 -->
       <div style="margin-bottom:10px" class="">
         <a-dropdown>
           <a-menu slot="overlay" @click="handleCommandClick">
-            <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
-            <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
-            <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
-            <a-menu-item key="LightTimeSync">时间校准</a-menu-item>
-            <a-menu-item key="SingleLightJiaoBiao">单灯校表</a-menu-item>
-            <a-menu-item key="LightPosition">经纬度修改</a-menu-item>
-            <a-menu-item key="LightPanId">PANID修改</a-menu-item>
-            <a-menu-item key="LightChannel">频道修改</a-menu-item>
-            <a-menu-item key="AlarmThreshold">报警阈修改</a-menu-item>
-            <a-menu-item key="InfraredParams">红外触发参数设置</a-menu-item>
-            <a-menu-item key="delete">删除{{ Cons.LightName }}</a-menu-item>
-            <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item>
+            <a-menu-item key="GatewayChannel">频道修改</a-menu-item>
+            <a-menu-item key="GatewayPanId">PANID修改</a-menu-item>
+            <a-menu-item key="GatewayElectricRelayConfig">网关继电器配置</a-menu-item>
+            <a-menu-item key="GatewayElectricAddress">电表地址修改</a-menu-item>
+            <a-menu-item key="delete">删除网关</a-menu-item>
           </a-menu>
-          <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
+          <a-button style="margin-left: 10px;margin-right: 10px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
         </a-dropdown>
+        <a-button type="primary" @click="refresh">刷新</a-button>
         <a v-if="!showSearchForm" style="margin-left: 8px" @click="toggleSearchForm">
           {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
           <a-icon :type="showSearchForm ? 'up' : 'down'" />
@@ -29,10 +33,10 @@
       <a-form v-if="showSearchForm" layout="inline" :form="filterForm">
         <a-row :gutter="24">
           <a-col :span="8" :xl="6">
-            <a-form-item label="智能灯编号">
+            <a-form-item label="网关名称">
               <a-input
                 v-decorator="[
-                  'lightId'
+                  'gatewayName'
                 ]"
               />
             </a-form-item>
@@ -52,7 +56,7 @@
       <!-- 表格 -->
       <a-table
         ref="light-control-list-tab-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio'}"
         :row-key="record => record.id"
         :columns="columns"
         :scroll="{x: 1200}"
@@ -63,48 +67,35 @@
         <template slot="operation" slot-scope="record">
           <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
           <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
+          <a-popconfirm
+            title="确认删除吗?"
+            ok-text="删除"
+            cancel-text="取消"
+            @confirm="doDelItems"
+          >
+            <span class="operation-btn" @click="doDelItems(record.id)"><icon-delete title="删除" />删除</span>
+          </a-popconfirm>
         </template>
       </a-table>
-      <LightControlDetailPop
-        :visible.sync="lightControlDetailPopVisible"
+      <CommonDrawerWrap
         :is-edit.sync="isEdit"
         :edit-id.sync="editId"
-        :pop-readonly.sync="popReadonly"
-        @close="handleEditPopClose"
-        @success="handleEditPopSuccess"
-      ></LightControlDetailPop>
-      <CommonDrawerWrap
-        :draw-width="800"
-        :visible.sync="lightCommandPopVisible"
+        :readonly.sync="popReadonly"
+        :draw-width="1000"
+        :visible.sync="gatewayCommandPopVisible"
         :draw-title="currentCommandTitle"
         @close="handleCommandPopClose"
         @success="handleCommandPopSuccess"
       >
-        <template v-slot:default>
-          <component :is="currentCommandPop"></component>
+        <template v-slot:default="slotProps">
+          <component :is="currentCommandPop" v-bind="slotProps"></component>
         </template>
       </CommonDrawerWrap>
-      <a-modal
-        title="单灯校表"
-        :visible="lightJiaoBiaoModalVisible"
-        @ok="commitLightJiaoBiao"
-        @cancel="lightJiaoBiaoModalVisible=false"
-      >
-        <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
-      </a-modal>
       <a-modal
         title="删除"
         :visible="deleteModalVisible"
         @ok="doDelItems"
         @cancel="deleteModalVisible=false"
-      >
-        <p>确定要删除所选智能灯?</p>
-      </a-modal>
-      <a-modal
-        title="强制删除"
-        :visible="forceDeleteModalVisible"
-        @ok="commitForceDelete"
-        @cancel="forceDeleteModalVisible=false"
       >
         <p>确定要删除所选智能灯?</p>
       </a-modal>
@@ -114,105 +105,62 @@
 
 <script>
 import IconEdit from '@/components/icons/IconEdit'
-import LightControlDetailPop from './components/LightControlDetailPop'
-import CommonDrawerWrap from './components/CommonDrawerWrap'
-import LightControlType from './components/commandPopContent/LightControlType'
-import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
-import LightControlStrategy from './components/commandPopContent/LightControlStrategy'
-import LightTimeSync from './components/commandPopContent/LightTimeSync'
-import LightPosition from './components/commandPopContent/LightPosition'
-import LightPanId from './components/commandPopContent/LightPanId'
-import LightChannel from './components/commandPopContent/LightChannel'
-import AlarmThreshold from './components/commandPopContent/AlarmThreshold'
-import InfraredParams from './components/commandPopContent/InfraredParams'
+import IconDelete from '@/components/icons/IconDelete'
 
+import GatewayDetailPop from '@/views/light-control-center/components/GatewayManageTab/components/GatewayDetailPop'
+import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
+import GatewayElectricRelayConfig from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayElectricRelayConfig'
+import GatewayChannel from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayChannel'
+import GatewayPanId from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayPanId'
+import GatewayElectricAddress from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayElectricAddress'
 const commandPopMap = {
-  'LightControlType': LightControlType,
-  'LightControlManualPower': LightControlManualPower,
-  'LightControlStrategy': LightControlStrategy,
-  'LightTimeSync': LightTimeSync,
-  'LightPosition': LightPosition,
-  'LightPanId': LightPanId,
-  'LightChannel': LightChannel,
-  'AlarmThreshold': AlarmThreshold,
-  'InfraredParams': InfraredParams
+  'GatewayElectricRelayConfig': GatewayElectricRelayConfig,
+  'AddPop': GatewayDetailPop,
+  'GatewayChannel': GatewayChannel,
+  'GatewayPanId': GatewayPanId,
+  'GatewayElectricAddress': GatewayElectricAddress
 }
 const commandPopTitleMap = {
-  'LightControlType': '开关灯模式',
-  'LightControlManualPower': '手动开关灯功率',
-  'LightControlStrategy': '调光策略设置',
-  'LightTimeSync': '时间校准',
-  'LightPosition': '经纬度修改',
-  'LightPanId': 'PANID修改',
-  'LightChannel': '频道修改',
-  'AlarmThreshold': '报警阈修改',
-  'InfraredParams': '红外触发参数设置'
+  'GatewayElectricRelayConfig': '网关继电器配置',
+  'GatewayChannel': '频道修改',
+  'GatewayPanId': 'PANID修改',
+  'GatewayElectricAddress': '电表地址修改'
 }
 
 // import { configSerialize } from '@/utils/common'
-import { LightName } from '@/config/LightConstant'
+import { LightName, GatewayName } from '@/config/LightConstant'
 export default {
-  name: 'LightControlTab',
-  components: { IconEdit, LightControlDetailPop, CommonDrawerWrap },
+  name: 'GatewayManageTab',
+  components: { IconEdit, IconDelete, CommonDrawerWrap },
   props: {},
   data() {
     return {
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
-      lightJiaoBiaoModalVisible: false,
-      forceDeleteModalVisible: false,
       deleteModalVisible: false,
       Cons: {
-        LightName
+        LightName, GatewayName
       },
       columns: [
         {
-          title: '智能灯编号',
-          dataIndex: 'lightId'
+          title: '网关名称',
+          dataIndex: 'gatewayName'
         },
         {
-          title: 'I路状态',
-          dataIndex: 'statusI'
+          title: '通讯地址',
+          dataIndex: 'address'
         },
         {
-          title: 'II路状态',
-          dataIndex: 'statusII'
+          title: '所属项目',
+          dataIndex: 'project'
         },
         {
-          title: '网关状态',
-          dataIndex: 'gatewayStatus'
+          title: '当前版本号',
+          dataIndex: 'version'
         },
         {
-          title: 'I路调光',
-          dataIndex: 'brightnessI'
-        },
-        {
-          title: 'II路调光',
-          dataIndex: 'brightnessII'
-        },
-        {
-          title: '电压/V',
-          dataIndex: 'voltage'
-        },
-        {
-          title: '电流/A',
-          dataIndex: 'eCurrent'
-        },
-        {
-          title: '频率',
-          dataIndex: 'frequency'
-        },
-        {
-          title: '功率因数',
-          dataIndex: 'powerFactor'
-        },
-        {
-          title: '日能耗/kWh',
-          dataIndex: 'dailyConsumption'
-        },
-        {
-          title: '更新时间',
-          dataIndex: 'updateTime'
+          title: '备注',
+          dataIndex: 'remarks'
         },
         {
           title: '操作',
@@ -230,8 +178,8 @@ export default {
       },
       loading: false,
       dataSource: null,
-      lightControlDetailPopVisible: false,
-      lightCommandPopVisible: false,
+      createPopVisible: false,
+      gatewayCommandPopVisible: false,
       isEdit: false,
       popReadonly: false,
       editId: '',
@@ -270,20 +218,26 @@ export default {
     },
     // 打开新建弹窗
     openCreate() {
-      this.lightControlDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '添加网关'
+      this.gatewayCommandPopVisible = true
     },
     // 打开编辑弹窗
     openEditPop(id) {
       this.editId = id
       this.isEdit = true
-      this.lightControlDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '编辑网关'
+      this.gatewayCommandPopVisible = true
     },
     // 打开只读弹窗
     openReadonlyPop(id) {
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
-      this.lightControlDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '查看网关'
+      this.gatewayCommandPopVisible = true
     },
     // 编辑弹窗关闭
     handleEditPopClose() {
@@ -291,6 +245,9 @@ export default {
     },
     // 保存成功
     handleEditPopSuccess() {
+      this.fetch({ pageSize: 10, pageNum: 1 })
+    },
+    refresh() {
       this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 删除
@@ -322,22 +279,13 @@ export default {
     },
     // 选择命令 打开弹窗
     handleCommandClick({ key }) {
-      // 单灯校表
-      if (key === 'SingleLightJiaoBiao') {
-        this.lightJiaoBiaoModalVisible = true
-        return
-      }
-      if (key === 'ForceDelete') {
-        this.forceDeleteModalVisible = true
-        return
-      }
       if (key === 'doDelItems') {
         this.deleteModalVisible = true
         return
       }
       this.currentCommandPop = commandPopMap[key]
       this.currentCommandTitle = commandPopTitleMap[key]
-      this.lightCommandPopVisible = true
+      this.gatewayCommandPopVisible = true
     },
     // 命令弹窗关闭
     handleCommandPopClose() {
@@ -346,14 +294,6 @@ export default {
     // 命令执行成功
     handleCommandPopSuccess() {
       this.fetch({ pageSize: 10, pageNum: 1 })
-    },
-    commitLightJiaoBiao() {
-      // todo 提交jiaobiao
-      this.lightJiaoBiaoModalVisible = false
-    },
-    // 强制删除智能灯
-    commitForceDelete() {
-      this.forceDeleteModalVisible = false
     }
   }
 }

@@ -63,7 +63,7 @@ export default {
   watch: {
 
   },
-  beforeCreate() {
+  created() {
 
   },
   mounted() {
@@ -72,6 +72,9 @@ export default {
   methods: {
     onClose() {
       this.$emit('update:visible', false)
+      this.$emit('update:isEdit', false)
+      this.$emit('update:editId', '')
+      this.$emit('update:readonly', false)
       this.$emit('close')
     },
     async handleSubmit() {

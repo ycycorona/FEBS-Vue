@@ -69,7 +69,8 @@ module.exports = {
       '^/api': {
         // target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro',
         // target: 'http://127.0.0.1:9527',
-        target: 'http://39.106.162.152:9527',
+        // target: 'http://39.106.162.152:9527',
+        target: 'http://47.92.126.243:8081',
         pathRewrite: {
           '^/api': ''
         },

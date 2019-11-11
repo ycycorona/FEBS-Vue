@@ -12,7 +12,7 @@
       </div>
       <div :class="['global-header-right', theme]">
         <div>
-          <span style="vertical-align: sub;">您好，欢迎使用敏感区域智能手机管控系统</span>
+          <span style="vertical-align: sub;">您好，欢迎使用智慧照明管理平台</span>
         </div>
         <header-avatar class="header-item" />
       </div>

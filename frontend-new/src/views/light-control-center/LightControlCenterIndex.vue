@@ -46,12 +46,17 @@
           </a-col>
         </a-row>
       </a-form>
-      <a-tabs default-active-key="controlTab" class="full-width-tab" @change="onTabChange">
+      <a-tabs v-if="currentDeviceType===0" default-active-key="controlTab" class="full-width-tab" @change="onTabChange">
         <a-tab-pane key="controlTab" :tab="currentControlDeviceName + '控制'">
-          <LightControlTab></LightControlTab>
+          <LightControlTab :group="currentGroup"></LightControlTab>
         </a-tab-pane>
         <a-tab-pane key="manageTab" :tab="currentControlDeviceName + '管理'">
           <LightManageTab></LightManageTab>
+        </a-tab-pane>
+      </a-tabs>
+      <a-tabs v-else default-active-key="manageTab">
+        <a-tab-pane key="manageTab" :tab="currentControlDeviceName + '管理'">
+          <gateway-manage-tab></gateway-manage-tab>
         </a-tab-pane>
       </a-tabs>
     </div>
@@ -63,10 +68,12 @@
 import SingleMenuWrap from '@/views/common/SingleMenuWrap'
 import LightManageTab from './components/LightManageTab/LightManageTab'
 import LightControlTab from './components/LightControlTab/LightControlTab'
+import GatewayManageTab from './components/GatewayManageTab/GatewayManageTab'
+
 import { LightName, GatewayName } from '@/config/LightConstant'
 export default {
   name: 'LightControlCenterIndex',
-  components: { SingleMenuWrap, LightManageTab, LightControlTab },
+  components: { SingleMenuWrap, LightManageTab, LightControlTab, GatewayManageTab },
   props: {
 
   },
@@ -80,12 +87,20 @@ export default {
       currentGroup: 0,
       functionSelectForm: this.$form.createForm(this),
       loading: false,
-      strategyOpt: [],
-      currentControlDeviceName: LightName
+      strategyOpt: []
+      // currentControlDeviceName: LightName
     }
   },
   computed: {
-
+    currentControlDeviceName() {
+      if (this.currentDeviceType === 1) {
+        return GatewayName
+      } else if (this.currentDeviceType === 0) {
+        return LightName
+      } else {
+        return ''
+      }
+    }
   },
   watch: {
     currentProject(newVal, oldVal) {

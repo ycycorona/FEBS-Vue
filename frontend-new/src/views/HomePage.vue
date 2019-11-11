@@ -139,8 +139,8 @@ export default {
     }
   },
   created() {
-    this.handleInfo_1()
-    this.handleInfo_2()
+    // this.handleInfo_1()
+    // this.handleInfo_2()
   },
   mounted() {
 

@@ -12,7 +12,7 @@ export default {
     isMobile: false,
     theme: db.get('THEME', 'dark'),
     layout: db.get('LAYOUT', 'side'),
-    systemName: '敏感区域智能手机管控系统',
+    systemName: '智慧照明管理平台',
     copyright: `${new Date().getFullYear()} <a href="http://www.huafangzhilian.cn/" target="_blank">华方智联</a>`,
     multipage: getBooleanValue(db.get('MULTIPAGE'), false),
     fixSiderbar: getBooleanValue(db.get('FIX_SIDERBAR'), true),

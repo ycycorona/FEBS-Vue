@@ -12,8 +12,8 @@
           <img src="@/assets/imgs/logo.png" style="width: 42px;">
         </div>
         <div :class="{'collapsed': collapsed}" style="padding: 3px 0 0 10px">
-          <h1>敏感区域智能</h1>
-          <h1>手机管控系统</h1>
+          <h1>智慧照明管理平台</h1>
+          <!-- <h1>手机管控系统</h1> -->
         </div>
 
       </router-link>
@@ -116,6 +116,7 @@ export default {
       }
       h1 {
         font-size: 18px;
+        line-height: 60px;
         padding: 0;
         margin: 0
       }
