@@ -43,7 +43,7 @@ export default {
     lazyAMapApiLoaderInstance.load().then(() => {
       this.mapInit()
       this.$emit('map-init-success')
-      console.log('高德地图初始化完成')
+      // console.log('高德地图初始化完成')
       // eslint-disable-next-line
       this.mouseTool = new AMap.MouseTool(this.aMapIns)
       // eslint-disable-next-line
@@ -81,6 +81,14 @@ export default {
     // 设置地图中心点
     setCenterPoint(lng, lat) {
       this.aMapIns.setCenter([lng, lat])
+    },
+    //
+    updatePointerByCityName(cityName) {
+      this.aMapIns.setCity(cityName, () => {
+        const centerPos = this.aMapIns.getCenter()
+        const { lng, lat } = centerPos
+        this.updatePointer(lng, lat)
+      })
     },
     setSelectPointer(lng, lat) {
       const marker = new AMap.Marker({

@@ -1,7 +1,9 @@
 <template>
   <a-locale-provider :locale="chinese">
     <div id="febs">
-      <router-view />
+      <a-spin :delay="1000" :spinning="gbSpinning" wrapper-class-name="global-spin">
+        <router-view />
+      </a-spin>
     </div>
   </a-locale-provider>
 </template>
@@ -16,6 +18,11 @@ export default {
   data() {
     return {
       chinese
+    }
+  },
+  computed: {
+    gbSpinning() {
+      return this.$store.state.globalState.gbSpinning
     }
   },
   created() {

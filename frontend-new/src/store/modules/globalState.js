@@ -2,7 +2,8 @@ export default {
   namespaced: true,
   state: {
     windowInnerHeight: window.innerHeight,
-    windowInnerWidth: window.innerWidth
+    windowInnerWidth: window.innerWidth,
+    gbSpinning: false
   },
   mutations: {
     setWindowInnerHeight(state, val) {
@@ -10,6 +11,9 @@ export default {
     },
     setWindowInnerWidth(state, val) {
       state.windowInnerWidth = val
+    },
+    setGbSpinning(state, val) {
+      state.gbSpinning = val
     }
   }
 }

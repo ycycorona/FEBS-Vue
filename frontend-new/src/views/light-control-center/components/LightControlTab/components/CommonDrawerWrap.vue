@@ -48,6 +48,9 @@ export default {
     readonly: {
       default: false,
       type: Boolean
+    },
+    detailData: {
+      type: Object
     }
   },
   data() {
@@ -71,11 +74,12 @@ export default {
   },
   methods: {
     onClose() {
+      this.$emit('close')
       this.$emit('update:visible', false)
       this.$emit('update:isEdit', false)
       this.$emit('update:editId', '')
       this.$emit('update:readonly', false)
-      this.$emit('close')
+      this.$emit('update:detailData', null)
     },
     async handleSubmit() {
       const submitFlag = await this.currentPopContent.handleSubmit()

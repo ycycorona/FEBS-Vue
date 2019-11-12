@@ -1,65 +1,86 @@
 <template>
-  <a-spin :spinning="loading" class="full-width">
-    <div class="standard-search-table-wrap table-page-search-wrapper">
-      <div class="float-add-btn-wrap">
-        <div class="left-text">
-          城市管理
-        </div>
-        <div class="float-add-btn">
-          <a-button
-            type="primary"
-            style="border-radius:45px!important;"
-            @click="openCreate"
-          >
-            <a-icon type="plus" /><span style="margin-left: 3px;">添加</span>
-          </a-button>
-        </div>
-      </div>
-      <!-- 表单区域 -->
-      <!-- 表格区域 -->
-      <div style="margin-bottom:10px">
-      </div>
-      <a-table
-        ref="filter-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        :row-key="record => record.id"
-        :columns="columns"
-        :scroll="{x: 1200}"
-        :data-source="dataSource"
-        :pagination="pagination"
-        @change="handleTableChange"
+  <div class="standard-search-table-wrap table-page-search-wrapper full-width">
+    <!-- 表单区域 -->
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item label="城市名称">
+            <a-input
+              v-decorator="[
+                'cityName'
+              ]"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
+    </a-form>
+    <!-- 操作按钮 -->
+    <div class="float-add-btn-wrap">
+      <a-popconfirm
+        title="确认删除吗?"
+        ok-text="删除"
+        cancel-text="取消"
+        @confirm="doDelItems"
       >
-        <template slot="position" slot-scope="record">
-          <span class="bold">经度:</span>{{ record.lng }}<span class="padding-left bold">纬度:</span>{{ record.lat }}
-        </template>
-        <template slot="operation" slot-scope="record">
-          <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="修改" />编辑</span>
-          <a-popconfirm
+        <a-button :disabled="selectedRowKeys.length===0" type="danger">删除</a-button>
+      </a-popconfirm>
+      <div class="float-add-btn" style="margin-bottom:10px">
+        <a-button
+          type="primary"
+          style="border-radius:45px!important;"
+          @click="openCreate"
+        >
+          <a-icon type="plus" /><span style="margin-left: 3px;">添加</span>
+        </a-button>
+      </div>
+    </div>
+    <!-- 表格区域 -->
+    <a-table
+      ref="filter-table"
+      :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 1200}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      @change="handleTableChange"
+    >
+      <template slot="position" slot-scope="record">
+        <span class="bold">经度:</span>{{ record.lng }}<span class="padding-left bold">纬度:</span>{{ record.lat }}
+      </template>
+      <template slot="operation" slot-scope="record">
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="修改" />编辑</span>
+        <!-- <a-popconfirm
             title="确认删除吗?"
             ok-text="删除"
             cancel-text="取消"
             @confirm="dodelItem(record.id)"
           >
             <span class="operation-btn"><icon-delete title="删除" />删除</span>
-          </a-popconfirm>
-        </template>
-      </a-table>
-      <CommonDrawerWrap
-        :is-edit.sync="isEdit"
-        :edit-id.sync="editId"
-        :draw-width="800"
-        :visible.sync="createEditPopVisible"
-        :draw-title="currentCommandTitle"
-        @close="handleCommandPopClose"
-        @success="handleCommandPopSuccess"
-      >
-        <template v-slot:default="slotProps">
-          <component :is="currentCommandPop" v-bind="slotProps"></component>
-        </template>
-      </CommonDrawerWrap>
-    </div>
-
-  </a-spin>
+          </a-popconfirm> -->
+      </template>
+    </a-table>
+    <CommonDrawerWrap
+      :detail-data.sync="detailData"
+      :is-edit.sync="isEdit"
+      :edit-id.sync="editId"
+      :draw-width="800"
+      :visible.sync="createEditPopVisible"
+      :draw-title="currentCommandTitle"
+      @close="handleCommandPopClose"
+      @success="handleCommandPopSuccess"
+    >
+      <template v-slot:default="slotProps">
+        <component :is="currentCommandPop" v-bind="slotProps"></component>
+      </template>
+    </CommonDrawerWrap>
+  </div>
 </template>
 
 <script>
@@ -68,6 +89,7 @@ import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
 import CityDetailPopContent from '@/views/light-config-center/CityManage/components/CityDetailPopContent'
+import { getDetail as getCityById, del as deleteCityByIds, getList } from '@/service/cityManageService'
 const PopTitleMap = new Map([
   ['create', '添加城市'],
   ['edit', '编辑城市']
@@ -81,6 +103,7 @@ export default {
   props: {},
   data() {
     return {
+      filterForm: this.$form.createForm(this),
       columns: [
         {
           title: '省份',
@@ -118,6 +141,7 @@ export default {
       currentCommandTitle: '',
       isEdit: false,
       editId: '',
+      detailData: null,
       selectedRowKeys: [],
       currentCommandPop: CityDetailPopContent
     }
@@ -135,7 +159,7 @@ export default {
       const params = {
 
       }
-      params.city = values.city
+      params.cityName = values.cityName
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
     resetFilterForm() {
@@ -144,20 +168,13 @@ export default {
     handleTableChange(pagination, filters, sorter) {
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
-    fetch(params = {}) {
-      // 显示loading
-      this.loading = true
-      this.$get('/business/city/getCityListByPage', {
-        ...params
-      }).then((r) => {
-        const data = r.data
-        const pagination = { ...this.pagination }
-        this.dataSource = data.rows
-        pagination.total = data.total
-        this.pagination = pagination
-      }).finally(() => {
-        this.loading = false
-      })
+    async fetch(params = {}) {
+      const data = await getList(params)
+      const pagination = { ...this.pagination }
+      this.dataSource = data.rows
+      pagination.total = data.total
+      this.pagination = pagination
+      this.selectedRowKeys = []
     },
     // 打开新建弹窗
     openCreate() {
@@ -165,8 +182,9 @@ export default {
       this.createEditPopVisible = true
     },
     // 打开编辑弹窗
-    openEditPop(id) {
+    async openEditPop(id) {
       this.currentCommandTitle = PopTitleMap.get('edit')
+      this.detailData = await getCityById(id)
       this.editId = id
       this.isEdit = true
       this.createEditPopVisible = true
@@ -180,43 +198,10 @@ export default {
       this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 删除
-    dodelItem(id) {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$delete('/business/media-file-config/deleteById', {
-          mediaConfigId: id
-        })
-          .then(r => {
-            const data = r.data
-            if (data.state === 1) {
-              this.$message.info('删除成功')
-              this.fetch({ pageSize: 10, pageNum: 1 })
-              resolve(data.data)
-            } else {
-              this.$message.error('删除失败' + data.message)
-              reject(data.message)
-            }
-          })
-          .finally(() => {
-            this.loading = false
-          })
-      })
-    },
-    doDelItems() {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        this.$delete('/business/city/deleteCityByBatch', {
-          cityIds: configSerialize(this.selectedRowKeys)
-        })
-          .then(r => {
-            resolve(r.data.data)
-            this.$message.info('删除成功')
-            this.fetch({ pageSize: 10, pageNum: 1 })
-          })
-          .finally(() => {
-            this.loading = false
-          })
-      })
+    async doDelItems() {
+      await deleteCityByIds(configSerialize(this.selectedRowKeys))
+      this.$message.info('删除成功')
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
