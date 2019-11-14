@@ -76,6 +76,27 @@
           <a-radio value="2">保密</a-radio>
         </a-radio-group>
       </a-form-item>
+      <a-form-item label="项目权限" v-bind="formItemLayout">
+        <a-select
+          v-decorator="['projectAuth',{
+            rules: [],
+            initialValue: []
+          }]"
+          mode="multiple"
+          style="width: 100%"
+          option-filter-prop="children"
+          @change="projectAuthChange(arguments[0])"
+        >
+          <a-select-option v-for="r in projectOpt" :key="r.id">{{ r.name }}</a-select-option>
+        </a-select>
+        <div v-for="p in projectAuth" :key="p.id">
+          {{ p.name }}：
+          <a-radio-group v-model="p.permissionId" :name="`radioGroup-${p.id}`">
+            <a-radio :value="2">只读</a-radio>
+            <a-radio :value="1">读写</a-radio>
+          </a-radio-group>
+        </div>
+      </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
       <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
@@ -97,6 +118,9 @@ export default {
   props: {
     userEditVisiable: {
       default: false
+    },
+    projectOpt: {
+      type: Array
     }
   },
   data() {
@@ -107,13 +131,22 @@ export default {
       roleData: [],
       userDept: [],
       userId: '',
-      loading: false
+      loading: false,
+      projectAuth: []
     }
   },
   computed: {
     ...mapState({
       currentUser: state => state.account.user
-    })
+    }),
+    projectOptMap() {
+      const projectOpt = this.projectOpt
+      const obj = {}
+      projectOpt.forEach(item => {
+        obj[item.id] = item
+      })
+      return obj
+    }
   },
   watch: {
     userEditVisiable() {
@@ -131,7 +164,26 @@ export default {
     ...mapMutations({
       setUser: 'account/setUser'
     }),
+    projectAuthChange(authIds, permissionIds = []) {
+      const authsProjects = authIds.map(authId => {
+        return this.projectOptMap[authId]
+      })
+      const projectAuth = authsProjects.map(pro => {
+        return {
+          name: pro.name,
+          projectId: pro.id,
+          permissionId: 2 // 默认只读
+        }
+      })
+      if (permissionIds.length !== 0) {
+        permissionIds.forEach((permissionId, index) => {
+          projectAuth[index].permissionId = permissionId
+        })
+      }
+      this.projectAuth = projectAuth
+    },
     onClose() {
+      this.projectAuth = []
       this.loading = false
       this.form.resetFields()
       this.$emit('close')
@@ -139,11 +191,19 @@ export default {
     setFormValues({ ...user }) {
       this.userId = user.userId
       const fields = ['username', 'email', 'status', 'ssex', 'mobile']
+      // debugger
+      this.projectAuthChange(user.uppList.map(item => item.projectId),
+        user.uppList.map(item => item.permissionId))
+      this.form.setFieldsValue({
+        projectAuth: user.uppList.map(item => item.projectId)
+      })
+
       Object.keys(user).forEach((key) => {
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)
           const obj = {}
           obj[key] = user[key]
+
           this.form.setFieldsValue(obj)
         }
       })
@@ -166,9 +226,16 @@ export default {
           const user = this.form.getFieldsValue()
           user.roleId = user.roleId.join(',')
           user.userId = this.userId
-          user.deptId = this.userDept
-          this.$put('user', {
-            ...user
+          // user.deptId = this.userDept[0]
+          delete user.projectAuth
+          const uppList = this.projectAuth.map(item => {
+            return {
+              permissionId: item.permissionId,
+              projectId: item.projectId
+            }
+          })
+          this.$putJson('user', {
+            user, uppList
           }).then((r) => {
             this.loading = false
             this.$emit('success')

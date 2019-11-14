@@ -89,6 +89,13 @@ const request = {
       }
     })
   },
+  postJson(url, params) {
+    return FEBS_REQUEST.post(url, params, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+  },
   put(url, params = {}) {
     return FEBS_REQUEST.put(url, params, {
       transformRequest: [(params) => {
@@ -96,6 +103,13 @@ const request = {
       }],
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+  },
+  putJson(url, params = {}) {
+    return FEBS_REQUEST.put(url, params, {
+      headers: {
+        'Content-Type': 'application/json'
       }
     })
   },

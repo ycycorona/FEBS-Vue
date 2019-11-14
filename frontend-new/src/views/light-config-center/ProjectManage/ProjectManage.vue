@@ -1,13 +1,13 @@
 <template>
-  <div class="standard-search-table-wrap table-page-search-wrapper full-width">
+  <div class="standard-search-table-wrap table-page-search-wrapper full-width project-manage-page-wrap">
     <!-- 表单区域 -->
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
-          <a-form-item label="城市名称">
+          <a-form-item label="项目名称">
             <a-input
               v-decorator="[
-                'cityName'
+                'projectName'
               ]"
             />
           </a-form-item>
@@ -89,15 +89,15 @@ import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
-import CityDetailPopContent from '@/views/light-config-center/CityManage/components/CityDetailPopContent'
+import ProjectDetailPopContent from '@/views/light-config-center/ProjectManage/components/ProjectDetailPopContent'
 import { getDetail as getCityById, del as deleteCityByIds, getList } from '@/service/cityManageService'
 const PopTitleMap = new Map([
-  ['create', '添加城市'],
-  ['edit', '编辑城市']
+  ['create', '添加项目'],
+  ['edit', '编辑项目']
 ])
 export default {
-  name: 'CityManage',
-  components: { IconEdit, IconDelete, CommonDrawerWrap, CityDetailPopContent },
+  name: 'ProjectManage',
+  components: { IconEdit, IconDelete, CommonDrawerWrap, ProjectDetailPopContent },
   filters: {
 
   },
@@ -107,7 +107,7 @@ export default {
       filterForm: this.$form.createForm(this),
       columns: [
         {
-          title: '省份',
+          title: '项目名称',
           dataIndex: 'province'
         },
         {
@@ -144,7 +144,7 @@ export default {
       editId: '',
       detailData: null,
       selectedRowKeys: [],
-      currentCommandPop: CityDetailPopContent
+      currentCommandPop: ProjectDetailPopContent
     }
   },
   computed: {
@@ -160,7 +160,7 @@ export default {
       const params = {
 
       }
-      params.cityName = values.cityName
+      params.projectName = values.projectName
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
     resetFilterForm() {

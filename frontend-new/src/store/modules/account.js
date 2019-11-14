@@ -1,4 +1,4 @@
-import db from 'utils/localstorage'
+import db from '@/utils/localstorage'
 
 export default {
   namespaced: true,
@@ -7,7 +7,8 @@ export default {
     expireTime: db.get('EXPIRE_TIME'),
     user: db.get('USER'),
     permissions: db.get('PERMISSIONS'),
-    roles: db.get('ROLES')
+    roles: db.get('ROLES'),
+    projectPermission: db.get('projectPermission')
   },
   mutations: {
     setToken(state, val) {
@@ -29,6 +30,10 @@ export default {
     setRoles(state, val) {
       db.save('ROLES', val)
       state.roles = val
+    },
+    setProjectPermission(state, val) {
+      db.save('projectPermission', val)
+      state.projectPermission = val
     }
   }
 }

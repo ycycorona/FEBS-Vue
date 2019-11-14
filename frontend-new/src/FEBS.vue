@@ -2,8 +2,9 @@
   <a-locale-provider :locale="chinese">
     <div id="febs">
       <a-spin :delay="1000" :spinning="gbSpinning" wrapper-class-name="global-spin">
-        <router-view />
+
       </a-spin>
+      <router-view />
     </div>
   </a-locale-provider>
 </template>

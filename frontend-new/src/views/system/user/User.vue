@@ -93,12 +93,14 @@
     </div>
     <!-- 用户信息查看 -->
     <user-info
+      :project-opt="projectOpt"
       :user-info-data="userInfo.data"
       :user-info-visiable="userInfo.visiable"
       @close="handleUserInfoClose"
     />
     <!-- 新增用户 -->
     <user-add
+      :project-opt="projectOpt"
       :user-add-visiable="userAdd.visiable"
       @close="handleUserAddClose"
       @success="handleUserAddSuccess"
@@ -106,6 +108,7 @@
     <!-- 修改用户 -->
     <user-edit
       ref="userEdit"
+      :project-opt="projectOpt"
       :user-edit-visiable="userEdit.visiable"
       @close="handleUserEditClose"
       @success="handleUserEditSuccess"
@@ -119,12 +122,14 @@ import DeptInputTree from '../dept/DeptInputTree'
 import RangeDate from '@/components/datetime/RangeDate'
 import UserAdd from './UserAdd'
 import UserEdit from './UserEdit'
+import { getListOpt as getProjectListOpt } from '@/service/projectManageService'
 
 export default {
   name: 'User',
   components: { UserInfo, UserAdd, UserEdit, DeptInputTree, RangeDate },
   data() {
     return {
+      projectOpt: [],
       advanced: false,
       userInfo: {
         visiable: false,
@@ -230,9 +235,13 @@ export default {
     }
   },
   mounted() {
+    this.doGetProjectList()
     this.fetch()
   },
   methods: {
+    async doGetProjectList() {
+      this.projectOpt = await getProjectListOpt()
+    },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -293,11 +302,12 @@ export default {
         content: '当您点击确定按钮后，这些记录将会被彻底删除',
         centered: true,
         onOk() {
-          const userIds = []
-          for (const key of that.selectedRowKeys) {
-            userIds.push(that.dataSource[key].userId)
-          }
-          that.$delete('user/' + userIds.join(',')).then(() => {
+          // const userIds = []
+          // for (const key of that.selectedRowKeys) {
+          //   debugger
+          //   userIds.push(that.dataSource[key].userId)
+          // }
+          that.$delete('user/' + that.selectedRowKeys.join(',')).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()

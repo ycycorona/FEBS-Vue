@@ -83,6 +83,27 @@
           <a-radio value="2">保密</a-radio>
         </a-radio-group>
       </a-form-item>
+      <a-form-item label="项目权限" v-bind="formItemLayout">
+        <a-select
+          v-decorator="['projectAuth',{
+            rules: [],
+            initialValue: []
+          }]"
+          mode="multiple"
+          style="width: 100%"
+          option-filter-prop="children"
+          @change="projectAuthChange(arguments[0])"
+        >
+          <a-select-option v-for="r in projectOpt" :key="r.id">{{ r.name }}</a-select-option>
+        </a-select>
+        <div v-for="p in projectAuth" :key="p.id">
+          {{ p.name }}：
+          <a-radio-group v-model="p.permissionId" :name="`radioGroup-${p.id}`">
+            <a-radio :value="2">只读</a-radio>
+            <a-radio :value="1">读写</a-radio>
+          </a-radio-group>
+        </div>
+      </a-form-item>
     </a-form>
     <div class="drawer-bootom-button">
       <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
@@ -102,6 +123,9 @@ export default {
   props: {
     userAddVisiable: {
       default: false
+    },
+    projectOpt: {
+      type: Array
     }
   },
   data() {
@@ -116,7 +140,18 @@ export default {
       defaultPassword: '1234qwer',
       form: this.$form.createForm(this),
       validateStatus: '',
-      help: ''
+      help: '',
+      projectAuth: []
+    }
+  },
+  computed: {
+    projectOptMap() {
+      const projectOpt = this.projectOpt
+      const obj = {}
+      projectOpt.forEach(item => {
+        obj[item.id] = item
+      })
+      return obj
     }
   },
   watch: {
@@ -132,7 +167,27 @@ export default {
     }
   },
   methods: {
+    projectAuthChange(authIds, permissionIds = []) {
+      console.log(arguments)
+      const authsProjects = authIds.map(authId => {
+        return this.projectOptMap[authId]
+      })
+      const projectAuth = authsProjects.map(pro => {
+        return {
+          name: pro.name,
+          projectId: pro.id,
+          permissionId: 2 // 默认只读
+        }
+      })
+      if (permissionIds.length !== 0) {
+        permissionIds.forEach((permissionId, index) => {
+          projectAuth[index].permissionId = permissionId
+        })
+      }
+      this.projectAuth = projectAuth
+    },
     reset() {
+      this.projectAuth = []
       this.validateStatus = ''
       this.help = ''
       this.user.username = ''
@@ -147,12 +202,20 @@ export default {
       if (this.validateStatus !== 'success') {
         this.handleUserNameBlur()
       }
+      const uppList = this.projectAuth.map(item => {
+        return {
+          permissionId: item.permissionId,
+          projectId: item.projectId
+        }
+      })
+
       this.form.validateFields((err, values) => {
         if (!err && this.validateStatus === 'success') {
           this.loading = true
           this.user.roleId = this.user.roleId.join(',')
-          this.$post('user', {
-            ...this.user
+          this.$postJson('user', {
+            user: this.user,
+            uppList: uppList
           }).then((r) => {
             this.reset()
             this.$emit('success')

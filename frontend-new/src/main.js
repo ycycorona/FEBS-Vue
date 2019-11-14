@@ -45,8 +45,10 @@ Vue.use({
 
 import '@/utils/filters'
 Vue.prototype.$post = request.post
+Vue.prototype.$postJson = request.postJson
 Vue.prototype.$get = request.get
 Vue.prototype.$put = request.put
+Vue.prototype.$putJson = request.putJson
 Vue.prototype.$delete = request.delete
 Vue.prototype.$export = request.export
 Vue.prototype.$download = request.download

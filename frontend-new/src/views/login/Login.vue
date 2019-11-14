@@ -144,7 +144,8 @@ export default {
       setMultipage: 'setting/setMultipage',
       fixSiderbar: 'setting/fixSiderbar',
       fixHeader: 'setting/fixHeader',
-      setColor: 'setting/setColor'
+      setColor: 'setting/setColor',
+      setProjectPermission: 'account/setProjectPermission'
     }),
     saveLoginData(data) {
       this.setToken(data.token)
@@ -158,6 +159,7 @@ export default {
       this.fixSiderbar(data.config.fixSiderbar === '1')
       this.fixHeader(data.config.fixHeader === '1')
       this.setColor(data.config.color)
+      this.setProjectPermission(data.uppList)
     }
   }
 }
