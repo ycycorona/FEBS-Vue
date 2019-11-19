@@ -159,8 +159,9 @@ const request = {
       }],
       responseType: 'blob'
     }).then((r) => {
-      const rawContentDisposition = r.headers['content-disposition'].split('; ')
+      const rawContentDisposition = r.headers['content-disposition'].split(';')
       const contentDisposition = qs.parse(rawContentDisposition[1])
+      debugger
       const content = r.data
       const blob = new Blob([content])
       if ('download' in document.createElement('a')) {
@@ -181,7 +182,12 @@ const request = {
     })
   },
   upload(url, params) {
-    return FEBS_REQUEST.post(url, params, {
+    // debugger
+    const formData = new FormData()
+    for (const k in params) {
+      formData.append(k, params[k])
+    }
+    return FEBS_REQUEST.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

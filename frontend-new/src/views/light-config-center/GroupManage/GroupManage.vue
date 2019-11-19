@@ -5,16 +5,29 @@
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
           <a-form-item label="项目名称">
+            <a-select
+              v-decorator="['projectId', {
+                rules:[{ required: true, message: '项目不能为空'}],
+                initialValue: formValues.projectId,
+              }]"
+              :options="projectOpt"
+              @change="projectChange"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="编组名称">
             <a-input
-              v-decorator="[
-                'projectName'
-              ]"
+              v-decorator="['groupName', {
+                rules:[],
+                initialValue: formValues.projectId,
+              }]"
             />
           </a-form-item>
         </a-col>
         <a-col :span="8" :xl="6">
           <span>
-            <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
+            <a-button style="margin-left: 15px" type="primary" @click="search()">查询</a-button>
             <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
           </span>
         </a-col>
@@ -65,7 +78,6 @@
       </template>
     </a-table>
     <CommonDrawerWrap
-
       :detail-data.sync="detailData"
       :is-edit.sync="isEdit"
       :edit-id.sync="editId"
@@ -76,7 +88,7 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :city-opt="cityOpt"></component>
+        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOpt"></component>
       </template>
     </CommonDrawerWrap>
   </div>
@@ -87,23 +99,26 @@ import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
-import ProjectDetailPopContent from '@/views/light-config-center/ProjectManage/components/ProjectDetailPopContent'
-import { getDetail, del, getList, exportExcel } from '@/service/projectManageService'
-import { getListOpt as getListOptCity } from '@/service/cityManageService'
+import GroupDetailPopContent from '@/views/light-config-center/GroupManage/components/GroupDetailPopContent'
+import { getDetail, del, getList, exportExcel } from '@/service/groupManageService'
+import { getListOptProcessed as getProjectOptProcessed } from '@/service/projectManageService'
 const PopTitleMap = new Map([
-  ['create', '添加项目'],
-  ['edit', '编辑项目']
+  ['create', '添加编组'],
+  ['edit', '编辑编组']
 ])
 export default {
-  name: 'ProjectManage',
-  components: { IconEdit, IconDelete, CommonDrawerWrap, ProjectDetailPopContent },
+  name: 'GroupManage',
+  components: { IconEdit, IconDelete, CommonDrawerWrap, GroupDetailPopContent },
   filters: {
 
   },
   props: {},
   data() {
     return {
-      cityOpt: [], // 城市列表 下拉用
+      formValues: {
+        projectId: '',
+        groupName: ''
+      },
       filterForm: this.$form.createForm(this),
       columns: [
         {
@@ -111,16 +126,20 @@ export default {
           dataIndex: 'name'
         },
         {
-          title: '所属城市',
-          dataIndex: 'cityName'
+          title: '所属项目',
+          dataIndex: 'group'
         },
         {
-          title: '项目地址',
+          title: '所属网关',
+          dataIndex: 'gateway'
+        },
+        {
+          title: '区域码',
+          dataIndex: 'quyuma'
+        },
+        {
+          title: '编组地址',
           dataIndex: 'address'
-        },
-        {
-          title: '备注',
-          dataIndex: 'descr'
         },
         {
           title: '操作',
@@ -144,7 +163,8 @@ export default {
       editId: '',
       detailData: null,
       selectedRowKeys: [],
-      currentCommandPop: ProjectDetailPopContent
+      currentCommandPop: GroupDetailPopContent,
+      projectOpt: []
     }
   },
   computed: {
@@ -154,22 +174,17 @@ export default {
 
   async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
-    const cityOptRaw = await getListOptCity()
-    this.cityOpt = cityOptRaw.map(city => {
-      return {
-        value: city.id,
-        label: city.name
-      }
-    })
+    this.projectOpt = await getProjectOptProcessed()
   },
   methods: {
-    search() {
+    search(inputParams = {}) {
       const values = this.filterForm.getFieldsValue()
       const params = {
-
+        projectId: values.projectId,
+        groupName: values.groupName
       }
-      params.projectName = values.projectName
-      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
+      console.log(inputParams)
+      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }, inputParams))
     },
     resetFilterForm() {
       this.filterForm.resetFields()
@@ -224,6 +239,11 @@ export default {
       }
       params.projectName = values.projectName
       exportExcel(params)
+    },
+    projectChange(projectId) {
+      this.search({
+        projectId: projectId
+      })
     }
   }
 }

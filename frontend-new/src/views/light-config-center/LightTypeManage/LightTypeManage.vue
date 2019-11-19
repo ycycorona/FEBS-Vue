@@ -1,13 +1,13 @@
 <template>
-  <div class="standard-search-table-wrap table-page-search-wrapper full-width project-manage-page-wrap">
+  <div class="standard-search-table-wrap table-page-search-wrapper full-width light-type-manage-page-wrap">
     <!-- 表单区域 -->
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
-          <a-form-item label="项目名称">
+          <a-form-item label="灯类型名称">
             <a-input
               v-decorator="[
-                'projectName'
+                'lightTypeName'
               ]"
             />
           </a-form-item>
@@ -54,18 +54,9 @@
     >
       <template slot="operation" slot-scope="record">
         <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="修改" />编辑</span>
-        <!-- <a-popconfirm
-            title="确认删除吗?"
-            ok-text="删除"
-            cancel-text="取消"
-            @confirm="dodelItem(record.id)"
-          >
-            <span class="operation-btn"><icon-delete title="删除" />删除</span>
-          </a-popconfirm> -->
       </template>
     </a-table>
     <CommonDrawerWrap
-
       :detail-data.sync="detailData"
       :is-edit.sync="isEdit"
       :edit-id.sync="editId"
@@ -76,7 +67,7 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :city-opt="cityOpt"></component>
+        <component :is="currentCommandPop" v-bind="slotProps"></component>
       </template>
     </CommonDrawerWrap>
   </div>
@@ -87,40 +78,31 @@ import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
-import ProjectDetailPopContent from '@/views/light-config-center/ProjectManage/components/ProjectDetailPopContent'
-import { getDetail, del, getList, exportExcel } from '@/service/projectManageService'
-import { getListOpt as getListOptCity } from '@/service/cityManageService'
+import LightTypeDetailPopContent from '@/views/light-config-center/LightTypeManage/components/LightTypeDetailPopContent'
+import { getDetail, del, getList, exportExcel } from '@/service/lightTypeManageService'
+
 const PopTitleMap = new Map([
-  ['create', '添加项目'],
-  ['edit', '编辑项目']
+  ['create', '添加灯类型'],
+  ['edit', '编辑灯类型']
 ])
 export default {
-  name: 'ProjectManage',
-  components: { IconEdit, IconDelete, CommonDrawerWrap, ProjectDetailPopContent },
+  name: 'LightTypeManage',
+  components: { IconEdit, IconDelete, CommonDrawerWrap, LightTypeDetailPopContent },
   filters: {
 
   },
   props: {},
   data() {
     return {
-      cityOpt: [], // 城市列表 下拉用
       filterForm: this.$form.createForm(this),
       columns: [
         {
-          title: '项目名称',
+          title: '智能灯类型',
           dataIndex: 'name'
         },
         {
-          title: '所属城市',
-          dataIndex: 'cityName'
-        },
-        {
-          title: '项目地址',
-          dataIndex: 'address'
-        },
-        {
-          title: '备注',
-          dataIndex: 'descr'
+          title: '添加时间',
+          dataIndex: 'createTime'
         },
         {
           title: '操作',
@@ -144,7 +126,7 @@ export default {
       editId: '',
       detailData: null,
       selectedRowKeys: [],
-      currentCommandPop: ProjectDetailPopContent
+      currentCommandPop: LightTypeDetailPopContent
     }
   },
   computed: {
@@ -154,13 +136,6 @@ export default {
 
   async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
-    const cityOptRaw = await getListOptCity()
-    this.cityOpt = cityOptRaw.map(city => {
-      return {
-        value: city.id,
-        label: city.name
-      }
-    })
   },
   methods: {
     search() {
@@ -168,7 +143,7 @@ export default {
       const params = {
 
       }
-      params.projectName = values.projectName
+      params.lightTypeName = values.lightTypeName
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
     resetFilterForm() {
@@ -222,7 +197,7 @@ export default {
       const params = {
 
       }
-      params.projectName = values.projectName
+      params.lightTypeName = values.lightTypeName
       exportExcel(params)
     }
   }

@@ -1,4 +1,15 @@
 import { requestContructor } from './constructor'
+
+export async function getListOptProcessed(params) {
+  const rawList = await getListOpt()
+  return rawList.map(item => {
+    return {
+      value: item.id,
+      label: item.name
+    }
+  })
+}
+
 // 获取列表 不分页
 export function getListOpt(params) {
   return requestContructor({
@@ -17,19 +28,19 @@ export function getList(params) {
   })
 }
 // 获取详情
-export function getDetail(cityId) {
+export function getDetail(projectId) {
   return requestContructor({
-    url: '/business/city/getCityById',
+    url: '/business/project/getProjectById',
     method: 'get',
     params: {
-      cityId
+      projectId
     }
   })
 }
 // 修改
 export function save(params) {
   return requestContructor({
-    url: '/business/city/updateCity',
+    url: '/business/project/updateProject',
     method: 'post',
     params,
     gbLoading: true
@@ -38,7 +49,7 @@ export function save(params) {
 // 新建
 export function add(params) {
   return requestContructor({
-    url: '/business/city/addCity',
+    url: '/business/project/addProject',
     method: 'post',
     params,
     gbLoading: true
@@ -47,11 +58,20 @@ export function add(params) {
 // 删除
 export function del(ids) {
   return requestContructor({
-    url: '/business/city/deleteCityByBatch',
+    url: '/business/project/deleteProjectByBatch',
     method: 'delete',
     params: {
-      cityIds: ids
+      projectIds: ids
     },
     gbLoading: true
+  })
+}
+
+// 导出excel
+export function exportExcel(params) {
+  return requestContructor({
+    url: '/business/project/export_project',
+    method: 'download',
+    params
   })
 }

@@ -1,13 +1,13 @@
 <template>
-  <div class="standard-search-table-wrap table-page-search-wrapper full-width project-manage-page-wrap">
+  <div class="standard-search-table-wrap table-page-search-wrapper full-width gateway-firmware-manage-tab-wrap">
     <!-- 表单区域 -->
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
-          <a-form-item label="项目名称">
+          <a-form-item label="文件名称">
             <a-input
               v-decorator="[
-                'projectName'
+                'versionName'
               ]"
             />
           </a-form-item>
@@ -30,7 +30,8 @@
       >
         <a-button class="operation-btn" :disabled="selectedRowKeys.length===0" type="danger">删除</a-button>
       </a-popconfirm>
-      <a-button type="primary" @click="exportExcel">生成报表</a-button>
+      <a-button type="primary" @click="refresh">刷新</a-button>
+      <!-- <a-button type="primary" @click="exportExcel">生成报表</a-button> -->
       <div class="float-add-btn" style="margin-bottom:10px">
         <a-button
           type="primary"
@@ -54,18 +55,12 @@
     >
       <template slot="operation" slot-scope="record">
         <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="修改" />编辑</span>
-        <!-- <a-popconfirm
-            title="确认删除吗?"
-            ok-text="删除"
-            cancel-text="取消"
-            @confirm="dodelItem(record.id)"
-          >
-            <span class="operation-btn"><icon-delete title="删除" />删除</span>
-          </a-popconfirm> -->
+        <span class="operation-btn" @click="openUpdateFirmwarePop(record.id)"><a-icon type="setting" style="color:rgb(30, 191, 77)" />升级</span>
       </template>
     </a-table>
     <CommonDrawerWrap
-
+      :confirm-text="currentCommandConfirmText"
+      :cancel-text="currentCommandCancelText"
       :detail-data.sync="detailData"
       :is-edit.sync="isEdit"
       :edit-id.sync="editId"
@@ -76,7 +71,7 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :city-opt="cityOpt"></component>
+        <component :is="currentCommandPop" v-bind="slotProps" :file-type="FileType" :project-opt="projectOpt"></component>
       </template>
     </CommonDrawerWrap>
   </div>
@@ -87,36 +82,46 @@ import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
-import ProjectDetailPopContent from '@/views/light-config-center/ProjectManage/components/ProjectDetailPopContent'
-import { getDetail, del, getList, exportExcel } from '@/service/projectManageService'
-import { getListOpt as getListOptCity } from '@/service/cityManageService'
+import FirmwareDetailPopContent from '@/views/light-config-center/FirmwareManage/components/FrimwareDetailPopContent'
+import GatewayFirmwareUpdatePopContent from '@/views/light-config-center/FirmwareManage/components/GatewayFirmwareUpdatePopContent'
+import { getDetail, del, getList } from '@/service/firmwareManageService'
+import { getListOptProcessed as getProjectOptProcessed } from '@/service/projectManageService'
+
 const PopTitleMap = new Map([
-  ['create', '添加项目'],
-  ['edit', '编辑项目']
+  ['create', '添加网关固件'],
+  ['edit', '编辑网关固件'],
+  ['update', '网关升级']
 ])
+const PopTitleConfirmText = new Map([
+  ['update', '升级固件']
+])
+const FileType = 1
 export default {
-  name: 'ProjectManage',
-  components: { IconEdit, IconDelete, CommonDrawerWrap, ProjectDetailPopContent },
+  name: 'GatewayFirmwareTab',
+  components: { IconEdit, IconDelete, CommonDrawerWrap, FirmwareDetailPopContent },
   filters: {
 
   },
   props: {},
   data() {
     return {
-      cityOpt: [], // 城市列表 下拉用
-      filterForm: this.$form.createForm(this),
+      filterForm: this.$form.createForm(this), FileType,
       columns: [
         {
-          title: '项目名称',
-          dataIndex: 'name'
+          title: '文件名',
+          dataIndex: 'versionName'
         },
         {
-          title: '所属城市',
-          dataIndex: 'cityName'
+          title: '版本号',
+          dataIndex: 'version'
         },
         {
-          title: '项目地址',
-          dataIndex: 'address'
+          title: '上传时间',
+          dataIndex: 'uploadTime'
+        },
+        {
+          title: '文件大小',
+          dataIndex: 'size'
         },
         {
           title: '备注',
@@ -140,11 +145,14 @@ export default {
       dataSource: null,
       createEditPopVisible: false,
       currentCommandTitle: '',
+      currentCommandConfirmText: '',
+      currentCommandCancelText: '',
       isEdit: false,
       editId: '',
       detailData: null,
       selectedRowKeys: [],
-      currentCommandPop: ProjectDetailPopContent
+      currentCommandPop: FirmwareDetailPopContent,
+      projectOpt: []
     }
   },
   computed: {
@@ -154,32 +162,31 @@ export default {
 
   async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
-    const cityOptRaw = await getListOptCity()
-    this.cityOpt = cityOptRaw.map(city => {
-      return {
-        value: city.id,
-        label: city.name
-      }
-    })
   },
   methods: {
-    search() {
+    search(obj = null) {
       const values = this.filterForm.getFieldsValue()
       const params = {
 
       }
-      params.projectName = values.projectName
+      params.versionName = values.versionName
+      if (obj) {
+        Object.assign(params, obj)
+      }
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
+    },
+    refresh() {
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     resetFilterForm() {
       this.filterForm.resetFields()
-      this.fetch({ pageSize: 10, pageNum: 1 })
+      this.search()
     },
     handleTableChange(pagination, filters, sorter) {
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
     async fetch(params = {}) {
-      const data = await getList(params)
+      const data = await getList(Object.assign(params, { fileType: FileType }))
       const pagination = { ...this.pagination }
       this.dataSource = data.rows
       pagination.total = data.total
@@ -188,16 +195,21 @@ export default {
     },
     // 打开新建弹窗
     openCreate() {
+      this.currentCommandPop = FirmwareDetailPopContent
       this.currentCommandTitle = PopTitleMap.get('create')
       this.createEditPopVisible = true
     },
     // 打开编辑弹窗
     async openEditPop(id) {
+      this.currentCommandPop = FirmwareDetailPopContent
       this.currentCommandTitle = PopTitleMap.get('edit')
       this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.createEditPopVisible = true
+    },
+    openUpdatePop() {
+
     },
     // 编辑弹窗关闭
     handleCommandPopClose() {
@@ -217,13 +229,24 @@ export default {
       this.selectedRowKeys = selectedRowKeys
     },
     // 生成excel报表
-    exportExcel() {
-      const values = this.filterForm.getFieldsValue()
-      const params = {
+    // exportExcel() {
+    //   const values = this.filterForm.getFieldsValue()
+    //   const params = {
 
-      }
-      params.projectName = values.projectName
-      exportExcel(params)
+    //   }
+    //   params.lightTypeName = values.lightTypeName
+    //   exportExcel(params)
+    // },
+    // 打开升级下发弹窗
+    async openUpdateFirmwarePop(id) {
+      this.currentCommandPop = GatewayFirmwareUpdatePopContent
+      this.currentCommandConfirmText = PopTitleConfirmText.get('update')
+      this.currentCommandTitle = PopTitleMap.get('update')
+      this.detailData = await getDetail(id)
+      this.projectOpt = await getProjectOptProcessed()
+      this.editId = id
+      this.isEdit = true
+      this.createEditPopVisible = true
     }
   }
 }

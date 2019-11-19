@@ -2,82 +2,77 @@
   <a-form :form="form">
     <a-row :gutter="12">
       <a-col :span="20">
-        <a-form-item label="省份" v-bind="formItemLayout">
-          <a-select
-            v-decorator="['province',
+        <a-form-item label="项目名称" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['name',
                           {
-                            rules:[{ required: true, message: '省份不能为空'}],
-                            initialValue: formValues.province}]"
-            :options="provinceOpts"
-            placeholder="请选择省份"
-            @change="provinceChange"
+                            rules:[{ required: true, message: '项目名称不能为空'}],
+                            initialValue: formValues.name}]"
           />
         </a-form-item>
       </a-col>
       <a-col :span="20">
-        <a-form-item label="城市" v-bind="formItemLayout">
+        <a-form-item label="项目类型" v-bind="formItemLayout">
           <a-select
-            v-decorator="['city',
+            v-decorator="['type',
                           {
-                            rules:[{ required: true, message: '城市不能为空'}],
-                            initialValue: formValues.city}]"
-            placeholder="请选择城市"
-            :options="cityOpts"
-            @change="cityChange"
+                            rules:[{ required: true, message: '不能为空'}],
+                            initialValue: formValues.type}]"
+            :options="projectOpt"
           />
+        </a-form-item>
+      </a-col>
+      <a-col :span="20">
+        <a-form-item label="所属城市" v-bind="formItemLayout">
+          <a-select
+            v-decorator="['cityId',
+                          {
+                            rules:[{ required: true, message: '不能为空'}],
+                            initialValue: formValues.cityId}]"
+            :options="cityOpt"
+            placeholder="请选择所属城市"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="20">
+        <a-form-item label="项目地址" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['address',
+                          {
+                            rules:[{ required: true, message: '项目地址不能为空'}],
+                            initialValue: formValues.address}]"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="20">
+        <a-form-item label="备注" v-bind="formItemLayout">
+          <a-textarea
+            v-decorator="['descr',
+                          {rules: [
 
+                           ],
+                           initialValue: formValues.descr}]"
+            class="text-area"
+            :rows="15"
+          />
         </a-form-item>
       </a-col>
     </a-row>
-    <template v-if="currentCity!==undefined">
-      <a-row :gutter="12">
-        <a-col :span="24">
-          <a-form-item label="位置" v-bind="formItemLayout_1">
-            <position-input
-              v-decorator="['position',
-                            {rules: [
-                               { required: true, message: '位置不能为空'}
-                             ],
-                             initialValue: formValues.position}]"
-              :readonly="true"
-              @change="positionChangeFromText"
-            ></position-input>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <PointerSelect
-        ref="positonSelect"
-        style="z-index:1"
-        :current-pointer="pointerSelectValue"
-        @change="positionChangeFromMap"
-      ></PointerSelect>
-    </template>
   </a-form>
 </template>
 <script>
-import { BasePosition } from '@/config/LightConstant'
-import PointerSelect from '@/components/diyMap/PointerSelect'
-import PositionInput from '@/components/diyMap/PositionInput'
-import cityData from '@/config/cityData'
-import { save as saveCity, add as addCity } from '@/service/cityManageService'
-/* const cityTool = {
-  getArray(val) {
-    return val.split('--')
+import { save, add } from '@/service/projectManageService'
+
+const projectOpt = [
+  {
+    value: '1',
+    label: '普通项目'
   },
-  getId(val) {
-    return Number(this.getArray(val)[0])
-  },
-  getName(val) {
-    return this.getArray(val)[1]
+  {
+    value: '2',
+    label: '特殊项目'
   }
-} */
-const provinceOpts = ((cityData) => {
-  const provinceList = []
-  for (let i = 1; i < cityData.length; i++) {
-    provinceList.push({ value: cityData[i][0][0], label: cityData[i][0][0] })
-  }
-  return provinceList
-})(cityData)
+]
 const formItemLayout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 18 }
@@ -85,15 +80,19 @@ const formItemLayout = {
 function formValueFormater(detailData = null) {
   if (detailData) {
     return {
-      province: detailData.province,
-      city: detailData.name,
-      position: [detailData.lng, detailData.lat]
+      address: detailData.address,
+      cityId: detailData.cityId,
+      descr: detailData.descr,
+      name: detailData.name,
+      type: detailData.type
     }
   } else {
     return {
-      province: undefined,
-      name: undefined,
-      position: BasePosition
+      address: '',
+      cityId: '',
+      descr: '',
+      name: '',
+      type: 1
     }
   }
 }
@@ -103,7 +102,7 @@ const formItemLayout_1 = {
 }
 export default {
   name: 'ProjectDetailPopContent',
-  components: { PointerSelect, PositionInput },
+  components: { },
   props: {
     detailData: {
       type: Object
@@ -111,41 +110,22 @@ export default {
     isEdit: {
       default: false,
       type: Boolean
+    },
+    cityOpt: {
+      type: Array
     }
   },
   data() {
     const formValues = this.$props.isEdit
       ? formValueFormater(this.$props.detailData) : formValueFormater(null)
     return {
-      loading: false,
-      formItemLayout, formItemLayout_1,
+      formItemLayout, formItemLayout_1, projectOpt,
       formValues,
-      form: this.$form.createForm(this),
-      provinceOpts,
-      currentProvince: '',
-      currentCity: '',
-      pointerSelectValue: formValues.position
+      form: this.$form.createForm(this)
     }
   },
   computed: {
-    cityOpts() {
-      const currentProvince = this.currentProvince
 
-      if (currentProvince === '') return []
-
-      const cityList = []
-      let tmp
-      for (let i = 1, length = cityData.length; i < length; i++) {
-        if (cityData[i][0][0] === currentProvince) {
-          tmp = cityData[i][0]
-        }
-      }
-      for (let i = 1, length = tmp.length; i < length; i++) {
-        cityList.push({ value: tmp[i], label: tmp[i] })
-      }
-
-      return cityList
-    }
   },
   watch: {
 
@@ -154,25 +134,9 @@ export default {
     this.$store.commit('contact/setCurrentPopContent', this)
   },
   mounted() {
-    if (this.isEdit) {
-      this.provinceChange(this.form.getFieldValue('province'), false)
-    }
+
   },
   methods: {
-    // async test() {
-    //   console.log('start')
-    //   await this.testPro()
-    //     .finally(() => {
-    //       console.log('finally')
-    //     })
-    //   console.log('end')
-    // },
-    // testPro() {
-    //   return new Promise((res, rej) => {
-    //     console.log('testPro start')
-    //     rej()
-    //   })
-    // },
     async handleSubmit() {
       if (!this.validateFields()) {
         return false
@@ -187,23 +151,26 @@ export default {
     },
     async add(formValues) {
       const params = {
-        name: formValues.city,
-        province: formValues.province,
-        lat: formValues.position[1],
-        lng: formValues.position[0]
+        address: formValues.address,
+        cityId: formValues.cityId,
+        descr: formValues.descr,
+        name: formValues.name,
+        type: formValues.type
       }
-      await addCity(params)
+      // debugger
+      await add(params)
       this.$message.info('新增城市成功')
     },
     async save(formValues) {
       const params = {
-        name: formValues.city,
-        province: formValues.province,
-        lat: formValues.position[1],
-        lng: formValues.position[0],
-        id: this.detailData.id
+        address: formValues.address,
+        cityId: formValues.cityId,
+        descr: formValues.descr,
+        name: formValues.name,
+        type: formValues.type,
+        id: formValues.id
       }
-      await saveCity(params)
+      await save(params)
       this.$message.info('修改城市成功')
     },
     collectData() {
@@ -221,42 +188,6 @@ export default {
         }
       })
       return validateFlag
-    },
-    provinceChange(province, clearCity = true) {
-      this.currentProvince = province
-      if (clearCity) {
-        this.form.setFieldsValue({
-          city: undefined
-        })
-      }
-    },
-    cityChange(city) {
-      this.currentCity = city
-      this.$refs['positonSelect'].updatePointerByCityName(city)
-    },
-    // 智能灯经纬度改变 从地图
-    positionChangeFromMap([lng, lat]) {
-      this.form.setFieldsValue({ position: [lng, lat] })
-    },
-    // 智能灯经纬度改变 从input
-    positionChangeFromText([lng, lat]) {
-      console.log(lng, lat)
-      if (!this.validateX(lng)) { return }
-      if (!this.validateY(lat)) { return }
-
-      this.pointerSelectValue = [lng, lat]
-    },
-    validateX(x) {
-      if (isNaN(x) || x === '') { return false }
-      // if (Math.abs(Number(x)) === 0) { return false }
-      if (Math.abs(Number(x)) >= 180) { return false }
-      return true
-    },
-    validateY(y) {
-      if (isNaN(y) || y === '') { return false }
-      // if (Math.abs(Number(y)) === 0) { return false }
-      if (Math.abs(Number(y)) >= 90) { return false }
-      return true
     }
   }
 }

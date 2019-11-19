@@ -27,12 +27,12 @@
 </template>
 
 <script>
-import TabTitle from '@/components/fragment/TabTitle'
+// import TabTitle from '@/components/fragment/TabTitle'
 import { LightName, BasePosition } from '@/config/LightConstant'
-import MultiInput from '@/components/input/MultiInput/MultiInput'
+// import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
-import PointerSelect from '@/components/diyMap/PointerSelect'
-import PositionInput from '@/components/diyMap/PositionInput'
+// import PointerSelect from '@/components/diyMap/PointerSelect'
+// import PositionInput from '@/components/diyMap/PositionInput'
 const titleOpt = [
   LightName + '状态'
 ]

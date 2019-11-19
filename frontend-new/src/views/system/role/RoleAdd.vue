@@ -98,7 +98,7 @@ export default {
       expandedKeys: [],
       menuTreeData: [],
       allTreeKeys: [],
-      checkStrictly: false
+      checkStrictly: true
     }
   },
   watch: {

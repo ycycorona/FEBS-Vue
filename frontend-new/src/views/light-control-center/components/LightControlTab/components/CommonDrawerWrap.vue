@@ -13,9 +13,9 @@
     <slot name="default" v-bind="$props"></slot>
     <div class="drawer-bootom-button">
       <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
-        <a-button :loading="loading" style="margin-right: .8rem">取消</a-button>
+        <a-button :loading="loading" style="margin-right: .8rem">{{ cancelText || '取消' }}</a-button>
       </a-popconfirm>
-      <a-button type="primary" :loading="loading" @click="handleSubmit">提交</a-button>
+      <a-button type="primary" :loading="loading" @click="handleSubmit">{{ confirmText || '确定' }}</a-button>
     </div>
   </a-drawer>
 </template>
@@ -25,6 +25,14 @@ export default {
   name: 'CommonDrawerWrap',
   components: { },
   props: {
+    confirmText: {
+      default: '确定',
+      type: String
+    },
+    cancelText: {
+      default: '取消',
+      type: String
+    },
     drawWidth: {
       default: 600,
       type: Number

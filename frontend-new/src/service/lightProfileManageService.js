@@ -1,9 +1,8 @@
 import { requestContructor } from './constructor'
-
 // 获取列表 不分页
 export function getListOpt(params) {
   return requestContructor({
-    url: '/business/city/getCityList',
+    url: '/business/light-onoff-profile/getLightOnoffProfileList',
     method: 'get'
   })
 }
@@ -11,26 +10,26 @@ export function getListOpt(params) {
 // 获取列表
 export function getList(params) {
   return requestContructor({
-    url: '/business/city/getCityListByPage',
+    url: '/business/light-onoff-profile/getOnoffProfileListByPage',
     method: 'get',
     params,
     fullData: true
   })
 }
 // 获取详情
-export function getDetail(cityId) {
+export function getDetail(id) {
   return requestContructor({
-    url: '/business/city/getCityById',
+    url: '/business/light-onoff-profile/getLightOnoffProfileById',
     method: 'get',
     params: {
-      cityId
+      profileId: id
     }
   })
 }
 // 修改
 export function save(params) {
   return requestContructor({
-    url: '/business/city/updateCity',
+    url: '/business/light-onoff-profile/updateLightOnoffProfile',
     method: 'post',
     params,
     gbLoading: true
@@ -39,7 +38,7 @@ export function save(params) {
 // 新建
 export function add(params) {
   return requestContructor({
-    url: '/business/city/addCity',
+    url: '/business/light-onoff-profile/addLightType',
     method: 'post',
     params,
     gbLoading: true
@@ -48,18 +47,19 @@ export function add(params) {
 // 删除
 export function del(ids) {
   return requestContructor({
-    url: '/business/city/deleteCityByBatch',
+    url: '/business/light-type/deleteLightTypeByBatch',
     method: 'delete',
     params: {
-      cityIds: ids
+      profileIds: ids
     },
     gbLoading: true
   })
 }
+
 // 导出excel
 export function exportExcel(params) {
   return requestContructor({
-    url: '/business/city/export_AllCity',
+    url: '/business/light-onoff-profile/export_onoffProfile',
     method: 'download',
     params
   })

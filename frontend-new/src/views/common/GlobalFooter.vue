@@ -3,7 +3,7 @@
     <div class="copyright">
       Copyright
       <a-icon type="copyright" />
-      <span v-html="copyright" />
+      <span class="copyright-span" v-html="copyright" />
     </div>
   </div>
 </template>
@@ -31,6 +31,10 @@ export default {
 
     &a {
       text-decoration: none;
+
+    }
+    span.copyright-span {
+      color: #ffffff
     }
   }
 </style>

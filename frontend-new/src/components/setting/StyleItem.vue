@@ -15,6 +15,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
   .style{
     margin-right: 16px;
     position: relative;
@@ -28,7 +29,7 @@ export default {
       padding-top: 15px;
       padding-left: 24px;
       height: 100%;
-      color: #1890ff;
+      color: @primary-color;
       font-size: 14px;
       font-weight: bold;
     }

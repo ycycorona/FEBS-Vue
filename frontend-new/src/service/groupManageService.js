@@ -1,9 +1,8 @@
 import { requestContructor } from './constructor'
-
 // 获取列表 不分页
 export function getListOpt(params) {
   return requestContructor({
-    url: '/business/city/getCityList',
+    url: '/business/group/getGroupList',
     method: 'get'
   })
 }
@@ -11,26 +10,26 @@ export function getListOpt(params) {
 // 获取列表
 export function getList(params) {
   return requestContructor({
-    url: '/business/city/getCityListByPage',
+    url: '/business/group/getGroupListByPage',
     method: 'get',
     params,
     fullData: true
   })
 }
 // 获取详情
-export function getDetail(cityId) {
+export function getDetail(id) {
   return requestContructor({
-    url: '/business/city/getCityById',
+    url: '/business/group/getGroupById',
     method: 'get',
     params: {
-      cityId
+      groupId: id
     }
   })
 }
 // 修改
 export function save(params) {
   return requestContructor({
-    url: '/business/city/updateCity',
+    url: '/business/group/updateGroup',
     method: 'post',
     params,
     gbLoading: true
@@ -39,7 +38,7 @@ export function save(params) {
 // 新建
 export function add(params) {
   return requestContructor({
-    url: '/business/city/addCity',
+    url: '/business/group/addGroup',
     method: 'post',
     params,
     gbLoading: true
@@ -48,19 +47,32 @@ export function add(params) {
 // 删除
 export function del(ids) {
   return requestContructor({
-    url: '/business/city/deleteCityByBatch',
+    url: '/business/group/deleteGroupByBatch',
     method: 'delete',
     params: {
-      cityIds: ids
+      groupIds: ids
     },
     gbLoading: true
   })
 }
+
 // 导出excel
 export function exportExcel(params) {
   return requestContructor({
-    url: '/business/city/export_AllCity',
+    url: '/business/group/export_group',
     method: 'download',
     params
+  })
+}
+
+// 通过项目获取编组
+export function getListOptByProjectId(id) {
+  return requestContructor({
+    url: '/business/version/getGroupByPorjectId',
+    method: 'get',
+    params: {
+      projectId: id
+    },
+    gbLoading: true
   })
 }

@@ -31,7 +31,6 @@
           </a-form-item>
         </a-col>
       </a-row>
-      </a-row>
     </a-form>
   </a-spin>
 </template>

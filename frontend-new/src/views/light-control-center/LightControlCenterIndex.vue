@@ -1,76 +1,27 @@
 <template>
   <SingleMenuWrap>
     <div class="full-width light-control-center-index-wrap table-page-search-wrapper">
-      <!-- 表单区域 -->
-      <a-form layout="inline" :form="functionSelectForm">
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item
-              label="项目"
-            >
-              <a-select
-                v-model="currentProject"
-                placeholder="请选择项目"
-              >
-                <a-select-option :value="0">项目1</a-select-option>
-                <a-select-option :value="1">项目2</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="4" :xl="3">
-            <a-form-item
-              label="设备"
-            >
-              <a-select
-                v-model="currentDeviceType"
-                placeholder="请选择设备类型"
-              >
-                <a-select-option :value="0">智能灯</a-select-option>
-                <a-select-option :value="1">网关</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col v-if="currentDeviceType===0" :span="8" :xl="6">
-            <a-form-item
-              label="编组"
-            >
-              <a-select
-                v-model="currentGroup"
-                placeholder="请选择编组"
-              >
-                <a-select-option :value="0">全部</a-select-option>
-                <a-select-option :value="1">编组1</a-select-option>
-                <a-select-option :value="2">编组2</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
-      <a-tabs v-if="currentDeviceType===0" default-active-key="controlTab" class="full-width-tab" @change="onTabChange">
-        <a-tab-pane key="controlTab" :tab="currentControlDeviceName + '控制'">
-          <LightControlTab :group="currentGroup"></LightControlTab>
+
+      <a-tabs default-active-key="lightControlTab" class="full-width-tab" @change="onTabChange">
+        <a-tab-pane key="lightControlTab" tab="智能灯控制">
+          <light-control-tab></light-control-tab>
         </a-tab-pane>
-        <a-tab-pane key="manageTab" :tab="currentControlDeviceName + '管理'">
-          <LightManageTab></LightManageTab>
+        <a-tab-pane key="lightManageTab" tab="智能灯管理">
+          <light-manage-tab></light-manage-tab>
         </a-tab-pane>
-      </a-tabs>
-      <a-tabs v-else default-active-key="manageTab">
-        <a-tab-pane key="manageTab" :tab="currentControlDeviceName + '管理'">
+        <a-tab-pane key="gatewayManageTab" tab="网关管理控制">
           <gateway-manage-tab></gateway-manage-tab>
         </a-tab-pane>
       </a-tabs>
     </div>
   </SingleMenuWrap>
 </template>
-
 <script>
-
 import SingleMenuWrap from '@/views/common/SingleMenuWrap'
 import LightManageTab from './components/LightManageTab/LightManageTab'
 import LightControlTab from './components/LightControlTab/LightControlTab'
 import GatewayManageTab from './components/GatewayManageTab/GatewayManageTab'
 
-import { LightName, GatewayName } from '@/config/LightConstant'
 export default {
   name: 'LightControlCenterIndex',
   components: { SingleMenuWrap, LightManageTab, LightControlTab, GatewayManageTab },
@@ -79,9 +30,6 @@ export default {
   },
   data() {
     return {
-      Cons: {
-        LightName, GatewayName
-      },
       currentProject: 0,
       currentDeviceType: 0,
       currentGroup: 0,
@@ -92,26 +40,18 @@ export default {
     }
   },
   computed: {
-    currentControlDeviceName() {
-      if (this.currentDeviceType === 1) {
-        return GatewayName
-      } else if (this.currentDeviceType === 0) {
-        return LightName
-      } else {
-        return ''
-      }
-    }
+
   },
   watch: {
     currentProject(newVal, oldVal) {
-      console.log(newVal, oldVal)
+
     },
     currentDeviceType(newVal, oldVal) {
 
     }
   },
   async created() {
-    this.fetch({ pageSize: 10, pageNum: 1 })
+
   },
   methods: {
     search() {
@@ -128,21 +68,6 @@ export default {
     },
     resetFilterForm() {
       this.filterForm.resetFields()
-    },
-    fetch(params = {}) {
-      // 显示loading
-      this.loading = true
-      this.loading = false
-      // console.log(params)
-      // this.$get('/business/alarm/getAlarmListByPage', {
-      //   ...params
-      // })
-      //   .then((r) => {
-      //     const data = r.data
-      //   })
-      //   .finally(() => {
-      //     this.loading = false
-      //   })
     },
     onTabChange() {
 

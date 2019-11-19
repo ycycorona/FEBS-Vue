@@ -1,115 +1,132 @@
 <template>
-  <a-spin :spinning="loading">
-    <div class="light-control-list-tab">
-      <!-- 操作按钮 -->
-      <div style="margin-bottom:10px" class="">
-        <a-dropdown>
-          <a-menu slot="overlay" @click="handleCommandClick">
-            <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
-            <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
-            <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
-            <a-menu-item key="LightTimeSync">时间校准</a-menu-item>
-            <a-menu-item key="SingleLightJiaoBiao">单灯校表</a-menu-item>
-            <a-menu-item key="LightPosition">经纬度修改</a-menu-item>
-            <a-menu-item key="LightPanId">PANID修改</a-menu-item>
-            <a-menu-item key="LightChannel">频道修改</a-menu-item>
-            <a-menu-item key="AlarmThreshold">报警阈修改</a-menu-item>
-            <a-menu-item key="InfraredParams">红外触发参数设置</a-menu-item>
-            <a-menu-item key="delete">删除{{ Cons.LightName }}</a-menu-item>
-            <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
-        </a-dropdown>
-        <a v-if="!showSearchForm" style="margin-left: 8px" @click="toggleSearchForm">
-          {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-          <a-icon :type="showSearchForm ? 'up' : 'down'" />
-        </a>
-      </div>
-      <!-- 搜索框 -->
-      <a-form v-if="showSearchForm" layout="inline" :form="filterForm">
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item label="智能灯编号">
-              <a-input
-                v-decorator="[
-                  'lightId'
-                ]"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <span>
-              <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
-              <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
-              <a style="margin-left: 8px" @click="toggleSearchForm">
-                {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-                <a-icon :type="showSearchForm ? 'up' : 'down'" />
-              </a>
-            </span>
-          </a-col>
-        </a-row>
-      </a-form>
-      <!-- 表格 -->
-      <a-table
-        ref="light-control-list-tab-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        :row-key="record => record.id"
-        :columns="columns"
-        :scroll="{x: 1200}"
-        :data-source="dataSource"
-        :pagination="pagination"
-        @change="handleTableChange"
-      >
-        <template slot="operation" slot-scope="record">
-          <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
-          <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
-        </template>
-      </a-table>
-      <LightControlDetailPop
-        :visible.sync="lightControlDetailPopVisible"
-        :is-edit.sync="isEdit"
-        :edit-id.sync="editId"
-        :pop-readonly.sync="popReadonly"
-        @close="handleEditPopClose"
-        @success="handleEditPopSuccess"
-      ></LightControlDetailPop>
-      <CommonDrawerWrap
-        :draw-width="800"
-        :visible.sync="lightCommandPopVisible"
-        :draw-title="currentCommandTitle"
-        @close="handleCommandPopClose"
-        @success="handleCommandPopSuccess"
-      >
-        <template v-slot:default>
-          <component :is="currentCommandPop"></component>
-        </template>
-      </CommonDrawerWrap>
-      <a-modal
-        title="单灯校表"
-        :visible="lightJiaoBiaoModalVisible"
-        @ok="commitLightJiaoBiao"
-        @cancel="lightJiaoBiaoModalVisible=false"
-      >
-        <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
-      </a-modal>
-      <a-modal
-        title="删除"
-        :visible="deleteModalVisible"
-        @ok="doDelItems"
-        @cancel="deleteModalVisible=false"
-      >
-        <p>确定要删除所选智能灯?</p>
-      </a-modal>
-      <a-modal
-        title="强制删除"
-        :visible="forceDeleteModalVisible"
-        @ok="commitForceDelete"
-        @cancel="forceDeleteModalVisible=false"
-      >
-        <p>确定要删除所选智能灯?</p>
-      </a-modal>
+  <div class="full-width  table-page-search-wrapper light-control-list-tab">
+    <!-- 搜索区域-->
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item
+            label="项目"
+          >
+            <a-select
+              v-model="currentProject"
+              placeholder="请选择项目"
+            >
+              <a-select-option :value="0">项目1</a-select-option>
+              <a-select-option :value="1">项目2</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item
+            label="编组"
+          >
+            <a-select
+              v-model="currentGroup"
+              placeholder="请选择编组"
+            >
+              <a-select-option :value="0">全部</a-select-option>
+              <a-select-option :value="1">编组1</a-select-option>
+              <a-select-option :value="2">编组2</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="智能灯编号">
+            <a-input
+              v-decorator="[
+                'lightId'
+              ]"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
+    </a-form>
+    <!-- 操作按钮 -->
+    <div style="margin-bottom:10px" class="">
+      <a-dropdown>
+        <a-menu slot="overlay" @click="handleCommandClick">
+          <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
+          <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
+          <a-menu-item key="LightControlStrategy">调光策略</a-menu-item>
+          <a-menu-item key="LightTimeSync">时间校准</a-menu-item>
+          <a-menu-item key="SingleLightJiaoBiao">单灯校表</a-menu-item>
+          <a-menu-item key="LightPosition">经纬度修改</a-menu-item>
+          <a-menu-item key="LightPanId">PANID修改</a-menu-item>
+          <a-menu-item key="LightChannel">频道修改</a-menu-item>
+          <a-menu-item key="AlarmThreshold">报警阈修改</a-menu-item>
+          <a-menu-item key="InfraredParams">红外触发参数设置</a-menu-item>
+          <a-menu-item key="delete">删除{{ Cons.LightName }}</a-menu-item>
+          <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
+      </a-dropdown>
     </div>
-  </a-spin>
+    <!-- 表格 -->
+    <a-table
+      ref="light-control-list-tab-table"
+      :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 1200}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      @change="handleTableChange"
+    >
+      <template slot="operation" slot-scope="record">
+        <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
+      </template>
+    </a-table>
+    <LightControlDetailPop
+      :visible.sync="lightControlDetailPopVisible"
+      :is-edit.sync="isEdit"
+      :edit-id.sync="editId"
+      :pop-readonly.sync="popReadonly"
+      @close="handleEditPopClose"
+      @success="handleEditPopSuccess"
+    ></LightControlDetailPop>
+    <CommonDrawerWrap
+      :draw-width="800"
+      :visible.sync="lightCommandPopVisible"
+      :draw-title="currentCommandTitle"
+      @close="handleCommandPopClose"
+      @success="handleCommandPopSuccess"
+    >
+      <template v-slot:default>
+        <component :is="currentCommandPop"></component>
+      </template>
+    </CommonDrawerWrap>
+    <a-modal
+      title="单灯校表"
+      :visible="lightJiaoBiaoModalVisible"
+      @ok="commitLightJiaoBiao"
+      @cancel="lightJiaoBiaoModalVisible=false"
+    >
+      <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
+    </a-modal>
+    <a-modal
+      title="删除"
+      :visible="deleteModalVisible"
+      @ok="doDelItems"
+      @cancel="deleteModalVisible=false"
+    >
+      <p>确定要删除所选智能灯?</p>
+    </a-modal>
+    <a-modal
+      title="强制删除"
+      :visible="forceDeleteModalVisible"
+      @ok="commitForceDelete"
+      @cancel="forceDeleteModalVisible=false"
+    >
+      <p>确定要删除所选智能灯?</p>
+    </a-modal>
+  </div>
 </template>
 
 <script>

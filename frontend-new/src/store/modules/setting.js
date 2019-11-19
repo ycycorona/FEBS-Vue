@@ -1,4 +1,4 @@
-import db from 'utils/localstorage'
+import db from '@/utils/localstorage'
 
 export default {
   namespaced: true,
@@ -27,7 +27,8 @@ export default {
       'rgb(47, 84, 235)',
       'rgb(114, 46, 209)'
     ],
-    color: db.get('COLOR', 'rgb(24, 144, 255)')
+    color: db.get('COLOR', '#00CFAA')
+    /*     'rgb(24, 144, 255)'  */
   },
   mutations: {
     setDevice(state, isMobile) {

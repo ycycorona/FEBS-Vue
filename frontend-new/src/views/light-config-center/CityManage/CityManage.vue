@@ -90,7 +90,7 @@ import IconDelete from '@/components/icons/IconDelete'
 import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
 import CityDetailPopContent from '@/views/light-config-center/CityManage/components/CityDetailPopContent'
-import { getDetail as getCityById, del as deleteCityByIds, getList } from '@/service/cityManageService'
+import { exportExcel, getDetail as getCityById, del as deleteCityByIds, getList } from '@/service/cityManageService'
 const PopTitleMap = new Map([
   ['create', '添加城市'],
   ['edit', '编辑城市']
@@ -165,6 +165,7 @@ export default {
     },
     resetFilterForm() {
       this.filterForm.resetFields()
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     handleTableChange(pagination, filters, sorter) {
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
@@ -209,7 +210,12 @@ export default {
     },
     // 生成excel报表
     exportExcel() {
-      this.$download('/business/city/export_AllCity')
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+
+      }
+      params.cityName = values.cityName
+      exportExcel(params)
     }
   }
 }

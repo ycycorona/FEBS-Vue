@@ -1,6 +1,9 @@
 <template>
   <div class="container">
     <div class="content">
+      <div class="left-img-wrap">
+        <img src="\static\img\login-left-pic.png" alt="" style="width: 75%;">
+      </div>
       <div class="form-wrap">
         <div class="top">
           <div class="header">
@@ -54,9 +57,18 @@ export default {
     height: 100vh;
     overflow: auto;
     //background: #f0f2f5 url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center 110px;
-    background: #f0f2f5 url('/static/img/login-back.png')  center/cover repeat local;
+    //background: #f0f2f5 url('/static/img/login-back.png')  center/cover repeat local;
+    background: #f0f2f5 url('/static/img/login-back.png') no-repeat;
     background-size: 100%;
     .content {
+      .left-img-wrap {
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        right: 50%;
+        width: 50%;
+        transform: translate(0, -50%);
+      }
       .form-wrap {
         position: absolute;
         top: 48%;
@@ -91,8 +103,9 @@ export default {
             margin-right: 0;
           }
           .title {
+            margin-left: 0.5rem;
             font-size: 28px;
-            color: rgba(0,0,0,.85);
+            color: #FFFFFF /* rgba(0,0,0,.85) */;
             font-family: 'Myriad Pro', 'Helvetica Neue', Arial, Helvetica, sans-serif;
             font-weight: 600;
             position: relative;
