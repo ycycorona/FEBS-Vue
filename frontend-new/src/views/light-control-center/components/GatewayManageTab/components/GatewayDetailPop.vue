@@ -382,10 +382,10 @@ export default {
       ? formValueFormater(this.$props.detailData) : formValueFormater(null)
     const gatewayConfigFormValues = gatewayConfigFormValuesFormater()
     this.formValues = formValues
+    this.gatewayConfigFormValues = gatewayConfigFormValues
     return {
       form: this.$form.createForm(this),
       gatewayConfigForm: this.$form.createForm(this),
-      gatewayConfigFormValues,
       formItemLayout, formItemLayout_1, formItemLayout_noLabel, number, TimepickerFormat,
       rawDetail: null,
       pointerSelectValue: formValues.gatewayPosition
@@ -398,9 +398,6 @@ export default {
 
   },
   created() {
-    // if (this.isEdit) {
-
-    // }
     this.$store.commit('contact/setCurrentPopContent', this)
   },
   mounted() {

@@ -34,18 +34,9 @@
         </a-col>
       </a-row>
     </a-form>
-    <!-- 添加按钮 -->
-    <div class="float-add-btn">
-      <a-button
-        type="primary"
-        style="border-radius:45px!important;"
-        @click="openCreate"
-      >
-        <a-icon type="plus" /><span style="margin-left: 3px;">添加网关</span>
-      </a-button>
-    </div>
+
     <!-- 操作按钮 -->
-    <div style="margin-bottom:10px" class="">
+    <div style="margin-bottom:10px;position:relative" class="">
       <a-dropdown>
         <a-menu slot="overlay" @click="handleCommandClick">
           <a-menu-item key="GatewayChannel">频道修改</a-menu-item>
@@ -57,6 +48,16 @@
         <a-button style="margin-left: 10px;margin-right: 10px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
       </a-dropdown>
       <a-button type="primary" @click="refresh">刷新</a-button>
+      <!-- 添加按钮 -->
+      <div class="float-add-btn">
+        <a-button
+          type="primary"
+          style="border-radius:45px!important;"
+          @click="openCreate"
+        >
+          <a-icon type="plus" /><span style="margin-left: 3px;">添加网关</span>
+        </a-button>
+      </div>
     </div>
     <!-- 表格 -->
     <a-table
@@ -339,7 +340,7 @@ export default {
     },
     projectChange(projectId) {
       this.filterForm.setFieldsValue({
-        'groupName': ''
+        'gatewayName': ''
       })
       this.search({
         projectId: projectId

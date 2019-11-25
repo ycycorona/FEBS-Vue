@@ -1,6 +1,57 @@
 <template>
-  <a-spin :spinning="loading">
-    <div class="light-manage-list-tab">
+  <div class="light-manage-list-tab">
+    <!-- 表单区域 -->
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item label="项目名称">
+            <a-select
+              v-decorator="['projectId', {
+                rules:[],
+                initialValue: formValues.projectId,
+              }]"
+              allow-clear
+              :options="projectOpt"
+              @change="projectChange"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="编组名称">
+            <a-input
+              v-decorator="['groupName', {
+                rules:[],
+                initialValue: formValues.groupName,
+              }]"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search()">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
+    </a-form>
+
+    <div style="margin-bottom:10px;position:relative" class="">
+      <a-popconfirm
+        title="确认删除吗?"
+        ok-text="删除"
+        cancel-text="取消"
+        @confirm="doDelItems"
+      >
+        <a-button style="margin-right:5px" :disabled="selectedRowKeys.length===0" type="danger">删除{{ Cons.LightName }}</a-button>
+      </a-popconfirm>
+      <a-popconfirm
+        title="确认审核吗?"
+        ok-text="审核"
+        cancel-text="取消"
+        @confirm="doApprove"
+      >
+        <a-button :disabled="selectedRowKeys.length===0" type="primary">审核{{ Cons.LightName }}</a-button>
+      </a-popconfirm>
       <!-- 添加按钮 -->
       <div class="float-add-btn">
         <a-button
@@ -11,95 +62,67 @@
           <a-icon type="plus" /><span style="margin-left: 3px;">添加{{ Cons.LightName }}</span>
         </a-button>
       </div>
-      <!-- 表格区域 -->
-      <div style="margin-bottom:10px" class="">
-        <a-popconfirm
-          title="确认删除吗?"
-          ok-text="删除"
-          cancel-text="取消"
-          @confirm="doDelItems"
-        >
-          <a-button style="margin-right:5px" :disabled="selectedRowKeys.length===0" type="danger">删除{{ Cons.LightName }}</a-button>
-        </a-popconfirm>
-        <a-popconfirm
-          title="确认审核吗?"
-          ok-text="审核"
-          cancel-text="取消"
-          @confirm="doApprove"
-        >
-          <a-button :disabled="selectedRowKeys.length===0" type="primary">审核{{ Cons.LightName }}</a-button>
-        </a-popconfirm>
-        <a v-if="!showSearchForm" style="margin-left: 8px" @click="toggleSearchForm">
-          {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-          <a-icon :type="showSearchForm ? 'up' : 'down'" />
-        </a>
-      </div>
-      <!-- 搜索框 -->
-      <a-form v-if="showSearchForm" layout="inline" :form="filterForm">
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item label="编组">
-              <a-input
-                v-decorator="[
-                  'group'
-                ]"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <span>
-              <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
-              <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
-              <a style="margin-left: 8px" @click="toggleSearchForm">
-                {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-                <a-icon :type="showSearchForm ? 'up' : 'down'" />
-              </a>
-            </span>
-          </a-col>
-        </a-row>
-      </a-form>
-      <a-table
-        ref="light-manage-list-tab-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        :row-key="record => record.id"
-        :columns="columns"
-        :scroll="{x: 1200}"
-        :data-source="dataSource"
-        :pagination="pagination"
-        @change="handleTableChange"
-      >
-        <template slot="operation" slot-scope="record">
-          <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
-          <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
-        </template>
-      </a-table>
-      <LightManageDetailPop
-        :visible.sync="lightManageDetailPopVisible"
-        :is-edit.sync="isEdit"
-        :edit-id.sync="editId"
-        :readonly.sync="popReadonly"
-        @close="handleEditPopClose"
-        @success="handleEditPopSuccess"
-      ></LightManageDetailPop>
     </div>
-  </a-spin>
-
+    <a-table
+      ref="light-manage-list-tab-table"
+      :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 1200}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      @change="handleTableChange"
+    >
+      <template slot="operation" slot-scope="record">
+        <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
+      </template>
+    </a-table>
+    <CommonDrawerWrap
+      :detail-data.sync="detailData"
+      :is-edit.sync="isEdit"
+      :edit-id.sync="editId"
+      :readonly.sync="popReadonly"
+      :draw-width="1000"
+      :visible.sync="commandPopVisible"
+      :draw-title="currentCommandTitle"
+      @close="handleCommandPopClose"
+      @success="handleCommandPopSuccess"
+    >
+      <template v-slot:default="slotProps">
+        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOptPopUse"></component>
+      </template>
+    </CommonDrawerWrap>
+  </div>
 </template>
 
 <script>
+import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
+
+import { configSerialize } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
 import LightManageDetailPop from './components/LightManageDetailPop'
-// import { configSerialize } from '@/utils/common'
+import { getDetail, del, getList, exportExcel } from '@/service/unapproveLightManageService'
 import { LightName } from '@/config/LightConstant'
+import { getListOptProcessed as getReadProjectOptProcessed,
+  getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
+const commandPopMap = {
+  'AddPop': LightManageDetailPop
+}
+
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
 }
 export default {
   name: 'LightManageTab',
-  components: { IconEdit, LightManageDetailPop },
+  components: { IconEdit, LightManageDetailPop, CommonDrawerWrap },
   props: {},
   data() {
+    this.formValues = {
+      projectId: '',
+      groupName: ''
+    }
     return {
       filterForm: this.$form.createForm(this),
       Cons: {
@@ -120,11 +143,7 @@ export default {
         },
         {
           title: '智能灯编号',
-          dataIndex: 'lightId'
-        },
-        {
-          title: '审核状态',
-          dataIndex: 'approveStatus'
+          dataIndex: 'lightNumber'
         },
         {
           title: '创建人',
@@ -148,87 +167,108 @@ export default {
         showSizeChanger: true,
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
-      loading: false,
       dataSource: null,
-      lightManageDetailPopVisible: false,
       isEdit: false,
       popReadonly: false,
       editId: '',
       selectedRowKeys: [],
       formItemLayout,
-      showSearchForm: false
+      commandPopVisible: false,
+      currentCommandPop: null,
+      currentCommandTitle: '',
+      projectOpt: [],
+      projectOptPopUse: [],
+      detailData: null
     }
   },
   computed: {},
   watch: {},
-  created() {
+  async created() {
+    this.projectOpt = await getReadProjectOptProcessed()
     this.fetch({ pageSize: 10, pageNum: 1 })
   },
   methods: {
-    toggleSearchForm() {
-      this.showSearchForm = !this.showSearchForm
+    search(inputParams = {}) {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+        projectId: values.projectId,
+        gatewayName: values.gatewayName
+      }
+      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }, inputParams))
+    },
+    resetFilterForm() {
+      this.filterForm.resetFields()
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination)
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
-    fetch(params = {}) {
-      // 显示loading
-      this.loading = true
-      this.$get('/light-control-center/light-manage/list', {
-        ...params, type: 0
-      }).then((r) => {
-        const data = r.data
-        const pagination = { ...this.pagination }
-        this.dataSource = data.rows
-        pagination.total = data.total
-        this.pagination = pagination
-      }).finally(() => {
-        this.loading = false
-      })
+    async fetch(params = {}) {
+      const data = await getList(params)
+      const pagination = { ...this.pagination }
+      this.dataSource = data.rows
+      pagination.total = data.total
+      this.pagination = pagination
+      this.selectedRowKeys = []
     },
     // 打开新建弹窗
-    openCreate() {
-      this.lightManageDetailPopVisible = true
+    async openCreate() {
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '添加路灯'
+      this.commandPopVisible = true
     },
     // 打开编辑弹窗
-    openEditPop(id) {
+    async openEditPop(id) {
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
+      this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
-      this.lightManageDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '编辑路灯'
+      this.commandPopVisible = true
     },
     // 打开只读弹窗
-    openReadonlyPop(id) {
+    async openReadonlyPop(id) {
+      this.projectOptPopUse = await getReadProjectOptProcessed()
+      this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
-      this.lightManageDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandTitle = '查看路灯'
+      this.commandPopVisible = true
     },
     // 编辑弹窗关闭
-    handleEditPopClose() {
+    handleCommandPopClose() {
 
     },
     // 保存成功
-    handleEditPopSuccess() {
+    handleCommandPopSuccess() {
       this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 删除
-    doDelItems() {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        resolve()
-        // this.$delete('/business/black-white-app/deleteBlackWhiteAppByBatch', {
-        //   appIds: configSerialize(this.selectedRowKeys)
-        // })
-        //   .then(r => {
-        //     resolve(r.data.data)
-        //     this.$message.info('删除成功')
-        //     this.fetch({ pageSize: 10, pageNum: 1 })
-        //   })
-        //   .finally(() => {
-        //     this.loading = false
-        //   })
-      })
+    async doDelItems() {
+      await del(configSerialize(this.selectedRowKeys))
+        .finally(() => {
+          this.deleteModalVisible = false
+        })
+      this.$message.info('删除成功')
+      this.fetch({ pageSize: 10, pageNum: 1 })
+    },
+    // 选择命令 打开弹窗
+    async handleCommandClick({ key }) {
+      if (key === 'doDelItems') {
+        this.deleteModalVisible = true
+        return
+      }
+      this.editId = this.selectedRowKeys[0]
+      this.detailData = {}
+
+      this.currentCommandPop = commandPopMap[key]
+      this.currentCommandTitle = commandPopTitleMap[key]
+      this.commandPopVisible = true
     },
     doApprove() {
 
@@ -236,11 +276,22 @@ export default {
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    search() {
-
+    projectChange(projectId) {
+      this.filterForm.setFieldsValue({
+        'groupName': ''
+      })
+      this.search({
+        projectId: projectId
+      })
     },
-    resetFilterForm() {
+    // 生成excel报表
+    exportExcel() {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
 
+      }
+      params.gatewayName = values.gatewayName
+      exportExcel(params)
     }
   }
 }
@@ -248,9 +299,4 @@ export default {
 
 <style lang="less" scoped>
 
-.float-add-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
 </style>
