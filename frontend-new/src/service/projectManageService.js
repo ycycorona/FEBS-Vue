@@ -10,10 +10,28 @@ export async function getListOptProcessed(params) {
   })
 }
 
+export async function getWriteListOptProcessed(params) {
+  const rawList = await getWriteListOpt()
+  return rawList.map(item => {
+    return {
+      value: item.id,
+      label: item.name
+    }
+  })
+}
+
 // 获取列表 不分页
 export function getListOpt(params) {
   return requestContructor({
     url: '/business/project/getProjectList',
+    method: 'get'
+  })
+}
+
+// 获取写权限列表 不分页
+export function getWriteListOpt(params) {
+  return requestContructor({
+    url: '/business/project/getWriteProjectList',
     method: 'get'
   })
 }

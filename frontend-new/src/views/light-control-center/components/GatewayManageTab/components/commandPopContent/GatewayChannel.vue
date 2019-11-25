@@ -19,7 +19,7 @@
   </a-spin>
 </template>
 <script>
-
+import { setChannel } from '@/service/gatewayManageService'
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
@@ -28,19 +28,31 @@ const formItemLayout_1 = {
   labelCol: { span: 0 },
   wrapperCol: { offset: 5, span: 19 }
 }
-function formValueFormater() {
-  return {
-    channel: ''
+function formValueFormater(detailData) {
+  if (detailData) {
+    return {
+      channel: detailData.gatewayConfig.pindao
+    }
+  } else {
+    return {
+      channel: ''
+    }
   }
 }
 export default {
   name: 'GatewayChannel',
   components: { },
   props: {
-
+    detailData: {
+      type: Object
+    },
+    editId: {
+      type: [String, Number]
+    }
   },
   data() {
-    const formValues = formValueFormater()
+    const formValues = this.$props.detailData
+      ? formValueFormater(this.$props.detailData) : formValueFormater(null)
     return {
       loading: false,
       formItemLayout, formItemLayout_1,
@@ -66,20 +78,13 @@ export default {
       await this.save(formValues)
       return true
     },
-    save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+    async save(formValues) {
+      await setChannel({
+        gatewayId: this.editId,
+        pindao: formValues.channel
+
+      })
+      this.$message.info('修改频道成功')
     },
     collectData() {
       return this.form.getFieldsValue()

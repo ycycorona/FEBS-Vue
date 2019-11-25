@@ -19,7 +19,9 @@ export function requestContructor(config) {
   return new Promise((resolve, reject) => {
     request[config.method](config.url, config.params)
       .then((r) => {
-        if (r.data.state === 1) {
+        if (r.data === null) {
+          reject(null)
+        } else if (r.data.state === 1) {
           if (config.fullData) {
             resolve(r.data)
           } else {

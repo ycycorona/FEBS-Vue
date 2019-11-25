@@ -168,7 +168,7 @@ export default {
         descr: formValues.descr,
         name: formValues.name,
         type: formValues.type,
-        id: formValues.id
+        id: this.detailData.id
       }
       await save(params)
       this.$message.info('修改城市成功')

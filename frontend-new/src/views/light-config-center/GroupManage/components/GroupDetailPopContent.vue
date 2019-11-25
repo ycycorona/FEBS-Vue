@@ -26,7 +26,7 @@
       <a-col :span="20">
         <a-form-item label="网关" v-bind="formItemLayout">
           <a-select
-            v-decorator="['gatewayIds', {
+            v-decorator="['gatewayId', {
               rules:[{ required: true, message: '网关不能为空'}],
               initialValue: formValues.gatewayId
             }]"
@@ -96,7 +96,7 @@ function formValueFormater(detailData = null) {
     return {
       groupName: detailData.groupName,
       projectId: detailData.projectId,
-      gatewayId: detailData.gatewayIds,
+      gatewayId: detailData.gatewayId,
       profileId: detailData.profileId,
       lightType: detailData.lightType,
       address: detailData.address,
@@ -131,6 +131,14 @@ export default {
     },
     projectOpt: {
       type: Array
+    },
+    readonly: {
+      default: false,
+      type: Boolean
+    },
+    editId: {
+      default: '',
+      type: [String, Number]
     }
   },
   data() {
@@ -156,6 +164,9 @@ export default {
   },
   async created() {
     this.$store.commit('contact/setCurrentPopContent', this)
+    if (this.isEdit) {
+      this.gatewayOpt = this.detailData.gatewayOpt
+    }
     getLightTypeListOpt()
       .then((data) => {
         this.currentlightTypeOptRaw = data
@@ -195,26 +206,27 @@ export default {
     },
     async add(formValues) {
       const params = {
-        groupName: '',
-        projectId: '',
-        gatewayId: '',
-        profileId: '',
-        lightType: '',
-        address: '',
-        descr: ''
+        groupName: formValues.groupName,
+        projectId: formValues.projectId,
+        gatewayId: formValues.gatewayId,
+        profileId: formValues.profileId,
+        lightType: formValues.lightType,
+        address: formValues.address,
+        descr: formValues.address
       }
       await add(params)
       this.$message.info('新增编组成功')
     },
     async save(formValues) {
       const params = {
-        groupName: '',
-        projectId: '',
-        gatewayId: '',
-        profileId: '',
-        lightType: '',
-        address: '',
-        descr: ''
+        id: this.editId,
+        groupName: formValues.groupName,
+        projectId: formValues.projectId,
+        gatewayId: formValues.gatewayId,
+        profileId: formValues.profileId,
+        lightType: formValues.lightType,
+        address: formValues.address,
+        descr: formValues.address
       }
       await save(params)
       this.$message.info('修改编组成功')

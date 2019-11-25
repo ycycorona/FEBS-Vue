@@ -98,7 +98,7 @@ export default {
       columns: [
         {
           title: '模式名称',
-          dataIndex: 'name'
+          dataIndex: 'profileName'
         },
         {
           title: '开灯时间',
@@ -155,7 +155,7 @@ export default {
       const params = {
 
       }
-      params.lightProfileName = values.lightProfileName
+      params.lightOnoffProfileName = values.lightProfileName
       this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }))
     },
     resetFilterForm() {

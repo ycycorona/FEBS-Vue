@@ -1,106 +1,111 @@
 <template>
-  <a-spin :spinning="loading">
-    <div class="gateway-list-tab">
-      <!-- 添加按钮 -->
-      <div class="float-add-btn">
-        <a-button
-          type="primary"
-          style="border-radius:45px!important;"
-          @click="openCreate"
-        >
-          <a-icon type="plus" /><span style="margin-left: 3px;">添加{{ Cons.GatewayName }}</span>
-        </a-button>
-      </div>
-      <!-- 操作按钮 -->
-      <div style="margin-bottom:10px" class="">
-        <a-dropdown>
-          <a-menu slot="overlay" @click="handleCommandClick">
-            <a-menu-item key="GatewayChannel">频道修改</a-menu-item>
-            <a-menu-item key="GatewayPanId">PANID修改</a-menu-item>
-            <a-menu-item key="GatewayElectricRelayConfig">网关继电器配置</a-menu-item>
-            <a-menu-item key="GatewayElectricAddress">电表地址修改</a-menu-item>
-            <a-menu-item key="delete">删除网关</a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 10px;margin-right: 10px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
-        </a-dropdown>
-        <a-button type="primary" @click="refresh">刷新</a-button>
-        <a v-if="!showSearchForm" style="margin-left: 8px" @click="toggleSearchForm">
-          {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-          <a-icon :type="showSearchForm ? 'up' : 'down'" />
-        </a>
-      </div>
-      <!-- 搜索框 -->
-      <a-form v-if="showSearchForm" layout="inline" :form="filterForm">
-        <a-row :gutter="24">
-          <a-col :span="8" :xl="6">
-            <a-form-item label="网关名称">
-              <a-input
-                v-decorator="[
-                  'gatewayName'
-                ]"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="8" :xl="6">
-            <span>
-              <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
-              <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
-              <a style="margin-left: 8px" @click="toggleSearchForm">
-                {{ showSearchForm ? '隐藏搜索框' : '搜索框' }}
-                <a-icon :type="showSearchForm ? 'up' : 'down'" />
-              </a>
-            </span>
-          </a-col>
-        </a-row>
-      </a-form>
-      <!-- 表格 -->
-      <a-table
-        ref="light-control-list-tab-table"
-        :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio'}"
-        :row-key="record => record.id"
-        :columns="columns"
-        :scroll="{x: 1200}"
-        :data-source="dataSource"
-        :pagination="pagination"
-        @change="handleTableChange"
+  <div class="gateway-list-tab">
+    <!-- 表单区域 -->
+    <a-form layout="inline" :form="filterForm">
+      <a-row :gutter="24">
+        <a-col :span="8" :xl="6">
+          <a-form-item label="项目名称">
+            <a-select
+              v-decorator="['projectId', {
+                rules:[],
+                initialValue: formValues.projectId,
+              }]"
+              allow-clear
+              :options="projectOpt"
+              @change="projectChange"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <a-form-item label="网关名称">
+            <a-input
+              v-decorator="['gatewayName', {
+                rules:[],
+                initialValue: formValues.gatewayName,
+              }]"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8" :xl="6">
+          <span>
+            <a-button style="margin-left: 15px" type="primary" @click="search()">查询</a-button>
+            <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
+          </span>
+        </a-col>
+      </a-row>
+    </a-form>
+    <!-- 添加按钮 -->
+    <div class="float-add-btn">
+      <a-button
+        type="primary"
+        style="border-radius:45px!important;"
+        @click="openCreate"
       >
-        <template slot="operation" slot-scope="record">
-          <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
-          <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
-          <a-popconfirm
-            title="确认删除吗?"
-            ok-text="删除"
-            cancel-text="取消"
-            @confirm="doDelItems"
-          >
-            <span class="operation-btn" @click="doDelItems(record.id)"><icon-delete title="删除" />删除</span>
-          </a-popconfirm>
-        </template>
-      </a-table>
-      <CommonDrawerWrap
-        :is-edit.sync="isEdit"
-        :edit-id.sync="editId"
-        :readonly.sync="popReadonly"
-        :draw-width="1000"
-        :visible.sync="gatewayCommandPopVisible"
-        :draw-title="currentCommandTitle"
-        @close="handleCommandPopClose"
-        @success="handleCommandPopSuccess"
-      >
-        <template v-slot:default="slotProps">
-          <component :is="currentCommandPop" v-bind="slotProps"></component>
-        </template>
-      </CommonDrawerWrap>
-      <a-modal
-        title="删除"
-        :visible="deleteModalVisible"
-        @ok="doDelItems"
-        @cancel="deleteModalVisible=false"
-      >
-        <p>确定要删除所选智能灯?</p>
-      </a-modal>
+        <a-icon type="plus" /><span style="margin-left: 3px;">添加网关</span>
+      </a-button>
     </div>
-  </a-spin>
+    <!-- 操作按钮 -->
+    <div style="margin-bottom:10px" class="">
+      <a-dropdown>
+        <a-menu slot="overlay" @click="handleCommandClick">
+          <a-menu-item key="GatewayChannel">频道修改</a-menu-item>
+          <a-menu-item key="GatewayPanId">PANID修改</a-menu-item>
+          <a-menu-item key="GatewayElectricRelayConfig">网关继电器配置</a-menu-item>
+          <a-menu-item key="GatewayElectricAddress">电表地址修改</a-menu-item>
+          <a-menu-item key="doDelItems">删除网关</a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 10px;margin-right: 10px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
+      </a-dropdown>
+      <a-button type="primary" @click="refresh">刷新</a-button>
+    </div>
+    <!-- 表格 -->
+    <a-table
+      ref="light-control-list-tab-table"
+      :row-selection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type: 'radio'}"
+      :row-key="record => record.id"
+      :columns="columns"
+      :scroll="{x: 1200}"
+      :data-source="dataSource"
+      :pagination="pagination"
+      @change="handleTableChange"
+    >
+      <template slot="operation" slot-scope="record">
+        <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
+        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑基础信息</span>
+        <a-popconfirm
+          title="确认删除吗?"
+          ok-text="删除"
+          cancel-text="取消"
+          @confirm="doDelItems"
+        >
+          <span class="operation-btn" @click="doDelItems(record.id)"><icon-delete title="删除" />删除</span>
+        </a-popconfirm>
+      </template>
+    </a-table>
+    <CommonDrawerWrap
+      :detail-data.sync="detailData"
+      :is-edit.sync="isEdit"
+      :edit-id.sync="editId"
+      :readonly.sync="popReadonly"
+      :draw-width="1000"
+      :visible.sync="commandPopVisible"
+      :draw-title="currentCommandTitle"
+      @close="handleCommandPopClose"
+      @success="handleCommandPopSuccess"
+    >
+      <template v-slot:default="slotProps">
+        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOptPopUse"></component>
+      </template>
+    </CommonDrawerWrap>
+    <a-modal
+      title="删除"
+      :visible="deleteModalVisible"
+      @ok="doDelItems"
+      @cancel="deleteModalVisible=false"
+    >
+      <p>确定要删除所选网关</p>
+    </a-modal>
+  </div>
 </template>
 
 <script>
@@ -113,6 +118,13 @@ import GatewayElectricRelayConfig from '@/views/light-control-center/components/
 import GatewayChannel from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayChannel'
 import GatewayPanId from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayPanId'
 import GatewayElectricAddress from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayElectricAddress'
+import { getDetail, del, getList, exportExcel,
+  getRelayByGatewayId, getGatewayConfig, getMeterAddressById } from '@/service/gatewayManageService'
+import { getListOptProcessed as getReadProjectOptProcessed,
+  getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
+
+import { configSerialize } from '@/utils/common'
+
 const commandPopMap = {
   'GatewayElectricRelayConfig': GatewayElectricRelayConfig,
   'AddPop': GatewayDetailPop,
@@ -134,6 +146,10 @@ export default {
   components: { IconEdit, IconDelete, CommonDrawerWrap },
   props: {},
   data() {
+    this.formValues = {
+      projectId: '',
+      gatewayName: ''
+    }
     return {
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
@@ -148,11 +164,11 @@ export default {
         },
         {
           title: '通讯地址',
-          dataIndex: 'address'
+          dataIndex: 'gatewayGprs'
         },
         {
           title: '所属项目',
-          dataIndex: 'project'
+          dataIndex: 'projectName'
         },
         {
           title: '当前版本号',
@@ -160,7 +176,7 @@ export default {
         },
         {
           title: '备注',
-          dataIndex: 'remarks'
+          dataIndex: 'description'
         },
         {
           title: '操作',
@@ -176,68 +192,76 @@ export default {
         showSizeChanger: true,
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
-      loading: false,
       dataSource: null,
-      createPopVisible: false,
-      gatewayCommandPopVisible: false,
+      commandPopVisible: false,
       isEdit: false,
       popReadonly: false,
       editId: '',
       selectedRowKeys: [],
       currentCommandPop: null,
-      currentCommandTitle: ''
+      currentCommandTitle: '',
+      projectOpt: [],
+      projectOptPopUse: [],
+      detailData: null
     }
   },
   computed: {},
   watch: {},
-  created() {
+  async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
+    this.projectOpt = await getReadProjectOptProcessed()
   },
   methods: {
-    toggleSearchForm() {
-      this.showSearchForm = !this.showSearchForm
+    search(inputParams = {}) {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+        projectId: values.projectId,
+        gatewayName: values.gatewayName
+      }
+      this.fetch(Object.assign(params, { pageSize: 10, pageNum: 1 }, inputParams))
+    },
+    resetFilterForm() {
+      this.filterForm.resetFields()
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     handleTableChange(pagination, filters, sorter) {
-      console.log(pagination)
       this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
-    fetch(params = {}) {
-      // 显示loading
-      this.loading = true
-      this.$get('/light-control-center/light-control/list', {
-        ...params, type: 0
-      }).then((r) => {
-        const data = r.data
-        const pagination = { ...this.pagination }
-        this.dataSource = data.rows
-        pagination.total = data.total
-        this.pagination = pagination
-      }).finally(() => {
-        this.loading = false
-      })
+    async fetch(params = {}) {
+      const data = await getList(params)
+      const pagination = { ...this.pagination }
+      this.dataSource = data.rows
+      pagination.total = data.total
+      this.pagination = pagination
+      this.selectedRowKeys = []
     },
     // 打开新建弹窗
-    openCreate() {
+    async openCreate() {
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
       this.currentCommandPop = commandPopMap['AddPop']
       this.currentCommandTitle = '添加网关'
-      this.gatewayCommandPopVisible = true
+      this.commandPopVisible = true
     },
     // 打开编辑弹窗
-    openEditPop(id) {
+    async openEditPop(id) {
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
+      this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.currentCommandPop = commandPopMap['AddPop']
       this.currentCommandTitle = '编辑网关'
-      this.gatewayCommandPopVisible = true
+      this.commandPopVisible = true
     },
     // 打开只读弹窗
-    openReadonlyPop(id) {
+    async openReadonlyPop(id) {
+      this.projectOptPopUse = await getReadProjectOptProcessed()
+      this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
       this.currentCommandPop = commandPopMap['AddPop']
       this.currentCommandTitle = '查看网关'
-      this.gatewayCommandPopVisible = true
+      this.commandPopVisible = true
     },
     // 编辑弹窗关闭
     handleEditPopClose() {
@@ -251,41 +275,59 @@ export default {
       this.fetch({ pageSize: 10, pageNum: 1 })
     },
     // 删除
-    doDelItems() {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        resolve()
-        // this.$delete('/business/black-white-app/deleteBlackWhiteAppByBatch', {
-        //   appIds: configSerialize(this.selectedRowKeys)
-        // })
-        //   .then(r => {
-        //     resolve(r.data.data)
-        //     this.$message.info('删除成功')
-        //     this.fetch({ pageSize: 10, pageNum: 1 })
-        //   })
-        //   .finally(() => {
-        //     this.loading = false
-        //   })
-      })
+    async doDelItems() {
+      await del(configSerialize(this.selectedRowKeys))
+        .finally(() => {
+          this.deleteModalVisible = false
+        })
+      this.$message.info('删除成功')
+      this.fetch({ pageSize: 10, pageNum: 1 })
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    search() {
-
-    },
-    resetFilterForm() {
-
-    },
     // 选择命令 打开弹窗
-    handleCommandClick({ key }) {
+    async handleCommandClick({ key }) {
       if (key === 'doDelItems') {
         this.deleteModalVisible = true
         return
       }
+      this.editId = this.selectedRowKeys[0]
+      this.detailData = {}
+      if (key === 'GatewayElectricRelayConfig') {
+        // 继电器配置
+        const data = await this.promiseAllDo(getDetail(this.editId), getRelayByGatewayId(this.editId))
+        this.detailData = {
+          gatewayParamsDetail: data[0].value,
+          relay: data[1].value
+        }
+      } else if (key === 'GatewayElectricAddress') {
+        // 电表地址
+        const data = await this.promiseAllDo(getDetail(this.editId), getMeterAddressById(this.editId))
+        this.detailData = {
+          gatewayParamsDetail: data[0].value,
+          gatewayObj: data[1].value
+        }
+      } else if (key === 'GatewayPanId' || key === 'GatewayChannel') {
+        // PANID
+        const data = await this.promiseAllDo(getDetail(this.editId), getGatewayConfig(this.editId))
+        this.detailData = {
+          gatewayParamsDetail: data[0].value,
+          gatewayConfig: data[1].value
+        }
+      } else {
+        const data = await this.promiseAllDo(getDetail(this.editId))
+        this.detailData = {
+          gatewayParamsDetail: data[0].value
+        }
+      }
       this.currentCommandPop = commandPopMap[key]
       this.currentCommandTitle = commandPopTitleMap[key]
-      this.gatewayCommandPopVisible = true
+      this.commandPopVisible = true
+    },
+    promiseAllDo(...pList) {
+      // console.log(pList)
+      return Promise.allSettled(pList)
     },
     // 命令弹窗关闭
     handleCommandPopClose() {
@@ -294,16 +336,34 @@ export default {
     // 命令执行成功
     handleCommandPopSuccess() {
       this.fetch({ pageSize: 10, pageNum: 1 })
+    },
+    projectChange(projectId) {
+      this.filterForm.setFieldsValue({
+        'groupName': ''
+      })
+      this.search({
+        projectId: projectId
+      })
+    },
+    // 生成excel报表
+    exportExcel() {
+      const values = this.filterForm.getFieldsValue()
+      const params = {
+
+      }
+      params.gatewayName = values.gatewayName
+      exportExcel(params)
     }
+
   }
 }
 </script>
 
 <style lang="less" scoped>
 
-.float-add-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
+// .float-add-btn {
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+// }
 </style>

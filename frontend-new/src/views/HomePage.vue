@@ -58,16 +58,16 @@
         <a-col :span="24">
           <a-card title="审计分析" :bordered="false" style="width: 100%">
             <router-link slot="extra" :to="'/analysis/index'">更多>></router-link>
-            <AnalysisGraphArea></AnalysisGraphArea>
+            <!-- <AnalysisGraphArea></AnalysisGraphArea> -->
           </a-card>
         </a-col>
       </a-row>
     </div>
-    <DealAlarmModal
+    <!-- <DealAlarmModal
       :visible.sync="dealAlarmModalVisible"
       :alarm-id.sync="currentDealAlarmId"
       :opt="{zIndex: 1040}"
-    ></DealAlarmModal>
+    ></DealAlarmModal> -->
   </a-spin>
 </template>
 <script>
@@ -76,7 +76,7 @@ import ImgDeviceNum from '@/assets/imgs/device-num.png'
 import ImgOfflineDevice from '@/assets/imgs/offline-device.png'
 import ImgOnlineDevice from '@/assets/imgs/online-device.png'
 import ImgUnhandledAlarm from '@/assets/imgs/unhandled-alarm.png'
-import AnalysisGraphArea from '@/views/analysis/AnalysisGraphArea.vue'
+// import AnalysisGraphArea from '@/views/analysis/AnalysisGraphArea.vue'
 
 const headInfo = [
   {
@@ -107,14 +107,14 @@ const headInfo = [
 ]
 const headInfoNameList = ['userCount', 'allPhoneCount', 'onlinePhoneCount', 'offlinePhoneCount', 'undealAlarmCount']
 import { mapState } from 'vuex'
-import DealAlarmModal from '@/views/alarm-message/components/DealAlarmModal'
+// import DealAlarmModal from '@/views/alarm-message/components/DealAlarmModal'
 import HomeMap from '@/views/home-components/HomeMap'
 
 export default {
   name: 'HomePage',
   components: {
-    DealAlarmModal,
-    HomeMap, AnalysisGraphArea
+    // DealAlarmModal,
+    HomeMap /* AnalysisGraphArea */
   },
   data() {
     return {

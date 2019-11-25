@@ -38,7 +38,7 @@ export function save(params) {
 // 新建
 export function add(params) {
   return requestContructor({
-    url: '/business/light-onoff-profile/addLightType',
+    url: '/business/light-onoff-profile/addLightOnoffProfile',
     method: 'post',
     params,
     gbLoading: true
@@ -47,7 +47,7 @@ export function add(params) {
 // 删除
 export function del(ids) {
   return requestContructor({
-    url: '/business/light-type/deleteLightTypeByBatch',
+    url: '/business/light-onoff-profile/deleteLightOnoffProfileByBatch',
     method: 'delete',
     params: {
       profileIds: ids

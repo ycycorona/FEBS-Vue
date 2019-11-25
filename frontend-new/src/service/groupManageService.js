@@ -13,9 +13,35 @@ export function getList(params) {
     url: '/business/group/getGroupListByPage',
     method: 'get',
     params,
-    fullData: true
+    fullData: true,
+    gbLoading: true
   })
 }
+
+// 通过项目获取编组列表 不分页
+export function getListOptByProjectId(id) {
+  return requestContructor({
+    url: '/business/version/getGroupByPorjectId',
+    method: 'get',
+    params: {
+      projectId: id
+    },
+    gbLoading: true
+  })
+}
+
+// 通过网关获取编组列表 不分页
+export function getListOptByGatewayId(id) {
+  return requestContructor({
+    url: '/business/group/getGroupsByGatewayId',
+    method: 'get',
+    params: {
+      gatewayId: id
+    },
+    gbLoading: true
+  })
+}
+
 // 获取详情
 export function getDetail(id) {
   return requestContructor({
@@ -65,14 +91,3 @@ export function exportExcel(params) {
   })
 }
 
-// 通过项目获取编组
-export function getListOptByProjectId(id) {
-  return requestContructor({
-    url: '/business/version/getGroupByPorjectId',
-    method: 'get',
-    params: {
-      projectId: id
-    },
-    gbLoading: true
-  })
-}

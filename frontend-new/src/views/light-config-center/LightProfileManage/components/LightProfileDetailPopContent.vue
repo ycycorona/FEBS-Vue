@@ -2,6 +2,17 @@
   <a-form :form="form" :self-update="true">
     <a-row :gutter="12">
       <a-col :span="24">
+        <a-form-item label="策略名称" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['profileName',
+                          {rules: [
+                             { required: true, message: '策略名称不能为空'}
+                           ],
+                           initialValue: formValues.profileName}]"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="24">
         <a-form-item label="开灯时间" v-bind="formItemLayout">
           <a-time-picker
             v-decorator="['lightOpenTime',
@@ -315,12 +326,13 @@ function momentObjFactory(str = '00:00:00') {
   return moment(str, 'HH:mm:ss')
 }
 function momentFomatter(momentObj) {
-  return momentObj.format('HH:mm:ss')
+  return momentObj ? momentObj.format('HH:mm:ss') : ''
 }
 function formValueFormater(detailData = null) {
   if (detailData) {
     const d = detailData
     return {
+      profileName: d.profileName,
       lightOpenTime: momentObjFactory(d.onTime),
       lightCloseTime: momentObjFactory(d.offTime),
       delayOpenMinutes: d.offset4on,
@@ -332,6 +344,7 @@ function formValueFormater(detailData = null) {
     }
   } else {
     return {
+      profileName: '',
       lightOpenTime: momentObjFactory(),
       lightCloseTime: momentObjFactory(),
       delayOpenMinutes: 0,
@@ -393,15 +406,53 @@ export default {
     },
     async add(formValues) {
       const params = {
-        name: formValues.name
+        offTime: momentFomatter(formValues.lightCloseTime),
+        onTime: momentFomatter(formValues.lightOpenTime),
+        profileName: formValues.profileName,
+        offset4off: formValues.delayCloseMinutes,
+        offset4on: formValues.delayOpenMinutes,
+        t1: momentFomatter(formValues.timePointI[0]),
+        t2: momentFomatter(formValues.timePointI[1]),
+        t3: momentFomatter(formValues.timePointI[2]),
+        t21: momentFomatter(formValues.timePointII[0]),
+        t22: momentFomatter(formValues.timePointII[1]),
+        t23: momentFomatter(formValues.timePointII[2]),
+        v1: formValues.powerIArray[0],
+        v2: formValues.powerIArray[1],
+        v3: formValues.powerIArray[2],
+        v4: formValues.powerIArray[3],
+        v21: formValues.powerIIArray[0],
+        v22: formValues.powerIIArray[1],
+        v23: formValues.powerIIArray[2],
+        v24: formValues.powerIIArray[3]
       }
-      // debugger
+      // console.log(params)
+      // return
       await add(params)
       this.$message.info('新增开关灯策略成功')
     },
     async save(formValues) {
       const params = {
-        name: formValues.name
+        id: this.detailData.id,
+        offTime: momentFomatter(formValues.lightCloseTime),
+        onTime: momentFomatter(formValues.lightOpenTime),
+        profileName: formValues.profileName,
+        offset4off: formValues.delayCloseMinutes,
+        offset4on: formValues.delayOpenMinutes,
+        t1: momentFomatter(formValues.timePointI[0]),
+        t2: momentFomatter(formValues.timePointI[1]),
+        t3: momentFomatter(formValues.timePointI[2]),
+        t21: momentFomatter(formValues.timePointII[0]),
+        t22: momentFomatter(formValues.timePointII[1]),
+        t23: momentFomatter(formValues.timePointII[2]),
+        v1: formValues.powerIArray[0],
+        v2: formValues.powerIArray[1],
+        v3: formValues.powerIArray[2],
+        v4: formValues.powerIArray[3],
+        v21: formValues.powerIIArray[0],
+        v22: formValues.powerIIArray[1],
+        v23: formValues.powerIIArray[2],
+        v24: formValues.powerIIArray[3]
       }
       await save(params)
       this.$message.info('修改开关等策略成功')

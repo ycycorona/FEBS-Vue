@@ -7,9 +7,10 @@
           <a-form-item label="项目名称">
             <a-select
               v-decorator="['projectId', {
-                rules:[{ required: true, message: '项目不能为空'}],
+                rules:[],
                 initialValue: formValues.projectId,
               }]"
+              allow-clear
               :options="projectOpt"
               @change="projectChange"
             />
@@ -20,7 +21,7 @@
             <a-input
               v-decorator="['groupName', {
                 rules:[],
-                initialValue: formValues.projectId,
+                initialValue: formValues.groupName,
               }]"
             />
           </a-form-item>
@@ -78,6 +79,7 @@
       </template>
     </a-table>
     <CommonDrawerWrap
+      :readonly.sync="isReadonly"
       :detail-data.sync="detailData"
       :is-edit.sync="isEdit"
       :edit-id.sync="editId"
@@ -88,7 +90,7 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOpt"></component>
+        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOptPopUse"></component>
       </template>
     </CommonDrawerWrap>
   </div>
@@ -101,10 +103,12 @@ import { configSerialize } from '@/utils/common'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
 import GroupDetailPopContent from '@/views/light-config-center/GroupManage/components/GroupDetailPopContent'
 import { getDetail, del, getList, exportExcel } from '@/service/groupManageService'
-import { getListOptProcessed as getProjectOptProcessed } from '@/service/projectManageService'
+import { getListOptProcessed as getReadProjectOptProcessed, getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
+import { getListOptByPid } from '@/service/gatewayManageService'
 const PopTitleMap = new Map([
   ['create', '添加编组'],
-  ['edit', '编辑编组']
+  ['edit', '编辑编组'],
+  ['read', '查看编组']
 ])
 export default {
   name: 'GroupManage',
@@ -122,16 +126,16 @@ export default {
       filterForm: this.$form.createForm(this),
       columns: [
         {
-          title: '项目名称',
-          dataIndex: 'name'
+          title: '编组名称',
+          dataIndex: 'groupName'
         },
         {
           title: '所属项目',
-          dataIndex: 'group'
+          dataIndex: 'projectName'
         },
         {
           title: '所属网关',
-          dataIndex: 'gateway'
+          dataIndex: 'gatewayName'
         },
         {
           title: '区域码',
@@ -164,7 +168,9 @@ export default {
       detailData: null,
       selectedRowKeys: [],
       currentCommandPop: GroupDetailPopContent,
-      projectOpt: []
+      projectOpt: [],
+      projectOptPopUse: [],
+      isReadonly: false
     }
   },
   computed: {
@@ -174,7 +180,7 @@ export default {
 
   async created() {
     this.fetch({ pageSize: 10, pageNum: 1 })
-    this.projectOpt = await getProjectOptProcessed()
+    this.projectOpt = await getReadProjectOptProcessed()
   },
   methods: {
     search(inputParams = {}) {
@@ -202,16 +208,35 @@ export default {
       this.selectedRowKeys = []
     },
     // 打开新建弹窗
-    openCreate() {
+    async openCreate() {
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
       this.currentCommandTitle = PopTitleMap.get('create')
       this.createEditPopVisible = true
     },
     // 打开编辑弹窗
     async openEditPop(id) {
       this.currentCommandTitle = PopTitleMap.get('edit')
+      this.projectOptPopUse = await getWriteProjectOptProcessed()
+      this.detailData = await getDetail(id)
+      this.detailData.gatewayOpt =
+        (await getListOptByPid(this.detailData.projectId)).map(item => {
+          return {
+            value: item.id,
+            label: item.gatewayName
+          }
+        })
+      this.editId = id
+      this.isEdit = true
+      this.createEditPopVisible = true
+    },
+    // 打开查看弹窗
+    async openReadPop(id) {
+      this.currentCommandTitle = PopTitleMap.get('read')
+      this.projectOptPopUse = await getReadProjectOptProcessed()
       this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
+      this.isReadonly = true
       this.createEditPopVisible = true
     },
     // 编辑弹窗关闭
@@ -241,6 +266,9 @@ export default {
       exportExcel(params)
     },
     projectChange(projectId) {
+      this.filterForm.setFieldsValue({
+        'groupName': ''
+      })
       this.search({
         projectId: projectId
       })

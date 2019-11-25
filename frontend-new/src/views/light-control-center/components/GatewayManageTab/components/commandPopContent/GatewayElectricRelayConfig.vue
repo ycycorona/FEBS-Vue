@@ -107,12 +107,12 @@ const formItemLayout_noLabel = {
   labelCol: { span: 0 },
   wrapperCol: { span: 24 }
 }
-const number = 16
+let number = 2
 const TimepickerFormat = 'HH:mm:ss'
 function momentObjFactory(str = '00:00:00') {
   return moment(str, 'HH:mm:ss')
 }
-function formValueFormater() {
+function formValueFormater(detailData, number) {
   return {
     name: createArrayFromNum(number, ''),
     switch: createArrayFromNum(number, false),
@@ -127,17 +127,26 @@ export default {
   props: {
     readonly: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    detailData: {
+      type: Object
+    },
+    editId: {
+      type: [String, Number]
     }
   },
   data() {
-    const formValues = formValueFormater()
+    number = 16
+    const formValues = this.$props.detailData
+      ? formValueFormater(this.$props.detailData, number) : formValueFormater(null, number)
+    this.formValues = formValues
     return {
       number,
       TimepickerFormat, formItemLayout_noLabel,
       loading: false,
       formItemLayout,
-      formValues,
+
       form: this.$form.createForm(this),
       currentSwitchList: formValues.switch,
       switchAll: false
@@ -203,8 +212,8 @@ export default {
       // this.currentSwitchList[index] = checked
     },
     allSwitchChange(checked) {
-      for (let i = 0; i < this.formValues.switch.length; i++) {
-        this.formValues.switch[i] = checked
+      for (let i = 0; i < this.currentSwitchList.length; i++) {
+        this.currentSwitchList[i] = checked
       }
     }
   }

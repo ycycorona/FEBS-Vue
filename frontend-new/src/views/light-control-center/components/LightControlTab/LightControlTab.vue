@@ -254,7 +254,9 @@ export default {
       editId: '',
       selectedRowKeys: [],
       currentCommandPop: null,
-      currentCommandTitle: ''
+      currentCommandTitle: '',
+      currentGroup: '',
+      currentProject: ''
     }
   },
   computed: {},
