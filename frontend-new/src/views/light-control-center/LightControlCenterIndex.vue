@@ -31,7 +31,7 @@ export default {
   props: {
     defaultActiveKey: {
       type: String,
-      default: 'gatewayManageTab'
+      default: 'lightControlTab'
     }
   },
   data() {

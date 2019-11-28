@@ -4,34 +4,30 @@
       <a-col :span="12">
         <a-form-item label="项目名称" v-bind="formItemLayout">
           <a-select
-            v-decorator="['project',
+            v-decorator="['projectId',
                           {rules: [
                              { required: true, message: '应用名称不能为空'}
                            ],
-                           initialValue: formValues.project}]"
+                           initialValue: formValues.projectId}]"
             :class="{'readonly': readonly}"
             :disabled="readonly"
-          >
-            <a-select-option :value="0">项目1</a-select-option>
-            <a-select-option :value="1">项目2</a-select-option>
-          </a-select>
+            :options="projectOpt"
+            @change="projectChange"
+          />
         </a-form-item>
       </a-col>
       <a-col :span="12">
         <a-form-item label="编组名称" v-bind="formItemLayout">
           <a-select
-            v-decorator="['group',
+            v-decorator="['groupId',
                           {rules: [
                              { required: true, message: '编组名称不能为空'}
                            ],
-                           initialValue: formValues.group}]"
+                           initialValue: formValues.groupId}]"
             :class="{'readonly': readonly}"
             :disabled="readonly"
-            palceholder="请选择编组"
-          >
-            <a-select-option :value="0">编组1</a-select-option>
-            <a-select-option :value="1">编组2</a-select-option>
-          </a-select>
+            :options="groupOpt"
+          />
         </a-form-item>
       </a-col>
     </a-row>
@@ -39,11 +35,11 @@
       <a-col :span="12">
         <a-form-item label="智能灯编号" v-bind="formItemLayout">
           <a-input
-            v-decorator="['lightId',
+            v-decorator="['lightNumber',
                           {rules: [
                              { required: true, message: '智能灯编号不能为空'}
                            ],
-                           initialValue: formValues.lightId}]"
+                           initialValue: formValues.lightNumber}]"
             :read-only="readonly"
           />
 
@@ -52,11 +48,11 @@
       <a-col :span="12">
         <a-form-item label="外壳编号" v-bind="formItemLayout">
           <a-input
-            v-decorator="['lightShellId',
+            v-decorator="['shellNumber',
                           {rules: [
                              { required: true, message: '外壳编号不能为空'}
                            ],
-                           initialValue: formValues.lightShellId}]"
+                           initialValue: formValues.shellNumber}]"
             :read-only="readonly"
           />
         </a-form-item>
@@ -66,17 +62,15 @@
       <a-col :span="12">
         <a-form-item label="智能灯类型" v-bind="formItemLayout">
           <a-select
-            v-decorator="['lightType',
+            v-decorator="['typeId',
                           {rules: [
                              { required: true, message: '智能灯类型不能为空'}
                            ],
-                           initialValue: formValues.lightType}]"
+                           initialValue: formValues.typeId}]"
+            :options="lightTypeOpt"
             :class="{'readonly': readonly}"
             :disabled="readonly"
-          >
-            <a-select-option :value="0">1</a-select-option>
-            <a-select-option :value="1">2</a-select-option>
-          </a-select>
+          />
         </a-form-item>
       </a-col>
       <a-col :span="12">
@@ -90,34 +84,62 @@
             :class="{'readonly': readonly}"
             :disabled="readonly"
           >
-            <a-select-option :value="0">1</a-select-option>
-            <a-select-option :value="1">2</a-select-option>
+            <a-select-option :value="1">安装两路</a-select-option>
+            <a-select-option :value="2">只安装主路</a-select-option>
+            <a-select-option :value="3">只安装辅路</a-select-option>
           </a-select>
         </a-form-item>
       </a-col>
     </a-row>
     <a-row :gutter="12">
       <a-col :span="12">
-        <a-form-item label="I额定功率" v-bind="formItemLayout">
+        <a-form-item label="I额定功率/W" v-bind="formItemLayout">
           <a-input
-            v-decorator="['powerI',
+            v-decorator="['nowGonglv1',
                           {rules: [
                              { required: true, message: 'I额定功率不能为空'}
                            ],
-                           initialValue: formValues.powerI}]"
+                           initialValue: formValues.nowGonglv1}]"
             :read-only="readonly"
           />
 
         </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-item label="II额定功率" v-bind="formItemLayout">
+        <a-form-item label="II额定功率/W" v-bind="formItemLayout">
           <a-input
-            v-decorator="['powerII',
+            v-decorator="['nowGonglv2',
                           {rules: [
                              { required: true, message: 'II额定功率不能为空'}
                            ],
-                           initialValue: formValues.powerI}]"
+                           initialValue: formValues.nowGonglv2}]"
+            :read-only="readonly"
+          />
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="I旧灯功率/W" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['oldkw',
+                          {rules: [
+                             { required: true, message: 'I额定功率不能为空'}
+                           ],
+                           initialValue: formValues.oldkw}]"
+            :read-only="readonly"
+          />
+
+        </a-form-item>
+      </a-col>
+      <a-col :span="12">
+        <a-form-item label="II旧灯功率/W" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['oldkw2',
+                          {rules: [
+                             { required: true, message: 'II额定功率不能为空'}
+                           ],
+                           initialValue: formValues.oldkw2}]"
             :read-only="readonly"
           />
         </a-form-item>
@@ -146,7 +168,7 @@
                           {rules: [
                              { required: true, message: '校表码不能为空'}
                            ],
-                           initialValue: formValues.jioabiaoCode}]"
+                           initialValue: formValues.jiaobiaoCode}]"
             :input-num="8"
             :readonly="readonly"
           ></multi-input>
@@ -218,6 +240,7 @@
     </a-row>
     <PointerSelect
       ref="positonSelect"
+      :readonly="readonly"
       style="z-index:1"
       :current-pointer="pointerSelectValue"
       @change="positionChangeFromMap"
@@ -227,49 +250,53 @@
 
 <script>
 import { BasePosition } from '@/config/LightConstant'
+import { configSerialize, configDeserialize } from '@/utils/common'
 import MultiInput from '@/components/input/MultiInput/MultiInput'
 import { createArrayFromNum } from '@/utils/common'
 import PointerSelect from '@/components/diyMap/PointerSelect'
 import PositionInput from '@/components/diyMap/PositionInput'
 import { save, add } from '@/service/unapproveLightManageService'
+import { getListOptByProjectId as getGroupListOptByProjectId } from '@/service/groupManageService'
+import { getListOpt as getLightTypeListOpt } from '@/service/lightTypeManageService'
 function formValueFormater(detailData = null) {
   if (detailData) {
     return {
-      project: 0,
-      group: '',
-      lightId: '',
-      lightShellId: '',
-      lightType: '',
-      installType: '',
-      macAddress: createArrayFromNum(8, 0),
-      jioabiaoCode: createArrayFromNum(12, 0),
-      panId: createArrayFromNum(8, 0),
-      channel: '',
-      powerI: '',
-      powerII: '',
-      installDirection: '',
-      lightPosition: BasePosition
+      projectId: detailData.projectId,
+      groupId: detailData.groupId,
+      lightNumber: detailData.lightNumber,
+      shellNumber: detailData.shellNumber,
+      typeId: detailData.typeId,
+      installType: 1,
+      macAddress: configDeserialize(detailData.mac),
+      jiaobiaoCode: configDeserialize(detailData.jiaobiaoma),
+      panId: configDeserialize(detailData.panid),
+      channel: detailData.pindao,
+      nowGonglv1: detailData.nowGonglv1,
+      nowGonglv2: detailData.nowGonglv2,
+      oldkw: detailData.oldkw,
+      oldkw2: detailData.oldkw2,
+      installDirection: detailData.anzhuang,
+      lightPosition: [detailData.lng, detailData.lat]
     }
   } else {
     return {
-      project: 0,
+      project: '',
       group: '',
-      lightId: '',
-      lightShellId: '',
-      lightType: '',
-      installType: '',
+      lightNumber: '',
+      shellNumber: '',
+      typeId: '',
+      installType: 1,
       macAddress: createArrayFromNum(8, 0),
-      jioabiaoCode: createArrayFromNum(12, 0),
+      jiaobiaoCode: createArrayFromNum(12, 0),
       panId: createArrayFromNum(8, 0),
       channel: '',
       powerI: '',
       powerII: '',
-      installDirection: '',
+      installDirection: 0,
       lightPosition: BasePosition
     }
   }
 }
-const counter = 0
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
@@ -299,24 +326,45 @@ export default {
     editId: {
       default: '',
       type: [String, Number]
+    },
+    popWindowData: {
+      type: Object
     }
   },
   data() {
-    const formValues = formValueFormater()
+    const formValues = this.$props.isEdit
+      ? formValueFormater(this.$props.detailData) : formValueFormater(null)
+    this.formValues = formValues
     return {
       form: this.$form.createForm(this),
-      formValues,
       loading: false,
       formItemLayout, formItemLayout_1,
       rawDetail: null,
-      pointerSelectValue: formValues.lightPosition
+      pointerSelectValue: formValues.lightPosition,
+      currentGroupOptListRaw: [],
+      groupOpt: [],
+      currentlightTypeOptRaw: [],
+      lightTypeOpt: []
     }
   },
   computed: {
 
   },
-  created() {
+  async created() {
     this.$store.commit('contact/setCurrentPopContent', this)
+    if (this.isEdit) {
+      this.gatewayOpt = this.detailData.gatewayOpt
+    }
+    getLightTypeListOpt()
+      .then((data) => {
+        this.currentlightTypeOptRaw = data
+        this.lightTypeOpt = this.currentlightTypeOptRaw.map(item => {
+          return {
+            value: item.id,
+            label: item.name
+          }
+        })
+      })
   },
   methods: {
     // 智能灯经纬度改变 从地图
@@ -357,38 +405,50 @@ export default {
     },
     async add(formValues) {
       const params = {
-        gatewayName: formValues.gatewayName,
-        gatewayGprs: formValues.gatewayGprs,
-        gatewayGeneration: formValues.gatewayGeneration,
+        anzhuang: formValues.installType,
+        fangxiang: formValues.installDirection,
+        groupId: formValues.groupId,
+        jiaobiaoma: configSerialize(formValues.jiaobiaoCode),
+        lng: formValues.lightPosition[0],
+        lat: formValues.lightPosition[1],
+        lightNumber: formValues.lightNumber,
+        mac: configSerialize(formValues.macAddress),
+        nowGonglv1: formValues.nowGonglv1,
+        nowGonglv2: formValues.nowGonglv2,
+        oldkw: formValues.oldkw,
+        oldkw2: formValues.oldkw2,
+        panid: configSerialize(formValues.panId),
+        pindao: formValues.channel,
         projectId: formValues.projectId,
-        ratioOfElectricMeter: formValues.ratioOfElectricMeter ? 1 : 0,
-        lng: formValues.gatewayPosition[0],
-        lat: formValues.gatewayPosition[1],
-        description: formValues.description,
-        type: formValues.type,
-        mode: formValues.mode
+        shellNumber: formValues.shellNumber,
+        typeId: formValues.typeId
       }
-      // console.log(params)
-      // return
       await add(params)
-      this.$message.info('新增网关成功')
+      this.$message.info('新增智能灯成功')
     },
     async save(formValues) {
       const params = {
         id: this.detailData.id,
-        gatewayName: formValues.gatewayName,
-        gatewayGprs: formValues.gatewayGprs,
-        gatewayGeneration: formValues.gatewayGeneration,
+        anzhuang: formValues.installType,
+        fangxiang: formValues.installDirection,
+        groupId: formValues.groupId,
+        jiaobiaoma: configSerialize(formValues.jiaobiaoCode),
+        lng: formValues.lightPosition[0],
+        lat: formValues.lightPosition[1],
+        lightNumber: formValues.lightNumber,
+        mac: configSerialize(formValues.macAddress),
+        nowGonglv1: formValues.nowGonglv1,
+        nowGonglv2: formValues.nowGonglv2,
+        oldkw: formValues.oldkw,
+        oldkw2: formValues.oldkw2,
+        panid: configSerialize(formValues.panId),
+        pindao: formValues.channel,
         projectId: formValues.projectId,
-        ratioOfElectricMeter: formValues.ratioOfElectricMeter ? 1 : 0,
-        lng: formValues.gatewayPosition[0],
-        lat: formValues.gatewayPosition[1],
-        description: formValues.description,
-        type: formValues.type,
-        mode: formValues.mode
+        shellNumber: formValues.shellNumber,
+        typeId: formValues.typeId
       }
       await save(params)
-      this.$message.info('修改网关成功')
+      this.$message.info('修改智能灯成功')
     },
     collectData() {
       return this.form.getFieldsValue()
@@ -405,6 +465,20 @@ export default {
         }
       })
       return validateFlag
+    },
+    async projectChange(id) {
+      // 先清空已经选择的网关
+      this.form.setFieldsValue({
+        'groupId': ''
+      })
+      this.currentGroupOptListRaw = await getGroupListOptByProjectId(id)
+
+      this.groupOpt = this.currentGroupOptListRaw.map(item => {
+        return {
+          value: item.id,
+          label: item.groupName
+        }
+      })
     }
   }
 }

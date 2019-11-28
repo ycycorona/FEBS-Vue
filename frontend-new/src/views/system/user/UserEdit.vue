@@ -80,7 +80,7 @@
         <a-select
           v-decorator="['projectAuth',{
             rules: [],
-            initialValue: []
+            initialValue: [],
           }]"
           mode="multiple"
           style="width: 100%"
@@ -132,7 +132,8 @@ export default {
       userDept: [],
       userId: '',
       loading: false,
-      projectAuth: []
+      projectAuth: [],
+      record: null
     }
   },
   computed: {
@@ -151,6 +152,7 @@ export default {
   watch: {
     userEditVisiable() {
       if (this.userEditVisiable) {
+        this.setFormValues(this.record)
         this.$get('role').then((r) => {
           this.roleData = r.data.rows
         })
@@ -192,11 +194,6 @@ export default {
       this.userId = user.userId
       const fields = ['username', 'email', 'status', 'ssex', 'mobile']
       // debugger
-      this.projectAuthChange(user.uppList.map(item => item.projectId),
-        user.uppList.map(item => item.permissionId))
-      this.form.setFieldsValue({
-        projectAuth: user.uppList.map(item => item.projectId)
-      })
 
       Object.keys(user).forEach((key) => {
         if (fields.indexOf(key) !== -1) {
@@ -206,6 +203,14 @@ export default {
 
           this.form.setFieldsValue(obj)
         }
+      })
+      // 初始化权限
+      this.form.getFieldDecorator('projectAuth')
+      this.projectAuthChange(user.uppList.map(item => item.projectId),
+        user.uppList.map(item => item.permissionId))
+
+      this.form.setFieldsValue({
+        projectAuth: user.uppList.map(item => item.projectId)
       })
       if (user.roleId) {
         this.form.getFieldDecorator('roleId')

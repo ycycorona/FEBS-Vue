@@ -14,7 +14,7 @@ export function getListOptByPid(projectId) {
 // 获取列表
 export function getList(params) {
   return requestContructor({
-    url: '/business/notApprovedLight/getNotApproveLightListByPage',
+    url: '/business/approvedLight/getApproveLightListByPage',
     method: 'get',
     params,
     fullData: true,
@@ -25,10 +25,10 @@ export function getList(params) {
 // 获取详情
 export function getDetail(id) {
   return requestContructor({
-    url: '/business/notApprovedLight/getNotApprovedLightDetailById',
+    url: '/business/approvedLight/getLightDetailByLightId',
     method: 'get',
     params: {
-      notApprovedLightId: id
+      lightId: id
     }
   })
 }

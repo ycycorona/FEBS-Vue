@@ -30,6 +30,18 @@ export function getListOptByProjectId(id) {
   })
 }
 
+// 通过项目获取编组列表 不分页
+export function getListOptByProjectId_1(id) {
+  return requestContructor({
+    url: '/business/group/getGroupsByPorjectId',
+    method: 'get',
+    params: {
+      projectId: id
+    },
+    gbLoading: true
+  })
+}
+
 // 通过网关获取编组列表 不分页
 export function getListOptByGatewayId(id) {
   return requestContructor({

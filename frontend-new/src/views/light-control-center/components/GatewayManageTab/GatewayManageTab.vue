@@ -328,6 +328,7 @@ export default {
     },
     promiseAllDo(...pList) {
       // console.log(pList)
+      // debugger
       return Promise.allSettled(pList)
     },
     // 命令弹窗关闭

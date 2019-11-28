@@ -4,16 +4,15 @@
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
         <a-col :span="8" :xl="6">
-          <a-form-item
-            label="项目"
-          >
+          <a-form-item label="项目名称">
             <a-select
-              v-model="currentProject"
-              placeholder="请选择项目"
-            >
-              <a-select-option :value="0">项目1</a-select-option>
-              <a-select-option :value="1">项目2</a-select-option>
-            </a-select>
+              v-decorator="['projectId', {
+                rules:[],
+                initialValue: formValues.projectId,
+              }]"
+              :options="projectOpt"
+              @change="projectChange"
+            />
           </a-form-item>
         </a-col>
         <a-col :span="8" :xl="6">
@@ -21,25 +20,45 @@
             label="编组"
           >
             <a-select
-              v-model="currentGroup"
-              placeholder="请选择编组"
-            >
-              <a-select-option :value="0">全部</a-select-option>
-              <a-select-option :value="1">编组1</a-select-option>
-              <a-select-option :value="2">编组2</a-select-option>
-            </a-select>
+              v-decorator="['groupId', {
+                rules:[],
+                initialValue: formValues.groupId,
+              }]"
+              :options="groupOpt"
+              @change="groupChange"
+            />
           </a-form-item>
         </a-col>
-        <a-col :span="8" :xl="6">
+        <a-col :span="4" :xl="3">
           <a-form-item label="智能灯编号">
             <a-input
               v-decorator="[
-                'lightId'
+                'lightId', {
+                  rules:[],
+                  initialValue: formValues.lightId,
+                }
               ]"
             />
           </a-form-item>
         </a-col>
-        <a-col :span="8" :xl="6">
+        <a-col :span="10" :xl="3">
+          <a-form-item
+            label="排序"
+          >
+            <a-select
+              v-decorator="['sortType', {
+                rules:[],
+                initialValue: formValues.sortType,
+              }]"
+            >
+              <a-select-option :value="1">按排序等级</a-select-option>
+              <a-select-option :value="2">按表格导入排序</a-select-option>
+              <a-select-option :value="3">按智能灯编号排序</a-select-option>
+              <a-select-option :value="4">按智能灯编号逆序</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="4" :xl="3">
           <span>
             <a-button style="margin-left: 15px" type="primary" @click="search">查询</a-button>
             <a-button style="margin-left: 8px" @click="resetFilterForm">重置</a-button>
@@ -74,7 +93,7 @@
       :row-key="record => record.id"
       :columns="columns"
       :scroll="{x: 1200}"
-      :data-source="dataSource"
+      :data-source="testList"
       :pagination="pagination"
       @change="handleTableChange"
     >
@@ -130,6 +149,7 @@
 </template>
 
 <script>
+import { configSerialize, isEmptyObject } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
 import LightControlDetailPop from './components/LightControlDetailPop'
 import CommonDrawerWrap from './components/CommonDrawerWrap'
@@ -142,7 +162,10 @@ import LightPanId from './components/commandPopContent/LightPanId'
 import LightChannel from './components/commandPopContent/LightChannel'
 import AlarmThreshold from './components/commandPopContent/AlarmThreshold'
 import InfraredParams from './components/commandPopContent/InfraredParams'
-
+import { getListOptProcessed as getReadProjectOptProcessed,
+  getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
+import { getDetail, del, getList } from '@/service/approvedLightManageService'
+import { getListOptByProjectId_1 as getGroupListOptByProjectId } from '@/service/groupManageService'
 const commandPopMap = {
   'LightControlType': LightControlType,
   'LightControlManualPower': LightControlManualPower,
@@ -173,6 +196,12 @@ export default {
   components: { IconEdit, LightControlDetailPop, CommonDrawerWrap },
   props: {},
   data() {
+    this.formValues = {
+      projectId: '',
+      groupId: '',
+      lightId: '',
+      sortType: 1
+    }
     return {
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
@@ -256,40 +285,52 @@ export default {
       currentCommandPop: null,
       currentCommandTitle: '',
       currentGroup: '',
-      currentProject: ''
+      currentProject: '',
+      projectOpt: [],
+      groupOpt: [],
+      testList: [{
+        id: 1
+      }]
     }
   },
-  computed: {},
+  computed: {
+
+  },
   watch: {},
   created() {
-    this.fetch({ pageSize: 10, pageNum: 1 })
+    this.getFirstData()
+    // this.search()
   },
   methods: {
-    toggleSearchForm() {
-      this.showSearchForm = !this.showSearchForm
+    async getFirstData() {
+      this.projectOpt = await getReadProjectOptProcessed()
+      this.filterForm.setFieldsValue({
+        projectId: this.projectOpt[0].value
+      })
+      await this.projectChange(this.projectOpt[0].value)
+    },
+    getCurrentSearchParams() {
+      const o = this.filterForm.getFieldsValue()
+      return isEmptyObject(o) ? this.formValues : o
+    },
+    search(inputParams = {}) {
+      this.fetch(Object.assign(this.getCurrentSearchParams(), { pageSize: 10, pageNum: 1 }, inputParams))
+    },
+    resetFilterForm() {
+      this.filterForm.resetFields()
+      this.getFirstData()
     },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination)
-      this.fetch({ pageSize: pagination.pageSize, pageNum: pagination.current })
+      this.search({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
-    fetch(params = {}) {
-      // 显示loading
-      this.loading = true
-      this.$get('/light-control-center/light-control/list', {
-        ...params, type: 0
-      }).then((r) => {
-        const data = r.data
-        const pagination = { ...this.pagination }
-        this.dataSource = data.rows
-        pagination.total = data.total
-        this.pagination = pagination
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-    // 打开新建弹窗
-    openCreate() {
-      this.lightControlDetailPopVisible = true
+    async fetch(params = {}) {
+      const data = await getList(params)
+      const pagination = { ...this.pagination }
+      this.dataSource = data.rows
+      pagination.total = data.total
+      this.pagination = pagination
+      this.selectedRowKeys = []
     },
     // 打开编辑弹窗
     openEditPop(id) {
@@ -310,34 +351,19 @@ export default {
     },
     // 保存成功
     handleEditPopSuccess() {
-      this.fetch({ pageSize: 10, pageNum: 1 })
+      this.search()
     },
     // 删除
-    doDelItems() {
-      this.loading = true
-      return new Promise((resolve, reject) => {
-        resolve()
-        // this.$delete('/business/black-white-app/deleteBlackWhiteAppByBatch', {
-        //   appIds: configSerialize(this.selectedRowKeys)
-        // })
-        //   .then(r => {
-        //     resolve(r.data.data)
-        //     this.$message.info('删除成功')
-        //     this.fetch({ pageSize: 10, pageNum: 1 })
-        //   })
-        //   .finally(() => {
-        //     this.loading = false
-        //   })
-      })
+    async doDelItems() {
+      await del(configSerialize(this.selectedRowKeys))
+        .finally(() => {
+          this.deleteModalVisible = false
+        })
+      this.$message.info('删除成功')
+      this.search()
     },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
-    },
-    search() {
-
-    },
-    resetFilterForm() {
-
     },
     // 选择命令 打开弹窗
     handleCommandClick({ key }) {
@@ -350,7 +376,7 @@ export default {
         this.forceDeleteModalVisible = true
         return
       }
-      if (key === 'doDelItems') {
+      if (key === 'delete') {
         this.deleteModalVisible = true
         return
       }
@@ -364,7 +390,7 @@ export default {
     },
     // 命令执行成功
     handleCommandPopSuccess() {
-      this.fetch({ pageSize: 10, pageNum: 1 })
+      this.search()
     },
     commitLightJiaoBiao() {
       // todo 提交jiaobiao
@@ -372,7 +398,24 @@ export default {
     },
     // 强制删除智能灯
     commitForceDelete() {
-      this.forceDeleteModalVisible = false
+      this.forceDeleteModalViIsible = false
+    },
+    async projectChange(projectId) {
+      const groupOptRaw = await getGroupListOptByProjectId(projectId)
+      this.groupOpt = groupOptRaw.map(item => {
+        return {
+          value: item.id,
+          label: item.groupName
+        }
+      })
+
+      this.filterForm.setFieldsValue({
+        'groupId': this.groupOpt.length === 0 ? '' : this.groupOpt[0].value
+      })
+      this.search()
+    },
+    async groupChange() {
+      this.search()
     }
   }
 }
@@ -380,9 +423,4 @@ export default {
 
 <style lang="less" scoped>
 
-.float-add-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
 </style>

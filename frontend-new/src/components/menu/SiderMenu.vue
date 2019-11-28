@@ -94,13 +94,13 @@ export default {
       height: 100%;
     }
     .logo.collapsed {
-      padding-left: 24px !important;
+      padding-left: 18px !important;
     }
     .logo {
       height: 59px;
       position: relative;
       // line-height: 59px;
-      padding-left: 35px;
+      padding-left: 20px;
       -webkit-transition: all .3s;
       transition: all .3s;
       overflow: hidden;
@@ -115,7 +115,7 @@ export default {
         }
       }
       h1 {
-        font-size: 18px;
+        font-size: 20px;
         line-height: 60px;
         padding: 0;
         margin: 0

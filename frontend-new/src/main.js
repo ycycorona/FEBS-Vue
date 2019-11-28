@@ -1,3 +1,5 @@
+import 'core-js'
+import 'regenerator-runtime/runtime'
 import Vue from 'vue'
 import Febs from './FEBS'
 import router from './router'

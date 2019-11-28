@@ -16,6 +16,10 @@ export default {
   props: {
     currentPointer: {
       type: Array
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -95,7 +99,7 @@ export default {
         icon: '//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
         position: [lng, lat],
         offset: new AMap.Pixel(-13, -30),
-        draggable: true
+        draggable: !this.readonly
       })
       marker.on('dragend', (e) => {
         const { lng, lat } = e.lnglat

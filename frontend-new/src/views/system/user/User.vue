@@ -268,7 +268,7 @@ export default {
       this.search()
     },
     edit(record) {
-      this.$refs.userEdit.setFormValues(record)
+      this.$refs.userEdit.record = record
       this.userEdit.visiable = true
     },
     handleUserEditClose() {

@@ -59,3 +59,46 @@ export function createArrayFromNum(number, init = '') {
   }
   return array
 }
+
+export function arrayToMapByKey(array, key) {
+  const m = {}
+  array.forEach(item => {
+    m[item[key]] = item
+  })
+  return m
+}
+/**
+ * @desc 判断是否是空值
+ * 注意：0不属于空值
+ * @param {number|string} val
+ */
+export function isEmptyValue(val) {
+  let flag = false
+  if (val === undefined || val === null || val === '') {
+    flag = true
+  }
+  return flag
+}
+
+/**
+ * @desc 判断是否是空值
+ * 注意：0属于空值
+ * @param {number|string} val
+ */
+export function isEmptyValueWith0(val) {
+  let flag = false
+  if (val === undefined || val === null || val === '' || val === 0) {
+    flag = true
+  }
+  return flag
+}
+
+/**
+ * @desc 判断是否是空对象
+ * @param {object} obj
+ */
+export function isEmptyObject(obj) {
+  if (!(obj instanceof Object)) { return false }
+  return Object.keys(obj).length === 0
+}
+

@@ -90,7 +90,12 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :project-opt="projectOptPopUse"></component>
+        <component
+          :is="currentCommandPop"
+          v-bind="slotProps"
+          :project-opt="projectOptPopUse"
+          :pop-window-data="popWindowData"
+        ></component>
       </template>
     </CommonDrawerWrap>
   </div>
@@ -102,10 +107,11 @@ import CommonDrawerWrap from '@/views/light-control-center/components/LightContr
 import { configSerialize } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
 import LightManageDetailPop from './components/LightManageDetailPop'
-import { getDetail, del, getList, exportExcel } from '@/service/unapproveLightManageService'
+import { getDetail, del, getList, exportExcel, getPopWindowData } from '@/service/unapproveLightManageService'
 import { LightName } from '@/config/LightConstant'
 import { getListOptProcessed as getReadProjectOptProcessed,
   getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
+import { getListOptByProjectId as getGroupListOptByProjectId } from '@/service/groupManageService'
 const commandPopMap = {
   'AddPop': LightManageDetailPop
 }
@@ -178,6 +184,7 @@ export default {
       currentCommandTitle: '',
       projectOpt: [],
       projectOptPopUse: [],
+      popWindowData: null,
       detailData: null
     }
   },
@@ -215,6 +222,7 @@ export default {
     // 打开新建弹窗
     async openCreate() {
       this.projectOptPopUse = await getWriteProjectOptProcessed()
+      this.popWindowData = await getPopWindowData()
       this.currentCommandPop = commandPopMap['AddPop']
       this.currentCommandTitle = '添加路灯'
       this.commandPopVisible = true
@@ -223,6 +231,13 @@ export default {
     async openEditPop(id) {
       this.projectOptPopUse = await getWriteProjectOptProcessed()
       this.detailData = await getDetail(id)
+      this.detailData.groupOpt =
+        (await getGroupListOptByProjectId(this.detailData.projectId)).map(item => {
+          return {
+            value: item.id,
+            label: item.groupName
+          }
+        })
       this.editId = id
       this.isEdit = true
       this.currentCommandPop = commandPopMap['AddPop']
@@ -256,19 +271,6 @@ export default {
         })
       this.$message.info('删除成功')
       this.fetch({ pageSize: 10, pageNum: 1 })
-    },
-    // 选择命令 打开弹窗
-    async handleCommandClick({ key }) {
-      if (key === 'doDelItems') {
-        this.deleteModalVisible = true
-        return
-      }
-      this.editId = this.selectedRowKeys[0]
-      this.detailData = {}
-
-      this.currentCommandPop = commandPopMap[key]
-      this.currentCommandTitle = commandPopTitleMap[key]
-      this.commandPopVisible = true
     },
     doApprove() {
 

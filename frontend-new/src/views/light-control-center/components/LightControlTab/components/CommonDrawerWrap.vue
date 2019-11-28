@@ -12,10 +12,12 @@
   >
     <slot name="default" v-bind="$props"></slot>
     <div class="drawer-bootom-button">
-      <a-popconfirm title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
-        <a-button :loading="loading" style="margin-right: .8rem">{{ cancelText || '取消' }}</a-button>
+
+      <a-popconfirm v-if="!readonly" title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
+        <a-button style="margin-right: .8rem">{{ cancelText || '取消' }}</a-button>
       </a-popconfirm>
-      <a-button type="primary" :loading="loading" @click="handleSubmit">{{ confirmText || '确定' }}</a-button>
+      <a-button v-else style="margin-right: .8rem" @click="onClose">{{ cancelText || '取消' }}</a-button>
+      <a-button v-if="!readonly" type="primary" @click="handleSubmit">{{ confirmText || '确定' }}</a-button>
     </div>
   </a-drawer>
 </template>
@@ -63,7 +65,7 @@ export default {
   },
   data() {
     return {
-      loading: false
+
     }
   },
   computed: {
@@ -82,12 +84,14 @@ export default {
   },
   methods: {
     onClose() {
-      this.$emit('close')
       this.$emit('update:visible', false)
+      this.$emit('close')
       this.$emit('update:isEdit', false)
       this.$emit('update:editId', '')
-      this.$emit('update:readonly', false)
       this.$emit('update:detailData', null)
+      setTimeout(() => {
+        this.$emit('update:readonly', false)
+      }, 1000)
     },
     async handleSubmit() {
       const submitFlag = await this.currentPopContent.handleSubmit()
