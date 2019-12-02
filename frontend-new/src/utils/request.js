@@ -161,7 +161,7 @@ const request = {
     }).then((r) => {
       const rawContentDisposition = r.headers['content-disposition'].split(';')
       const contentDisposition = qs.parse(rawContentDisposition[1])
-      debugger
+      // debugger
       const content = r.data
       const blob = new Blob([content])
       if ('download' in document.createElement('a')) {

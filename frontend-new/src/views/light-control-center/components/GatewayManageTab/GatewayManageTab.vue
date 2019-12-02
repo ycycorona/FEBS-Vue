@@ -113,6 +113,7 @@
 import IconEdit from '@/components/icons/IconEdit'
 import IconDelete from '@/components/icons/IconDelete'
 
+import GatewayDetailView from '@/views/light-control-center/components/GatewayManageTab/components/GatewayDetailView'
 import GatewayDetailPop from '@/views/light-control-center/components/GatewayManageTab/components/GatewayDetailPop'
 import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
 import GatewayElectricRelayConfig from '@/views/light-control-center/components/GatewayManageTab/components/commandPopContent/GatewayElectricRelayConfig'
@@ -129,6 +130,7 @@ import { configSerialize } from '@/utils/common'
 const commandPopMap = {
   'GatewayElectricRelayConfig': GatewayElectricRelayConfig,
   'AddPop': GatewayDetailPop,
+  'ReadPop': GatewayDetailView,
   'GatewayChannel': GatewayChannel,
   'GatewayPanId': GatewayPanId,
   'GatewayElectricAddress': GatewayElectricAddress
@@ -260,7 +262,7 @@ export default {
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
-      this.currentCommandPop = commandPopMap['AddPop']
+      this.currentCommandPop = commandPopMap['ReadPop']
       this.currentCommandTitle = '查看网关'
       this.commandPopVisible = true
     },

@@ -59,7 +59,7 @@ export default {
     //background: #f0f2f5 url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg') no-repeat center 110px;
     //background: #f0f2f5 url('/static/img/login-back.png')  center/cover repeat local;
     background: #f0f2f5 url('/static/img/login-back.png') no-repeat;
-    background-size: 100%;
+    background-size: cover;
     .content {
       .left-img-wrap {
         text-align: center;

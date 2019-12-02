@@ -1,181 +1,183 @@
 <template>
-  <a-form :form="form">
-    <tab-title v-if="readonly" title="网关参数" />
-    <a-row :gutter="12">
-      <a-col :span="12">
-        <a-form-item label="网关名称" v-bind="formItemLayout">
-          <a-input
-            v-decorator="['gatewayName',
-                          {rules: [
-                             { required: true, message: '网关名称不能为空'}
-                           ],
-                           initialValue: formValues.gatewayName}]"
-            palceholder=""
-            :read-only="readonly"
-          />
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="项目" v-bind="formItemLayout">
-          <a-select
-            v-decorator="['projectId', {
-              rules:[{ required: true, message: '项目不能为空'}],
-              initialValue: formValues.projectId,
-            }]"
-            :class="{'readonly': readonly}"
-            :disabled="readonly"
-            :options="projectOpt"
-          />
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="通讯地址(唯一)" v-bind="formItemLayout">
-          <a-input
-            v-decorator="['gatewayGprs',
-                          {rules: [
-                             { required: true, message: '通讯地址不能为空'}
-                           ],
-                           initialValue: formValues.gatewayGprs}]"
-            palceholder=""
-            :read-only="readonly"
-          />
-        </a-form-item>
-      </a-col>
+  <a-tabs default-active-key="1">
+    <a-tab-pane key="1" tab="网关基础信息" force-render>
+      <a-form :form="form">
+        <tab-title v-if="readonly" title="网关参数" />
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="网关名称" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['gatewayName',
+                              {rules: [
+                                 { required: true, message: '网关名称不能为空'}
+                               ],
+                               initialValue: formValues.gatewayName}]"
+                palceholder=""
+                :read-only="readonly"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="项目" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['projectId', {
+                  rules:[{ required: true, message: '项目不能为空'}],
+                  initialValue: formValues.projectId,
+                }]"
+                :class="{'readonly': readonly}"
+                :disabled="readonly"
+                :options="projectOpt"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="通讯地址(唯一)" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['gatewayGprs',
+                              {rules: [
+                                 { required: true, message: '通讯地址不能为空'}
+                               ],
+                               initialValue: formValues.gatewayGprs}]"
+                palceholder=""
+                :read-only="readonly"
+              />
+            </a-form-item>
+          </a-col>
 
-      <a-col :span="12">
-        <a-form-item label="网关类型" v-bind="formItemLayout">
-          <a-select
-            v-decorator="['gatewayGeneration',
-                          {rules: [
-                             { required: true, message: '不能为空'}
-                           ],
-                           initialValue: formValues.gatewayGeneration}]"
-            :class="{'readonly': readonly}"
-            :disabled="readonly"
-          >
-            <a-select-option :value="1">TI网关</a-select-option>
-            <a-select-option :value="2">NXP网关</a-select-option>
-          </a-select>
+          <a-col :span="12">
+            <a-form-item label="网关类型" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['gatewayGeneration',
+                              {rules: [
+                                 { required: true, message: '不能为空'}
+                               ],
+                               initialValue: formValues.gatewayGeneration}]"
+                :class="{'readonly': readonly}"
+                :disabled="readonly"
+              >
+                <a-select-option :value="1">TI网关</a-select-option>
+                <a-select-option :value="2">NXP网关</a-select-option>
+              </a-select>
 
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="无线组网模式" v-bind="formItemLayout">
-          <a-select
-            v-decorator="['type',
-                          {rules: [
-                             { required: true, message: '不能为空'}
-                           ],
-                           initialValue: formValues.type}]"
-            :class="{'readonly': readonly}"
-            :disabled="readonly"
-          >
-            <a-select-option :value="1">网关模块</a-select-option>
-            <a-select-option :value="2">NB</a-select-option>
-            <a-select-option :value="3">其他</a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="继电器通电模式" v-bind="formItemLayout">
-          <a-select
-            v-decorator="['mode',
-                          {rules: [
-                             { required: true, message: '不能为空'}
-                           ],
-                           initialValue: formValues.mode}]"
-            :class="{'readonly': readonly}"
-            :disabled="readonly"
-          >
-            <a-select-option :value="1">定时开关模式</a-select-option>
-            <a-select-option :value="2">经纬度开关模式</a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="是否使用电表" v-bind="formItemLayout">
-          <a-switch
-            v-decorator="['useElectricMeter',
-                          {rules: [
-                             { required: true, message: '不能为空'}
-                           ],
-                           valuePropName: 'checked',
-                           initialValue: formValues.useElectricMeter}]"
-            :disabled="readonly"
-            checked-children="使用"
-            un-checked-children="不使用"
-            @change="useElectricMeterChange"
-          />
-        </a-form-item>
-      </a-col>
-    </a-row>
-    <a-row v-if="useElectricMeter" :gutter="12">
-      <a-col :span="12">
-        <a-form-item label="电表地址" v-bind="formItemLayout">
-          <multi-input
-            v-decorator="['electricMeterAddress',
-                          {rules: [
-                             { required: true, message: '电表地址不能为空'}
-                           ],
-                           initialValue: formValues.electricMeterAddress}]"
-            :input-num="6"
-            :readonly="readonly"
-          ></multi-input>
-        </a-form-item>
-      </a-col>
-      <a-col :span="12">
-        <a-form-item label="电表变比" v-bind="formItemLayout">
-          <a-input
-            v-decorator="['ratioOfElectricMeter',
-                          {rules: [
-                             { required: true, message: '电表变比不能为空'}
-                           ],
-                           initialValue: formValues.ratioOfElectricMeter}]"
-            :read-only="readonly"
-          />
-        </a-form-item>
-      </a-col>
-    </a-row>
-    <a-row :gutter="12">
-      <a-col :span="12">
-        <a-form-item label="备注" v-bind="formItemLayout">
-          <a-input
-            v-decorator="['description',
-                          {rules: [
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="无线组网模式" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['type',
+                              {rules: [
+                                 { required: true, message: '不能为空'}
+                               ],
+                               initialValue: formValues.type}]"
+                :class="{'readonly': readonly}"
+                :disabled="readonly"
+              >
+                <a-select-option :value="1">网关模块</a-select-option>
+                <a-select-option :value="2">NB</a-select-option>
+                <a-select-option :value="3">其他</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="继电器通电模式" v-bind="formItemLayout">
+              <a-select
+                v-decorator="['mode',
+                              {rules: [
+                                 { required: true, message: '不能为空'}
+                               ],
+                               initialValue: formValues.mode}]"
+                :class="{'readonly': readonly}"
+                :disabled="readonly"
+              >
+                <a-select-option :value="1">定时开关模式</a-select-option>
+                <a-select-option :value="2">经纬度开关模式</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="是否使用电表" v-bind="formItemLayout">
+              <a-switch
+                v-decorator="['useElectricMeter',
+                              {rules: [
+                                 { required: true, message: '不能为空'}
+                               ],
+                               valuePropName: 'checked',
+                               initialValue: formValues.useElectricMeter}]"
+                :disabled="readonly"
+                checked-children="使用"
+                un-checked-children="不使用"
+                @change="useElectricMeterChange"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row v-if="useElectricMeter" :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="电表地址" v-bind="formItemLayout">
+              <multi-input
+                v-decorator="['electricMeterAddress',
+                              {rules: [
+                                 { required: true, message: '电表地址不能为空'}
+                               ],
+                               initialValue: formValues.electricMeterAddress}]"
+                :input-num="6"
+                :readonly="readonly"
+              ></multi-input>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="电表变比" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['ratioOfElectricMeter',
+                              {rules: [
+                                 { required: true, message: '电表变比不能为空'}
+                               ],
+                               initialValue: formValues.ratioOfElectricMeter}]"
+                :read-only="readonly"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="12">
+            <a-form-item label="备注" v-bind="formItemLayout">
+              <a-input
+                v-decorator="['description',
+                              {rules: [
 
-                           ],
-                           initialValue: formValues.description}]"
-            palceholder=""
-            :read-only="readonly"
-          />
-        </a-form-item>
-      </a-col>
-    </a-row>
-    <a-row :gutter="12">
-      <a-col :span="24">
-        <a-form-item label="网关位置" v-bind="formItemLayout_1">
-          <position-input
-            v-decorator="['gatewayPosition',
-                          {rules: [
-                             { required: true, message: '网关位置不能为空'}
-                           ],
-                           initialValue: formValues.gatewayPosition}]"
-            palceholder="请选择网关位置"
-            :readonly="readonly"
-            @change="positionChangeFromText"
-          ></position-input>
-        </a-form-item>
-      </a-col>
-    </a-row>
-    <PointerSelect
-      ref="positonSelect"
-      style="z-index:1"
-      :current-pointer="pointerSelectValue"
-      @change="positionChangeFromMap"
-    ></PointerSelect>
-    <!-- 只读模式显示更多 -->
-    <template v-if="readonly">
-      <tab-title title="网关配置" style="margin-top:20px" />
+                               ],
+                               initialValue: formValues.description}]"
+                palceholder=""
+                :read-only="readonly"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="12">
+          <a-col :span="24">
+            <a-form-item label="网关位置" v-bind="formItemLayout_1">
+              <position-input
+                v-decorator="['gatewayPosition',
+                              {rules: [
+                                 { required: true, message: '网关位置不能为空'}
+                               ],
+                               initialValue: formValues.gatewayPosition}]"
+                palceholder="请选择网关位置"
+                :readonly="readonly"
+                @change="positionChangeFromText"
+              ></position-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <PointerSelect
+          ref="positonSelect"
+          style="z-index:1"
+          :current-pointer="pointerSelectValue"
+          @change="positionChangeFromMap"
+        ></PointerSelect>
+      </a-form>
+    </a-tab-pane>
+    <a-tab-pane key="2" tab="网关配置信息" force-render>
       <a-form :form="gatewayConfigForm">
         <a-row :gutter="12">
           <a-col :span="12">
@@ -221,11 +223,15 @@
             </a-form-item>
           </a-col>
         </a-row>
+      </a-form>
+    </a-tab-pane>
+    <a-tab-pane key="3" tab="网关继电器策略" force-render>
+      <a-form :form="gatewayRelayForm">
         <div style="margin-bottom: 20px;">网关继电器配置：</div>
         <a-row :gutter="12">
           <a-col :span="2" class="text-center">
             <span class="all-switch-text">启用/禁用</span>
-            <a-switch v-model="gatewayConfigFormValues.switchAll" :disabled="readonly"></a-switch>
+            <a-switch v-model="gatewayRelayFormValues.switchAll" :disabled="readonly"></a-switch>
           </a-col>
           <a-col :span="2" class="text-center">路编号</a-col>
           <a-col :span="4" class="text-center">路名称</a-col>
@@ -240,7 +246,7 @@
           <a-col :span="2" class="text-center">
             <a-form-item label="开关" v-bind="formItemLayout_noLabel">
               <a-switch
-                v-model="gatewayConfigFormValues.switch[index]"
+                v-model="gatewayRelayFormValues.switch[index]"
                 :disabled="readonly"
               />
             </a-form-item>
@@ -256,8 +262,8 @@
                               {rules: [
 
                                ],
-                               initialValue: gatewayConfigFormValues.name[index]}]"
-                :disabled="!gatewayConfigFormValues.switch[index]"
+                               initialValue: gatewayRelayFormValues.name[index]}]"
+                :disabled="!gatewayRelayFormValues.switch[index]"
                 :readonly="readonly"
               />
             </a-form-item>
@@ -267,11 +273,11 @@
               <a-select
                 v-decorator="[
                   `type[${index}]`, {
-                    initialValue: gatewayConfigFormValues.type[index]
+                    initialValue: gatewayRelayFormValues.type[index]
                   }
                 ]"
                 :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index] || readonly"
+                :disabled="!gatewayRelayFormValues.switch[index] || readonly"
               >
                 <a-select-option :value="0">定时</a-select-option>
                 <a-select-option :value="1">经纬度</a-select-option>
@@ -285,9 +291,9 @@
                               {rules: [
                                  { required: true, message: '开灯时间不能为空'}
                                ],
-                               initialValue: gatewayConfigFormValues.openTime[index]}]"
+                               initialValue: gatewayRelayFormValues.openTime[index]}]"
                 :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index]"
+                :disabled="!gatewayRelayFormValues.switch[index]"
                 :allow-clear="false"
                 class="full-width"
                 :format="TimepickerFormat"
@@ -301,9 +307,9 @@
                               {rules: [
                                  { required: true, message: '熄灯时间不能为空'}
                                ],
-                               initialValue: gatewayConfigFormValues.closeTime[index]}]"
+                               initialValue: gatewayRelayFormValues.closeTime[index]}]"
                 :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index]"
+                :disabled="!gatewayRelayFormValues.switch[index]"
                 :allow-clear="false"
                 class="full-width"
                 :format="TimepickerFormat"
@@ -312,8 +318,9 @@
           </a-col>
         </a-row>
       </a-form>
-    </template>
-  </a-form>
+    </a-tab-pane>
+  </a-tabs>
+
 </template>
 
 <script>
@@ -363,11 +370,16 @@ function formValueFormater(detailData = null) {
     }
   }
 }
-function gatewayConfigFormValuesFormater() {
+function gatewayConfigFormValuesFormater(detailData = null) {
   return {
-    channel: '',
+    channel: '123',
     electricAddress: createArrayFromNum(6, 0),
-    panId: createArrayFromNum(8, 0),
+    panId: createArrayFromNum(8, 0)
+  }
+}
+
+function gatewayRelayFormValuesFormater(detailData = null) {
+  return {
     name: createArrayFromNum(number, ''),
     switch: createArrayFromNum(number, true),
     openTime: createArrayFromNum(number, momentObjFactory),
@@ -397,7 +409,7 @@ export default {
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: true
     },
     isEdit: {
       default: false,
@@ -415,12 +427,15 @@ export default {
     const formValues = this.$props.isEdit
       ? formValueFormater(this.$props.detailData) : formValueFormater(null)
     const gatewayConfigFormValues = gatewayConfigFormValuesFormater()
+    const gatewayRelayFormValues = gatewayRelayFormValuesFormater()
     this.formValues = formValues
+    this.gatewayRelayFormValues = gatewayRelayFormValues
     this.gatewayConfigFormValues = gatewayConfigFormValues
     this.useElectricMeter = formValues.useElectricMeter
     return {
       form: this.$form.createForm(this),
       gatewayConfigForm: this.$form.createForm(this),
+      gatewayRelayForm: this.$form.createForm(this),
       formItemLayout, formItemLayout_1, formItemLayout_noLabel, number, TimepickerFormat,
       rawDetail: null,
       pointerSelectValue: formValues.gatewayPosition
