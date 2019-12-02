@@ -394,7 +394,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.no-margin-divide /deep/ .ant-divider-horizontal {
-  margin: 5px 0;
-}
 </style>

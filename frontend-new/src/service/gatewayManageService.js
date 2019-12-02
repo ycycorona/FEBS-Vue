@@ -29,7 +29,8 @@ export function getDetail(id) {
     method: 'get',
     params: {
       gatewayId: id
-    }
+    },
+    gbLoading: true
   })
 }
 // 修改

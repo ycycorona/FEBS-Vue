@@ -1,9 +1,7 @@
 <template>
   <a-locale-provider :locale="chinese">
     <div id="febs">
-      <a-spin :delay="1000" :spinning="gbSpinning" wrapper-class-name="global-spin">
-
-      </a-spin>
+      <a-spin :delay="500" :spinning="gbSpinning" class="global-spin-container" />
       <router-view />
     </div>
   </a-locale-provider>
@@ -35,6 +33,7 @@ export default {
 }
 </script>
 <style lang="less">
+
   :global {
     .dragable-ghost {
       border: 1px dashed #aaaaaa;

@@ -169,7 +169,7 @@
                              { required: true, message: '校表码不能为空'}
                            ],
                            initialValue: formValues.jiaobiaoCode}]"
-            :input-num="8"
+            :input-num="12"
             :readonly="readonly"
           ></multi-input>
         </a-form-item>

@@ -1,6 +1,6 @@
 import request from 'utils/request'
 import { message, /* Modal, */ notification } from 'ant-design-vue'
-import stroe from '@/store'
+import store from '@/store'
 /**
  * config{}
  * @param {object} config
@@ -13,7 +13,7 @@ export function requestContructor(config) {
   }
   // 全局加载提示
   if (config.gbLoading) {
-    stroe.commit('globalState/setGbSpinning', true)
+    store.commit('globalState/setGbSpinning', true)
   }
 
   return new Promise((resolve, reject) => {
@@ -38,7 +38,7 @@ export function requestContructor(config) {
       })
       .finally(() => {
         loadingFlag && loadingFlag()
-        config.gbLoading && stroe.commit('globalState/setGbSpinning', false)
+        config.gbLoading && store.commit('globalState/setGbSpinning', false)
       })
   })
 }

@@ -37,7 +37,7 @@
 
     <!-- 操作按钮 -->
     <div style="margin-bottom:10px;position:relative" class="">
-      <a-dropdown>
+      <a-dropdown :disabled="selectedRowKeys.length===0">
         <a-menu slot="overlay" @click="handleCommandClick">
           <a-menu-item key="GatewayChannel">频道修改</a-menu-item>
           <a-menu-item key="GatewayPanId">PANID修改</a-menu-item>
@@ -329,8 +329,6 @@ export default {
       this.commandPopVisible = true
     },
     promiseAllDo(...pList) {
-      // console.log(pList)
-      // debugger
       return Promise.allSettled(pList)
     },
     // 命令弹窗关闭

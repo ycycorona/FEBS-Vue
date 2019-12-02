@@ -102,16 +102,9 @@
         <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
       </template>
     </a-table>
-    <LightControlDetailPop
-      :visible.sync="lightControlDetailPopVisible"
-      :is-edit.sync="isEdit"
-      :edit-id.sync="editId"
-      :pop-readonly.sync="popReadonly"
-      @close="handleEditPopClose"
-      @success="handleEditPopSuccess"
-    ></LightControlDetailPop>
     <CommonDrawerWrap
-      :draw-width="800"
+      :readonly="popReadonly"
+      :draw-width="1000"
       :visible.sync="lightCommandPopVisible"
       :draw-title="currentCommandTitle"
       @close="handleCommandPopClose"
@@ -151,7 +144,7 @@
 <script>
 import { configSerialize, isEmptyObject } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
-import LightControlDetailPop from './components/LightControlDetailPop'
+import LightControlReadPop from './components/LightControlReadPop'
 import CommonDrawerWrap from './components/CommonDrawerWrap'
 import LightControlType from './components/commandPopContent/LightControlType'
 import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
@@ -167,6 +160,7 @@ import { getListOptProcessed as getReadProjectOptProcessed,
 import { getDetail, del, getList } from '@/service/approvedLightManageService'
 import { getListOptByProjectId_1 as getGroupListOptByProjectId } from '@/service/groupManageService'
 const commandPopMap = {
+  'ReadPop': LightControlReadPop,
   'LightControlType': LightControlType,
   'LightControlManualPower': LightControlManualPower,
   'LightControlStrategy': LightControlStrategy,
@@ -193,7 +187,7 @@ const commandPopTitleMap = {
 import { LightName } from '@/config/LightConstant'
 export default {
   name: 'LightControlTab',
-  components: { IconEdit, LightControlDetailPop, CommonDrawerWrap },
+  components: { IconEdit, CommonDrawerWrap },
   props: {},
   data() {
     this.formValues = {
@@ -287,6 +281,8 @@ export default {
       currentGroup: '',
       currentProject: '',
       projectOpt: [],
+      projectOptPopUse: [],
+      detailData: null,
       groupOpt: [],
       testList: [{
         id: 1
@@ -321,7 +317,6 @@ export default {
       this.getFirstData()
     },
     handleTableChange(pagination, filters, sorter) {
-      console.log(pagination)
       this.search({ pageSize: pagination.pageSize, pageNum: pagination.current })
     },
     async fetch(params = {}) {
@@ -333,17 +328,21 @@ export default {
       this.selectedRowKeys = []
     },
     // 打开编辑弹窗
-    openEditPop(id) {
-      this.editId = id
-      this.isEdit = true
-      this.lightControlDetailPopVisible = true
-    },
+    // openEditPop(id) {
+    //   this.editId = id
+    //   this.isEdit = true
+    //   this.lightControlDetailPopVisible = true
+    // },
     // 打开只读弹窗
-    openReadonlyPop(id) {
+    async openReadonlyPop(id) {
+      this.projectOptPopUse = await getReadProjectOptProcessed()
+      // this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
-      this.lightControlDetailPopVisible = true
+      this.currentCommandPop = commandPopMap['ReadPop']
+      this.currentCommandTitle = '查看智能灯'
+      this.lightCommandPopVisible = true
     },
     // 编辑弹窗关闭
     handleEditPopClose() {
@@ -408,7 +407,6 @@ export default {
           label: item.groupName
         }
       })
-
       this.filterForm.setFieldsValue({
         'groupId': this.groupOpt.length === 0 ? '' : this.groupOpt[0].value
       })

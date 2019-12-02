@@ -173,146 +173,6 @@
       :current-pointer="pointerSelectValue"
       @change="positionChangeFromMap"
     ></PointerSelect>
-    <!-- 只读模式显示更多 -->
-    <template v-if="readonly">
-      <tab-title title="网关配置" style="margin-top:20px" />
-      <a-form :form="gatewayConfigForm">
-        <a-row :gutter="12">
-          <a-col :span="12">
-            <a-form-item label="频道" v-bind="formItemLayout">
-              <a-input
-                v-decorator="['channel',
-                              {rules: [
-                                 { required: true, message: '频道不能为空'}
-                               ],
-                               initialValue: gatewayConfigFormValues.channel}]"
-                :read-only="readonly"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="12">
-          <a-col :span="12">
-            <a-form-item label="电表地址" v-bind="formItemLayout">
-              <multi-input
-                v-decorator="['electricAddress',
-                              {rules: [
-                                 { required: true, message: '电表地址不能为空'}
-                               ],
-                               initialValue: gatewayConfigFormValues.electricAddress}]"
-                :input-num="6"
-                :readonly="readonly"
-              ></multi-input>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="12">
-          <a-col :span="24">
-            <a-form-item label="PANID" v-bind="formItemLayout_1">
-              <multi-input
-                v-decorator="['panId',
-                              {rules: [
-                                 { required: true, message: 'panId不能为空'}
-                               ],
-                               initialValue: gatewayConfigFormValues.panId}]"
-                :input-num="8"
-                :readonly="readonly"
-              ></multi-input>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <div style="margin-bottom: 20px;">网关继电器配置：</div>
-        <a-row :gutter="12">
-          <a-col :span="2" class="text-center">
-            <span class="all-switch-text">启用/禁用</span>
-            <a-switch v-model="gatewayConfigFormValues.switchAll" :disabled="readonly"></a-switch>
-          </a-col>
-          <a-col :span="2" class="text-center">路编号</a-col>
-          <a-col :span="4" class="text-center">路名称</a-col>
-          <a-col :span="4" class="text-center">回路模式</a-col>
-          <a-col :span="6" class="text-center">开时间</a-col>
-          <a-col :span="6" class="text-center">关时间</a-col>
-        </a-row>
-        <div class="no-margin-divide">
-          <a-divider />
-        </div>
-        <a-row v-for="(n, index) in number" :key="n" :gutter="12">
-          <a-col :span="2" class="text-center">
-            <a-form-item label="开关" v-bind="formItemLayout_noLabel">
-              <a-switch
-                v-model="gatewayConfigFormValues.switch[index]"
-                :disabled="readonly"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="2" class="text-center">
-            <a-form-item label="编号" v-bind="formItemLayout_noLabel">
-              {{ n }}
-            </a-form-item> </a-col>
-          <a-col :span="4" class="text-center">
-            <a-form-item label="名称" v-bind="formItemLayout_noLabel">
-              <debounced-input
-                v-decorator="[`name[${index}]`,
-                              {rules: [
-
-                               ],
-                               initialValue: gatewayConfigFormValues.name[index]}]"
-                :disabled="!gatewayConfigFormValues.switch[index]"
-                :readonly="readonly"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="4" class="text-center">
-            <a-form-item label="回路模式" v-bind="formItemLayout_noLabel">
-              <a-select
-                v-decorator="[
-                  `type[${index}]`, {
-                    initialValue: gatewayConfigFormValues.type[index]
-                  }
-                ]"
-                :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index] || readonly"
-              >
-                <a-select-option :value="0">定时</a-select-option>
-                <a-select-option :value="1">经纬度</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="定时开时间" v-bind="formItemLayout_noLabel">
-              <a-time-picker
-                v-decorator="[`openTime[${index}]`,
-                              {rules: [
-                                 { required: true, message: '开灯时间不能为空'}
-                               ],
-                               initialValue: gatewayConfigFormValues.openTime[index]}]"
-                :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index]"
-                :allow-clear="false"
-                class="full-width"
-                :format="TimepickerFormat"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="定时关时间" v-bind="formItemLayout_noLabel">
-              <a-time-picker
-                v-decorator="[`closeTime[${index}]`,
-                              {rules: [
-                                 { required: true, message: '熄灯时间不能为空'}
-                               ],
-                               initialValue: gatewayConfigFormValues.closeTime[index]}]"
-                :class="{'readonly': readonly}"
-                :disabled="!gatewayConfigFormValues.switch[index]"
-                :allow-clear="false"
-                class="full-width"
-                :format="TimepickerFormat"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </a-form>
-    </template>
   </a-form>
 </template>
 
@@ -324,7 +184,6 @@ import PositionInput from '@/components/diyMap/PositionInput'
 import { createArrayFromNum, configSerialize, configDeserialize } from '@/utils/common'
 import MultiInput from '@/components/input/MultiInput/MultiInput'
 import moment from 'moment'
-import DebouncedInput from '@/components/input/DebouncedInput/DebouncedInput'
 import { save, add } from '@/service/gatewayManageService'
 
 const number = 16
@@ -372,8 +231,7 @@ function gatewayConfigFormValuesFormater() {
     switch: createArrayFromNum(number, true),
     openTime: createArrayFromNum(number, momentObjFactory),
     closeTime: createArrayFromNum(number, momentObjFactory),
-    type: createArrayFromNum(number, 0),
-    switchAll: false
+    type: createArrayFromNum(number, 0)
   }
 }
 const formItemLayout = {
@@ -390,7 +248,7 @@ const formItemLayout_noLabel = {
 }
 export default {
   name: 'GatewayDetailPop',
-  components: { DebouncedInput, PointerSelect, PositionInput, TabTitle, MultiInput },
+  components: { PointerSelect, PositionInput, TabTitle, MultiInput },
   props: {
     detailData: {
       type: Object
@@ -436,7 +294,7 @@ export default {
     this.$store.commit('contact/setCurrentPopContent', this)
   },
   mounted() {
-
+    // this.$store.commit('globalState/setGbSpinning', true)
   },
   methods: {
     // 智能灯经纬度改变 从地图
@@ -483,7 +341,7 @@ export default {
         projectId: formValues.projectId,
         useElectricMeter: formValues.useElectricMeter ? 1 : 0,
         ratioOfElectricMeter: formValues.ratioOfElectricMeter,
-        electricMeterAddress: formValues.electricMeterAddress,
+        electricMeterAddress: configSerialize(formValues.electricMeterAddress),
         lng: formValues.gatewayPosition[0],
         lat: formValues.gatewayPosition[1],
         description: formValues.description,

@@ -31,6 +31,7 @@ module.exports = {
     "vue/no-v-html": "off",
     'vue/html-self-closing': 0,
     'vue/no-unused-vars': 0,
+    'vue/no-unused-components': 0,
     'vue/require-prop-types': 0,
     'vue/require-default-prop': 0,
     'vue/order-in-components': 2,
@@ -151,7 +152,7 @@ module.exports = {
     }],
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
-    'no-unused-vars': [2, {
+    'no-unused-vars': [1, {
       'vars': 'all',
       'args': 'none'
     }],

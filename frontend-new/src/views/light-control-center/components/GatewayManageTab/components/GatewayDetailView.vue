@@ -1,5 +1,5 @@
 <template>
-  <a-tabs default-active-key="1">
+  <a-tabs default-active-key="1" style="margin-top: -24px;">
     <a-tab-pane key="1" tab="网关基础信息" force-render>
       <a-form :form="form">
         <tab-title v-if="readonly" title="网关参数" />
@@ -545,6 +545,7 @@ export default {
       })
       return validateFlag
     },
+    // 是否使用电表
     useElectricMeterChange(val) {
       this.useElectricMeter = val
     }

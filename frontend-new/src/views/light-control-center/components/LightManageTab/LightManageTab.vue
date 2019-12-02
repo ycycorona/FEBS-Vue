@@ -75,7 +75,7 @@
     >
       <template slot="operation" slot-scope="record">
         <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
-        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
+        <!-- <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span> -->
       </template>
     </a-table>
     <CommonDrawerWrap
@@ -224,7 +224,7 @@ export default {
       this.projectOptPopUse = await getWriteProjectOptProcessed()
       this.popWindowData = await getPopWindowData()
       this.currentCommandPop = commandPopMap['AddPop']
-      this.currentCommandTitle = '添加路灯'
+      this.currentCommandTitle = '添加智能灯'
       this.commandPopVisible = true
     },
     // 打开编辑弹窗
@@ -241,7 +241,7 @@ export default {
       this.editId = id
       this.isEdit = true
       this.currentCommandPop = commandPopMap['AddPop']
-      this.currentCommandTitle = '编辑路灯'
+      this.currentCommandTitle = '编辑智能灯'
       this.commandPopVisible = true
     },
     // 打开只读弹窗
