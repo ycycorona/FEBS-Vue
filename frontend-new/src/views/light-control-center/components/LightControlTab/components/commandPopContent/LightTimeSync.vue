@@ -1,30 +1,29 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="24">
-          <a-form-item label="校准系统时间" v-bind="formItemLayout">
-            <a-date-picker
-              v-decorator="['sysDateTime',
-                            {rules: [
-                               { required: true, message: '时间不能为空'}
-                             ],
-                             initialValue: formValues.sysDateTime}]"
-              format="YYYY-MM-DD HH:mm:ss"
-              :show-time="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label="" v-bind="formItemLayout_1">
-            <a-button @click="getLocalDate">同步本地时间</a-button>
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-spin>
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="24">
+        <a-form-item label="校准系统时间" v-bind="formItemLayout">
+          <a-date-picker
+            v-decorator="['sysDateTime',
+                          {rules: [
+                             { required: true, message: '时间不能为空'}
+                           ],
+                           initialValue: formValues.sysDateTime}]"
+            format="YYYY-MM-DD HH:mm:ss"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="24">
+        <a-form-item label="" v-bind="formItemLayout_1">
+          <a-button @click="getLocalDate">同步本地时间</a-button>
+        </a-form-item>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
+import { pushSetSysTimeByBatch } from '@/service/approvedLightManageService'
+import { configSerialize, configDeserialize } from '@/utils/common'
 import moment from 'moment'
 const formItemLayout = {
   labelCol: { span: 5 },
@@ -43,13 +42,14 @@ export default {
   name: 'LightTimeSync',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
     return {
       moment,
-      loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
       form: this.$form.createForm(this)
@@ -74,19 +74,12 @@ export default {
       return true
     },
     save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+      const params = {
+        lightIds: configSerialize(this.selectedRowKeys),
+        time: formValues.sysDateTime.format('YYYY-MM-DD HH:mm:ss')
+      }
+
+      return pushSetSysTimeByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()

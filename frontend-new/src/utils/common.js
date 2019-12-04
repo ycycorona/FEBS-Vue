@@ -10,7 +10,9 @@ export function triggerWindowResizeEvent() {
  * @param {Array} arr
  */
 export function configSerialize(arr) {
-  if (!arr) { return '' }
+  if (!(arr instanceof Array)) {
+    throw Error('参数不是数组')
+  }
   return arr.join(',')
 }
 
@@ -19,7 +21,9 @@ export function configSerialize(arr) {
  * @param {String} str
  */
 export function configDeserialize(str) {
-  if (!str) { return [] }
+  if (typeof str !== 'string') {
+    throw Error('参数不是字符串')
+  }
   return str.split(',').map(item => Number(item))
 }
 

@@ -103,3 +103,85 @@ export function approve(ids) {
     gbLoading: true
   })
 }
+
+// 单/多选设置智能灯频道(下发指令)
+export function pushSetPindaoByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetPindaoByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选设置智能灯频道(下发指令)
+export function pushSetPANIDByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetPANIDByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选修改经纬度(下发指令)
+export function pushSetLatlngByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetLatlngByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选校表(下发指令)
+export function pushSetJiaobiaoByBatch(lightIds) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetJiaobiaoByBatch',
+    method: 'post',
+    params: {
+      lightIds
+    },
+    gbLoading: true
+  })
+}
+
+// 单/多选时间校准(下发指令)
+export function pushSetSysTimeByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetSysTimeByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选设置报警阈(下发指令)
+export function pushSetThresholdByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetThresholdByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选设置红外触发参数(下发指令)
+export function pushSetTriggerByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetTriggerByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}
+
+// 单/多选设置强制开关灯功率(下发指令)
+export function pushSetSwitchPowerByBatch(params) {
+  return requestContructor({
+    url: '/business/approvedLight/pushSetSwitchPowerByBatch',
+    method: 'post',
+    params,
+    gbLoading: true
+  })
+}

@@ -1,35 +1,35 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="24">
-          <a-form-item label="智能灯位置" v-bind="formItemLayout">
-            <position-input
-              v-decorator="['lightPosition',
-                            {rules: [
-                               { required: true, message: '智能灯位置不能为空'}
-                             ],
-                             initialValue: formValues.lightPosition}]"
-              palceholder="请选择智能灯位置"
-              @change="positionChangeFromText"
-            ></position-input>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <PointerSelect
-        ref="positonSelect"
-        style="z-index:1"
-        :current-pointer="pointerSelectValue"
-        @change="positionChangeFromMap"
-      ></PointerSelect>
-    </a-form>
-  </a-spin>
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="24">
+        <a-form-item label="智能灯位置" v-bind="formItemLayout">
+          <position-input
+            v-decorator="['lightPosition',
+                          {rules: [
+                             { required: true, message: '智能灯位置不能为空'}
+                           ],
+                           initialValue: formValues.lightPosition}]"
+            palceholder="请选择智能灯位置"
+            @change="positionChangeFromText"
+          ></position-input>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <PointerSelect
+      ref="positonSelect"
+      style="z-index:1"
+      :current-pointer="pointerSelectValue"
+      @change="positionChangeFromMap"
+    ></PointerSelect>
+  </a-form>
 </template>
 <script>
 import { BasePosition } from '@/config/LightConstant'
 import moment from 'moment'
 import PointerSelect from '@/components/diyMap/PointerSelect'
 import PositionInput from '@/components/diyMap/PositionInput'
+import { pushSetLatlngByBatch } from '@/service/approvedLightManageService'
+import { configSerialize, configDeserialize } from '@/utils/common'
 const formItemLayout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 }
@@ -47,14 +47,15 @@ export default {
   name: 'LightPosition',
   components: { PointerSelect, PositionInput },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
     return {
       BasePosition,
       moment,
-      loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
       form: this.$form.createForm(this),
@@ -104,19 +105,13 @@ export default {
       return true
     },
     save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+      const params = {
+        lightIds: configSerialize(this.selectedRowKeys),
+        lng: formValues.lightPosition[0],
+        lat: formValues.lightPosition[1]
+      }
+
+      return pushSetLatlngByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()

@@ -1,57 +1,59 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="24">
-          <a-form-item label="主路功率（0-100）" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['powerI',
-                            {rules: [
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="24">
+        <a-form-item label="主路功率（0-100）" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['power1',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.powerI}]"
-              :min="0"
-              :max="100"
-              :formatter="value => `${value}%`"
-              :parser="value => value.replace('%', '')"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label="辅路功率（0-100）" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['powerII',
-                            {rules: [
+                           ],
+                           initialValue: formValues.power1}]"
+            :min="0"
+            :max="100"
+            :formatter="value => `${value}%`"
+            :parser="value => value.replace('%', '')"
+          />
+        </a-form-item>
+      </a-col>
+      <a-col :span="24">
+        <a-form-item label="辅路功率（0-100）" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['power2',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.powerII}]"
-              :min="0"
-              :max="100"
-              :formatter="value => `${value}%`"
-              :parser="value => value.replace('%', '')"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-spin>
+                           ],
+                           initialValue: formValues.power2}]"
+            :min="0"
+            :max="100"
+            :formatter="value => `${value}%`"
+            :parser="value => value.replace('%', '')"
+          />
+        </a-form-item>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
+import { pushSetSwitchPowerByBatch } from '@/service/approvedLightManageService'
+import { configSerialize, configDeserialize } from '@/utils/common'
 const formItemLayout = {
   labelCol: { span: 5 },
   wrapperCol: { span: 19 }
 }
 function formValueFormater() {
   return {
-    powerI: 50,
-    powerII: 50
+    power1: 50,
+    power2: 50
   }
 }
 export default {
   name: 'LightControlManualPower',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
@@ -81,19 +83,13 @@ export default {
       return true
     },
     save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+      const params = {
+        lightIds: configSerialize(this.selectedRowKeys),
+        power1: formValues.power1,
+        power2: formValues.power2
+      }
+
+      return pushSetSwitchPowerByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()

@@ -1,25 +1,24 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="频道(11-26)" v-bind="formItemLayout">
-            <a-input
-              v-decorator="['channel',
-                            {rules: [
-                               { required: true, message: '频道不能为空'}
-                             ],
-                             initialValue: formValues.channel}]"
-              palceholder=""
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-spin>
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="频道(11-26)" v-bind="formItemLayout">
+          <a-input
+            v-decorator="['channel',
+                          {rules: [
+                             { required: true, message: '频道不能为空'}
+                           ],
+                           initialValue: formValues.channel}]"
+            palceholder=""
+          />
+        </a-form-item>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
-
+import { pushSetPindaoByBatch } from '@/service/approvedLightManageService'
+import { configSerialize, configDeserialize } from '@/utils/common'
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
@@ -37,12 +36,13 @@ export default {
   name: 'LightChannel',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
     return {
-      loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
       form: this.$form.createForm(this)
@@ -66,20 +66,13 @@ export default {
       await this.save(formValues)
       return true
     },
-    save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+    async save(formValues) {
+      const params = {
+        lightIds: configSerialize(this.selectedRowKeys),
+        pindao: formValues.channel
+      }
+
+      return pushSetPindaoByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()

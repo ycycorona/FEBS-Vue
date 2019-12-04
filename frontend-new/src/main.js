@@ -9,6 +9,7 @@ import request from '@/utils/request'
 import db from 'utils/localstorage'
 import VueApexCharts from 'vue-apexcharts'
 import VueAMap from 'vue-amap'
+import { configSerialize, configDeserialize } from '@/utils/common'
 // mock
 import './mock'
 
@@ -56,6 +57,8 @@ Vue.prototype.$export = request.export
 Vue.prototype.$download = request.download
 Vue.prototype.$upload = request.upload
 
+Vue.prototype.$configSerialize = configSerialize
+Vue.prototype.$configDeserialize = configDeserialize
 /* eslint-disable no-new */
 new Vue({
   router,

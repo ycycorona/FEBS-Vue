@@ -68,7 +68,7 @@
     </a-form>
     <!-- 操作按钮 -->
     <div style="margin-bottom:10px" class="">
-      <a-dropdown>
+      <a-dropdown :disabled="selectedRowKeys.length===0">
         <a-menu slot="overlay" @click="handleCommandClick">
           <a-menu-item key="LightControlType">开关灯模式</a-menu-item>
           <a-menu-item key="LightControlManualPower">手动模式开关灯功率</a-menu-item>
@@ -110,8 +110,8 @@
       @close="handleCommandPopClose"
       @success="handleCommandPopSuccess"
     >
-      <template v-slot:default>
-        <component :is="currentCommandPop"></component>
+      <template v-slot:default="slotProps">
+        <component :is="currentCommandPop" v-bind="slotProps" :selected-row-keys="selectedRowKeys"></component>
       </template>
     </CommonDrawerWrap>
     <a-modal
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-import { configSerialize, isEmptyObject } from '@/utils/common'
+import { configSerialize, isEmptyObject, configDeserialize } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
 import LightControlReadPop from './components/LightControlReadPop'
 import CommonDrawerWrap from './components/CommonDrawerWrap'
@@ -157,7 +157,7 @@ import AlarmThreshold from './components/commandPopContent/AlarmThreshold'
 import InfraredParams from './components/commandPopContent/InfraredParams'
 import { getListOptProcessed as getReadProjectOptProcessed,
   getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
-import { getDetail, del, getList } from '@/service/approvedLightManageService'
+import { getDetail, del, getList, pushSetJiaobiaoByBatch } from '@/service/approvedLightManageService'
 import { getListOptByProjectId_1 as getGroupListOptByProjectId } from '@/service/groupManageService'
 const commandPopMap = {
   'ReadPop': LightControlReadPop,
@@ -389,6 +389,7 @@ export default {
     },
     // 命令执行成功
     handleCommandPopSuccess() {
+      this.resetSelectedRowKeys()
       this.search()
     },
     commitLightJiaoBiao() {
@@ -414,6 +415,12 @@ export default {
     },
     async groupChange() {
       this.search()
+    },
+    resetSelectedRowKeys() {
+      this.selectedRowKeys = []
+    },
+    async doJiaoBiao() {
+      await pushSetJiaobiaoByBatch(configDeserialize(this.selectedRowKeys))
     }
   }
 }

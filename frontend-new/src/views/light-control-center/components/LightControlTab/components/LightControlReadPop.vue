@@ -24,7 +24,9 @@
       ></light-strategy>
     </a-tab-pane>
     <a-tab-pane key="5" tab="报警阈" force-render>
-
+      <alarm-threshold
+        :detail-data="{}"
+      ></alarm-threshold>
     </a-tab-pane>
   </a-tabs>
 
@@ -35,6 +37,7 @@ import InstallParamsForm from '@/views/light-control-center/components/LightMana
 import RealTimeStatus from '@/views/light-control-center/components/LightControlTab/components/LightDetailTab/RealTimeStatus'
 import LightConfig from '@/views/light-control-center/components/LightControlTab/components/LightDetailTab/LightConfig'
 import LightStrategy from '@/views/light-control-center/components/LightControlTab/components/LightDetailTab/LightStrategy'
+import AlarmThreshold from '@/views/light-control-center/components/LightControlTab/components/LightDetailTab/AlarmThreshold'
 import { createArrayFromNum, configSerialize, configDeserialize } from '@/utils/common'
 
 const formItemLayout = {
@@ -51,7 +54,7 @@ const formItemLayout_noLabel = {
 }
 export default {
   name: 'LightControlReadPop',
-  components: { InstallParamsForm, RealTimeStatus, LightConfig, LightStrategy },
+  components: { InstallParamsForm, RealTimeStatus, LightConfig, LightStrategy, AlarmThreshold },
   props: {
     detailData: {
       type: Object

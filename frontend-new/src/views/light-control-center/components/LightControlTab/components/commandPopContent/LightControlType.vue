@@ -57,7 +57,9 @@ export default {
   name: 'LightControlType',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
@@ -92,6 +94,7 @@ export default {
       return true
     },
     save(formValues) {
+      console.log(formValues)
       // const params = []
       // this.loading = true
       // return new Promise((resolve, reject) => {

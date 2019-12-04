@@ -1,56 +1,54 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="电压上限(V)" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['voltageMax',
-                            {rules: [
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="电压上限(V)" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['voltageMax',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.voltageMax}]"
-              :min="85"
-              :max="305"
-            /> <span>(设置范围：85.0-305.0)</span>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="电压下限(V)" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['voltageMax',
-                            {rules: [
+                           ],
+                           initialValue: formValues.voltageMax}]"
+            :min="85"
+            :max="305"
+          /> <span>(设置范围：85.0-305.0)</span>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="电压下限(V)" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['voltageMin',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.voltageMin}]"
-              :min="85"
-              :max="305"
-            /> <span>(设置范围：85.0-305.0)</span>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="电流上限(A)" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['currencyMax',
-                            {rules: [
+                           ],
+                           initialValue: formValues.voltageMin}]"
+            :min="85"
+            :max="305"
+          /> <span>(设置范围：85.0-305.0)</span>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="电流上限(A)" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['currencyMax',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.currencyMax}]"
-              :min="0"
-              :max="16"
-            />(设置范围：0.000-16.000)
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-spin>
+                           ],
+                           initialValue: formValues.currencyMax}]"
+            :min="0"
+            :max="16"
+          />(设置范围：0.000-16.000)
+        </a-form-item>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
-
+import { pushSetThresholdByBatch } from '@/service/approvedLightManageService'
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
@@ -70,12 +68,13 @@ export default {
   name: 'AlarmThreshold',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
     return {
-      loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
       form: this.$form.createForm(this)
@@ -100,19 +99,14 @@ export default {
       return true
     },
     save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+      const params = {
+        lightIds: this.$configSerialize(this.selectedRowKeys),
+        cur_max: formValues.currencyMax,
+        vol_max: formValues.voltageMax,
+        vol_min: formValues.voltageMin
+      }
+
+      return pushSetThresholdByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()

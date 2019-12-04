@@ -1,41 +1,39 @@
 <template>
-  <a-spin :spinning="loading">
-    <a-form :form="form">
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="触发功率(%)" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['power',
-                            {rules: [
+  <a-form :form="form">
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="触发功率(%)" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['trig_power',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.power}]"
-              :min="20"
-              :max="100"
-            /> <span>(设置范围：20-100)</span>
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutter="12">
-        <a-col :span="12">
-          <a-form-item label="触发时间(秒)" v-bind="formItemLayout">
-            <a-input-number
-              v-decorator="['time',
-                            {rules: [
+                           ],
+                           initialValue: formValues.trig_power}]"
+            :min="20"
+            :max="100"
+          /> <span>(设置范围：20-100)</span>
+        </a-form-item>
+      </a-col>
+    </a-row>
+    <a-row :gutter="12">
+      <a-col :span="12">
+        <a-form-item label="触发时间(秒)" v-bind="formItemLayout">
+          <a-input-number
+            v-decorator="['trig_time',
+                          {rules: [
 
-                             ],
-                             initialValue: formValues.time}]"
-              :min="30"
-              :max="255"
-            /> <span>(设置范围：30-255)</span>
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-spin>
+                           ],
+                           initialValue: formValues.trig_time}]"
+            :min="30"
+            :max="255"
+          /> <span>(设置范围：30-255)</span>
+        </a-form-item>
+      </a-col>
+    </a-row>
+  </a-form>
 </template>
 <script>
-
+import { pushSetTriggerByBatch } from '@/service/approvedLightManageService'
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 }
@@ -46,20 +44,21 @@ const formItemLayout_1 = {
 }
 function formValueFormater() {
   return {
-    power: 20,
-    time: 30
+    trig_power: 20,
+    trig_time: 30
   }
 }
 export default {
   name: 'InfraredParams',
   components: { },
   props: {
-
+    selectedRowKeys: {
+      type: Array
+    }
   },
   data() {
     const formValues = formValueFormater()
     return {
-      loading: false,
       formItemLayout, formItemLayout_1,
       formValues,
       form: this.$form.createForm(this)
@@ -84,19 +83,13 @@ export default {
       return true
     },
     save(formValues) {
-      // const params = []
-      // this.loading = true
-      // return new Promise((resolve, reject) => {
-      //   this.$post('/business/black-white-app/addBlackWhiteAppByBatch', {
-      //     jsonString: JSON.stringify(params)
-      //   }).then(r => {
-      //     this.$message.info('新增应用黑名单成功')
-      //     resolve(r.data.data)
-      //   })
-      //     .finally(() => {
-      //       this.loading = false
-      //     })
-      // })
+      const params = {
+        lightIds: this.$configSerialize(this.selectedRowKeys),
+        trig_power: formValues.trig_power,
+        trig_time: formValues.trig_time
+      }
+
+      return pushSetTriggerByBatch(params)
     },
     collectData() {
       return this.form.getFieldsValue()
