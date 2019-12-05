@@ -1,7 +1,10 @@
 <template>
   <!-- :title="() => 'testTableTitle'" -->
   <div>
-    <form-test />
+    <CommonDrawerWrap :visible="true">
+      <div>test</div>
+    </CommonDrawerWrap>
+    <!-- <form-test />
     <a-table
       class="test-table"
       :columns="columns"
@@ -24,13 +27,14 @@
         {{ record.login.uuid }}
       </template>
     </a-table>
-    <LeafFletTest></LeafFletTest>
+    <LeafFletTest></LeafFletTest> -->
   </div>
 </template>
 
 <script>
 import FormTest from './FormTest'
 import LeafFletTest from '@/components/Leaflet'
+import CommonDrawerWrap from '@/views/light-control-center/components/LightControlTab/components/CommonDrawerWrap'
 const columns = [{
   title: 'Name',
   dataIndex: 'name',
@@ -57,7 +61,7 @@ const columns = [{
 
 export default {
   name: 'TableTest',
-  components: { FormTest, LeafFletTest },
+  components: { FormTest, LeafFletTest, CommonDrawerWrap },
   props: {},
   data() {
     const selectedRowKeys = []

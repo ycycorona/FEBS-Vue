@@ -1,5 +1,5 @@
 <template>
-  <div class="full-width table-page-search-wrapper light-control-list-tab">
+  <div class="full-width  table-page-search-wrapper light-control-list-tab">
     <!-- 搜索区域-->
     <a-form layout="inline" :form="filterForm">
       <a-row :gutter="24">
@@ -144,17 +144,17 @@
 <script>
 import { configSerialize, isEmptyObject, configDeserialize } from '@/utils/common'
 import IconEdit from '@/components/icons/IconEdit'
-import LightControlReadPop from './components/LightControlReadPop'
-import CommonDrawerWrap from './components/CommonDrawerWrap'
-import LightControlType from './components/commandPopContent/LightControlType'
-import LightControlManualPower from './components/commandPopContent/LightControlManualPower'
-import LightControlStrategy from './components/commandPopContent/LightControlStrategy'
-import LightTimeSync from './components/commandPopContent/LightTimeSync'
-import LightPosition from './components/commandPopContent/LightPosition'
-import LightPanId from './components/commandPopContent/LightPanId'
-import LightChannel from './components/commandPopContent/LightChannel'
-import AlarmThreshold from './components/commandPopContent/AlarmThreshold'
-import InfraredParams from './components/commandPopContent/InfraredParams'
+import LightControlReadPop from '../LightControlTab/components/LightControlReadPop'
+import CommonDrawerWrap from '../LightControlTab/components/CommonDrawerWrap'
+import LightControlType from '../LightControlTab/components/commandPopContent/LightControlType'
+import LightControlManualPower from '../LightControlTab/components/commandPopContent/LightControlManualPower'
+import LightControlStrategy from '../LightControlTab/components/commandPopContent/LightControlStrategy'
+import LightTimeSync from '../LightControlTab/components/commandPopContent/LightTimeSync'
+import LightPosition from '../LightControlTab/components/commandPopContent/LightPosition'
+import LightPanId from '../LightControlTab/components/commandPopContent/LightPanId'
+import LightChannel from '../LightControlTab/components/commandPopContent/LightChannel'
+import AlarmThreshold from '../LightControlTab/components/commandPopContent/AlarmThreshold'
+import InfraredParams from '../LightControlTab/components/commandPopContent/InfraredParams'
 import { getListOptProcessed as getReadProjectOptProcessed,
   getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
 import { getDetail, del, getList, pushSetJiaobiaoByBatch } from '@/service/approvedLightManageService'
@@ -186,7 +186,7 @@ const commandPopTitleMap = {
 // import { configSerialize } from '@/utils/common'
 import { LightName } from '@/config/LightConstant'
 export default {
-  name: 'LightControlTab',
+  name: 'LightControlByGroupTab',
   components: { IconEdit, CommonDrawerWrap },
   props: {},
   data() {

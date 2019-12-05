@@ -10,9 +10,8 @@
     :visible="visible"
     style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
   >
-    <slot name="default" v-bind="$props"></slot>
+    <slot name="default"></slot>
     <div class="drawer-bootom-button">
-
       <a-popconfirm v-if="!readonly" title="确定放弃编辑？" ok-text="确定" cancel-text="取消" @confirm="onClose">
         <a-button style="margin-right: .8rem">{{ cancelText || '取消' }}</a-button>
       </a-popconfirm>

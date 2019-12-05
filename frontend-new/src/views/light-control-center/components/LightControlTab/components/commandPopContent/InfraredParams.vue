@@ -88,7 +88,6 @@ export default {
         trig_power: formValues.trig_power,
         trig_time: formValues.trig_time
       }
-
       return pushSetTriggerByBatch(params)
     },
     collectData() {

@@ -22,7 +22,7 @@
 import SingleMenuWrap from '@/views/common/SingleMenuWrap'
 import LightManageTab from './components/LightManageTab/LightManageTab'
 import LightControlTab from './components/LightControlTab/LightControlTab'
-// import LightControlByGroupTab from './components/LightControlTab/LightControlByGroupTab'
+import LightControlByGroupTab from './components/LightControlByGroupTab/LightControlByGroupTab'
 import GatewayManageTab from './components/GatewayManageTab/GatewayManageTab'
 
 export default {
