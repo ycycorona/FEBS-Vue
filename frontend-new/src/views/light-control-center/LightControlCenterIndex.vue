@@ -27,7 +27,7 @@ import GatewayManageTab from './components/GatewayManageTab/GatewayManageTab'
 
 export default {
   name: 'LightControlCenterIndex',
-  components: { SingleMenuWrap, LightManageTab, LightControlTab, GatewayManageTab },
+  components: { SingleMenuWrap, LightManageTab, LightControlTab, GatewayManageTab, LightControlByGroupTab },
   props: {
     defaultActiveKey: {
       type: String,

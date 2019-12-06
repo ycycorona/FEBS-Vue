@@ -85,6 +85,16 @@
         </a-menu>
         <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
       </a-dropdown>
+      <a-button style="margin-left: 8px" type="primary" @click="refresh">刷新</a-button>
+      <span class="icon-example">
+        <img :src="imgs.lightGb" height="24px">关闭&nbsp;
+        <img :src="imgs.lightGz" height="24px">故障&nbsp;
+        <img :src="imgs.lightDengdai" height="24px">待读&nbsp;
+        <img :src="imgs.lightKd" height="24px">开灯&nbsp;
+        <img :src="imgs.lightGd" height="24px">关灯&nbsp;
+        <img :src="imgs.gatewayOnline" height="24px">在线&nbsp;
+        <img :src="imgs.gatewayOutline" height="24px">离线&nbsp;
+      </span>
     </div>
     <!-- 表格 -->
     <a-table
@@ -111,7 +121,12 @@
       @success="handleCommandPopSuccess"
     >
       <template v-slot:default="slotProps">
-        <component :is="currentCommandPop" v-bind="slotProps" :selected-row-keys="selectedRowKeys"></component>
+        <component
+          :is="currentCommandPop"
+          v-bind="slotProps"
+          :selected-row-keys="selectedRowKeys"
+          :detail-data="detailData"
+        ></component>
       </template>
     </CommonDrawerWrap>
     <a-modal
@@ -159,6 +174,17 @@ import { getListOptProcessed as getReadProjectOptProcessed,
   getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
 import { getDetail, del, getList, pushSetJiaobiaoByBatch } from '@/service/approvedLightManageService'
 import { getListOptByProjectId_1 as getGroupListOptByProjectId } from '@/service/groupManageService'
+
+import lightGb from '@/assets/imgs/light-management/light-gb.png'
+import lightGz from '@/assets/imgs/light-management/light-gz.png'
+import lightDengdai from '@/assets/imgs/light-management/light-dengdai.png'
+import lightKd from '@/assets/imgs/light-management/light-kd.png'
+import lightGd from '@/assets/imgs/light-management/light-gd.png'
+import gatewayOnline from '@/assets/imgs/light-management/gateway-online.png'
+import gatewayOutline from '@/assets/imgs/light-management/gateway-outline.png'
+const imgs = {
+  lightGb, lightGz, lightDengdai, lightKd, lightGd, gatewayOnline, gatewayOutline
+}
 const commandPopMap = {
   'ReadPop': LightControlReadPop,
   'LightControlType': LightControlType,
@@ -183,7 +209,6 @@ const commandPopTitleMap = {
   'InfraredParams': '红外触发参数设置'
 }
 
-// import { configSerialize } from '@/utils/common'
 import { LightName } from '@/config/LightConstant'
 export default {
   name: 'LightControlTab',
@@ -197,6 +222,7 @@ export default {
       sortType: 1
     }
     return {
+      imgs,
       filterForm: this.$form.createForm(this),
       showSearchForm: false,
       lightJiaoBiaoModalVisible: false,
@@ -268,9 +294,7 @@ export default {
         showSizeChanger: true,
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
-      loading: false,
       dataSource: null,
-      lightControlDetailPopVisible: false,
       lightCommandPopVisible: false,
       isEdit: false,
       popReadonly: false,
@@ -278,8 +302,6 @@ export default {
       selectedRowKeys: [],
       currentCommandPop: null,
       currentCommandTitle: '',
-      currentGroup: '',
-      currentProject: '',
       projectOpt: [],
       projectOptPopUse: [],
       detailData: null,
@@ -327,16 +349,10 @@ export default {
       this.pagination = pagination
       this.selectedRowKeys = []
     },
-    // 打开编辑弹窗
-    // openEditPop(id) {
-    //   this.editId = id
-    //   this.isEdit = true
-    //   this.lightControlDetailPopVisible = true
-    // },
     // 打开只读弹窗
     async openReadonlyPop(id) {
       this.projectOptPopUse = await getReadProjectOptProcessed()
-      // this.detailData = await getDetail(id)
+      this.detailData = await getDetail(id)
       this.editId = id
       this.isEdit = true
       this.popReadonly = true
@@ -421,11 +437,23 @@ export default {
     },
     async doJiaoBiao() {
       await pushSetJiaobiaoByBatch(configDeserialize(this.selectedRowKeys))
+    },
+    refresh() {
+      this.resetSelectedRowKeys()
+      this.search()
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-
+.icon-example {
+    float: right;
+    display: inline-block;
+    height: 32px;
+    line-height: 3.3;
+    img {
+      vertical-align: baseline;
+    }
+}
 </style>

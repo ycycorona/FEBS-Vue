@@ -15,47 +15,16 @@
             />
           </a-form-item>
         </a-col>
-        <a-col :span="8" :xl="6">
-          <a-form-item
-            label="编组"
-          >
-            <a-select
-              v-decorator="['groupId', {
-                rules:[],
-                initialValue: formValues.groupId,
-              }]"
-              :options="groupOpt"
-              @change="groupChange"
-            />
-          </a-form-item>
-        </a-col>
         <a-col :span="4" :xl="3">
-          <a-form-item label="智能灯编号">
+          <a-form-item label="编组名称">
             <a-input
               v-decorator="[
-                'lightId', {
+                'groupName', {
                   rules:[],
-                  initialValue: formValues.lightId,
+                  initialValue: formValues.groupName,
                 }
               ]"
             />
-          </a-form-item>
-        </a-col>
-        <a-col :span="10" :xl="3">
-          <a-form-item
-            label="排序"
-          >
-            <a-select
-              v-decorator="['sortType', {
-                rules:[],
-                initialValue: formValues.sortType,
-              }]"
-            >
-              <a-select-option :value="1">按排序等级</a-select-option>
-              <a-select-option :value="2">按表格导入排序</a-select-option>
-              <a-select-option :value="3">按智能灯编号排序</a-select-option>
-              <a-select-option :value="4">按智能灯编号逆序</a-select-option>
-            </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="4" :xl="3">
@@ -80,11 +49,12 @@
           <a-menu-item key="LightChannel">频道修改</a-menu-item>
           <a-menu-item key="AlarmThreshold">报警阈修改</a-menu-item>
           <a-menu-item key="InfraredParams">红外触发参数设置</a-menu-item>
-          <a-menu-item key="delete">删除{{ Cons.LightName }}</a-menu-item>
-          <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item>
+          <!-- <a-menu-item key="delete">删除{{ Cons.LightName }}</a-menu-item>
+          <a-menu-item key="ForceDelete">强制删除(控制器无反馈时使用)</a-menu-item> -->
         </a-menu>
         <a-button style="margin-left: 8px" type="primary" :disabled="selectedRowKeys.length===0"> 操作 <a-icon type="down" /> </a-button>
       </a-dropdown>
+      <a-button style="margin-left: 8px" type="primary" @click="refresh">刷新</a-button>
     </div>
     <!-- 表格 -->
     <a-table
@@ -93,13 +63,12 @@
       :row-key="record => record.id"
       :columns="columns"
       :scroll="{x: 1200}"
-      :data-source="testList"
+      :data-source="dataSource"
       :pagination="pagination"
       @change="handleTableChange"
     >
       <template slot="operation" slot-scope="record">
-        <span class="operation-btn" @click="openReadonlyPop(record.id)"><a-icon type="eye" class="eye-icon" />查看</span>
-        <span class="operation-btn" @click="openEditPop(record.id)"><icon-edit title="编辑" />编辑</span>
+
       </template>
     </a-table>
     <CommonDrawerWrap
@@ -121,14 +90,6 @@
       @cancel="lightJiaoBiaoModalVisible=false"
     >
       <p>确定要执行校表功能(将每一个智能灯的校表码写入对应的控制器)?</p>
-    </a-modal>
-    <a-modal
-      title="删除"
-      :visible="deleteModalVisible"
-      @ok="doDelItems"
-      @cancel="deleteModalVisible=false"
-    >
-      <p>确定要删除所选智能灯?</p>
     </a-modal>
     <a-modal
       title="强制删除"
@@ -157,8 +118,9 @@ import AlarmThreshold from '../LightControlTab/components/commandPopContent/Alar
 import InfraredParams from '../LightControlTab/components/commandPopContent/InfraredParams'
 import { getListOptProcessed as getReadProjectOptProcessed,
   getWriteListOptProcessed as getWriteProjectOptProcessed } from '@/service/projectManageService'
-import { getDetail, del, getList, pushSetJiaobiaoByBatch } from '@/service/approvedLightManageService'
-import { getListOptByProjectId_1 as getGroupListOptByProjectId } from '@/service/groupManageService'
+
+import { pushSetJiaobiaoByBatch } from '@/service/approvedLightManageService'
+import { getListOptByProjectId_1 as getGroupListOptByProjectId, getList } from '@/service/groupManageService'
 const commandPopMap = {
   'ReadPop': LightControlReadPop,
   'LightControlType': LightControlType,
@@ -207,57 +169,25 @@ export default {
       },
       columns: [
         {
-          title: '智能灯编号',
-          dataIndex: 'lightId'
+          title: '编组名称',
+          dataIndex: 'groupName'
         },
         {
-          title: 'I路状态',
-          dataIndex: 'statusI'
+          title: '编组地址',
+          dataIndex: 'address'
         },
         {
-          title: 'II路状态',
-          dataIndex: 'statusII'
+          title: '所属网关',
+          dataIndex: 'gatewayName'
         },
         {
-          title: '网关状态',
-          dataIndex: 'gatewayStatus'
-        },
-        {
-          title: 'I路调光',
-          dataIndex: 'brightnessI'
-        },
-        {
-          title: 'II路调光',
-          dataIndex: 'brightnessII'
-        },
-        {
-          title: '电压/V',
-          dataIndex: 'voltage'
-        },
-        {
-          title: '电流/A',
-          dataIndex: 'eCurrent'
-        },
-        {
-          title: '频率',
-          dataIndex: 'frequency'
-        },
-        {
-          title: '功率因数',
-          dataIndex: 'powerFactor'
-        },
-        {
-          title: '日能耗/kWh',
-          dataIndex: 'dailyConsumption'
-        },
-        {
-          title: '更新时间',
-          dataIndex: 'updateTime'
-        },
-        {
-          title: '操作',
-          scopedSlots: { customRender: 'operation' }
+          title: '备注',
+          dataIndex: 'descr'
         }
+        // {
+        //   title: '操作',
+        //   scopedSlots: { customRender: 'operation' }
+        // }
       ],
       pagination: {
         total: 0,
@@ -268,9 +198,7 @@ export default {
         showSizeChanger: true,
         showTotal: (total, range) => `显示 ${range[0]} ~ ${range[1]} 条记录，共 ${total} 条记录`
       },
-      loading: false,
       dataSource: null,
-      lightControlDetailPopVisible: false,
       lightCommandPopVisible: false,
       isEdit: false,
       popReadonly: false,
@@ -278,8 +206,6 @@ export default {
       selectedRowKeys: [],
       currentCommandPop: null,
       currentCommandTitle: '',
-      currentGroup: '',
-      currentProject: '',
       projectOpt: [],
       projectOptPopUse: [],
       detailData: null,
@@ -327,23 +253,6 @@ export default {
       this.pagination = pagination
       this.selectedRowKeys = []
     },
-    // 打开编辑弹窗
-    // openEditPop(id) {
-    //   this.editId = id
-    //   this.isEdit = true
-    //   this.lightControlDetailPopVisible = true
-    // },
-    // 打开只读弹窗
-    async openReadonlyPop(id) {
-      this.projectOptPopUse = await getReadProjectOptProcessed()
-      // this.detailData = await getDetail(id)
-      this.editId = id
-      this.isEdit = true
-      this.popReadonly = true
-      this.currentCommandPop = commandPopMap['ReadPop']
-      this.currentCommandTitle = '查看智能灯'
-      this.lightCommandPopVisible = true
-    },
     // 编辑弹窗关闭
     handleEditPopClose() {
 
@@ -353,14 +262,14 @@ export default {
       this.search()
     },
     // 删除
-    async doDelItems() {
-      await del(configSerialize(this.selectedRowKeys))
-        .finally(() => {
-          this.deleteModalVisible = false
-        })
-      this.$message.info('删除成功')
-      this.search()
-    },
+    // async doDelItems() {
+    //   await del(configSerialize(this.selectedRowKeys))
+    //     .finally(() => {
+    //       this.deleteModalVisible = false
+    //     })
+    //   this.$message.info('删除成功')
+    //   this.search()
+    // },
     onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -401,15 +310,8 @@ export default {
       this.forceDeleteModalViIsible = false
     },
     async projectChange(projectId) {
-      const groupOptRaw = await getGroupListOptByProjectId(projectId)
-      this.groupOpt = groupOptRaw.map(item => {
-        return {
-          value: item.id,
-          label: item.groupName
-        }
-      })
       this.filterForm.setFieldsValue({
-        'groupId': this.groupOpt.length === 0 ? '' : this.groupOpt[0].value
+        'groupName': ''
       })
       this.search()
     },
@@ -421,6 +323,10 @@ export default {
     },
     async doJiaoBiao() {
       await pushSetJiaobiaoByBatch(configDeserialize(this.selectedRowKeys))
+    },
+    refresh() {
+      this.resetSelectedRowKeys()
+      this.search()
     }
   }
 }
